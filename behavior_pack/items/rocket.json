@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:rocket",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_rocket"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.rocket.name"
+      },
+      "minecraft:max_stack_size": 16
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:pistol_ammo",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_pistol_ammo"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.pistol_ammo.name"
+      },
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

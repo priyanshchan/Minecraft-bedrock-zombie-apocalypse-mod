@@ -1,0 +1,26 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:tank_kit",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_tank_kit"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.tank_kit.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "rare",
+      "minecraft:entity_placer": {
+        "entity": "frontline:tank"
+      }
+    }
+  }
+}

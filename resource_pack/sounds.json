@@ -1,0 +1,134 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "frontline:nato_rifleman": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "hurt": "game.player.hurt",
+          "death": "game.player.die",
+          "step": {
+            "sound": "step.gravel",
+            "volume": 0.2,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:nato_marksman": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "hurt": "game.player.hurt",
+          "death": "game.player.die",
+          "step": {
+            "sound": "step.gravel",
+            "volume": 0.2,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:nato_heavy": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "hurt": "game.player.hurt",
+          "death": "game.player.die",
+          "step": {
+            "sound": "step.gravel",
+            "volume": 0.2,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:redfang_fighter": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "hurt": "game.player.hurt",
+          "death": "game.player.die",
+          "step": {
+            "sound": "step.gravel",
+            "volume": 0.2,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:redfang_sniper": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "hurt": "game.player.hurt",
+          "death": "game.player.die",
+          "step": {
+            "sound": "step.gravel",
+            "volume": 0.2,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:redfang_rpg": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "hurt": "game.player.hurt",
+          "death": "game.player.die",
+          "step": {
+            "sound": "step.gravel",
+            "volume": 0.2,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:jeep": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.0
+        ],
+        "events": {
+          "hurt": "random.anvil_land",
+          "death": "random.explode",
+          "step": {
+            "sound": "frontline.engine",
+            "volume": 0.5,
+            "pitch": 1.0
+          }
+        }
+      },
+      "frontline:tank": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.0
+        ],
+        "events": {
+          "hurt": "random.anvil_land",
+          "death": "random.explode",
+          "step": {
+            "sound": "frontline.engine",
+            "volume": 0.5,
+            "pitch": 1.0
+          }
+        }
+      }
+    }
+  }
+}

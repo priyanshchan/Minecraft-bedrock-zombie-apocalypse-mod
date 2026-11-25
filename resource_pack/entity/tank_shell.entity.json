@@ -1,0 +1,22 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:tank_shell",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/models/projectiles/tank_shell"
+      },
+      "geometry": {
+        "default": "geometry.frontline.projectile_tank_shell"
+      },
+      "animations": {},
+      "scripts": {},
+      "render_controllers": [
+        "controller.render.frontline.single"
+      ]
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "resource_pack_name": "frontline",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "frontline_ammo_box": {
+      "textures": "textures/items/frontline/ammo_box"
+    },
+    "frontline_assault_rifle": {
+      "textures": "textures/items/frontline/assault_rifle"
+    },
+    "frontline_binoculars": {
+      "textures": "textures/items/frontline/binoculars"
+    },
+    "frontline_combat_knife": {
+      "textures": "textures/items/frontline/combat_knife"
+    },
+    "frontline_field_radio": {
+      "textures": "textures/items/frontline/field_radio"
+    },
+    "frontline_field_ration": {
+      "textures": "textures/items/frontline/field_ration"
+    },
+    "frontline_frag_grenade": {
+      "textures": "textures/items/frontline/frag_grenade"
+    },
+    "frontline_jeep_kit": {
+      "textures": "textures/items/frontline/jeep_kit"
+    },
+    "frontline_lmg": {
+      "textures": "textures/items/frontline/lmg"
+    },
+    "frontline_medkit": {
+      "textures": "textures/items/frontline/medkit"
+    },
+    "frontline_pistol_ammo": {
+      "textures": "textures/items/frontline/pistol_ammo"
+    },
+    "frontline_repair_tool": {
+      "textures": "textures/items/frontline/repair_tool"
+    },
+    "frontline_rifle_ammo": {
+      "textures": "textures/items/frontline/rifle_ammo"
+    },
+    "frontline_rocket": {
+      "textures": "textures/items/frontline/rocket"
+    },
+    "frontline_rocket_launcher": {
+      "textures": "textures/items/frontline/rocket_launcher"
+    },
+    "frontline_service_pistol": {
+      "textures": "textures/items/frontline/service_pistol"
+    },
+    "frontline_shotgun": {
+      "textures": "textures/items/frontline/shotgun"
+    },
+    "frontline_shotgun_shells": {
+      "textures": "textures/items/frontline/shotgun_shells"
+    },
+    "frontline_smg": {
+      "textures": "textures/items/frontline/smg"
+    },
+    "frontline_smoke_grenade": {
+      "textures": "textures/items/frontline/smoke_grenade"
+    },
+    "frontline_sniper_rifle": {
+      "textures": "textures/items/frontline/sniper_rifle"
+    },
+    "frontline_sniper_rounds": {
+      "textures": "textures/items/frontline/sniper_rounds"
+    },
+    "frontline_tank_kit": {
+      "textures": "textures/items/frontline/tank_kit"
+    }
+  }
+}

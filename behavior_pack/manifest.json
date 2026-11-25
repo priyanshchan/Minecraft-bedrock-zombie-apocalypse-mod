@@ -1,0 +1,64 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Frontline: NATO vs Red Fang [BP]",
+    "description": "Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, pick a class, drive jeeps and tanks and fight beside AI soldiers. \u00a77v1.0.0",
+    "uuid": "42f759db-d178-41e6-9c35-e3f792dd35be",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      90
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "5110ae2f-1259-46e1-94e0-a82dbfa4d2f3",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "bc78a123-5b8d-47a6-90d3-aa94a874d5de",
+      "entry": "scripts/main.js",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "318b6965-393b-4691-ab71-abf4a284c06d",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.0.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.0.0"
+    }
+  ],
+  "metadata": {
+    "authors": [
+      "Frontline add-on contributors"
+    ],
+    "license": "MIT"
+  }
+}

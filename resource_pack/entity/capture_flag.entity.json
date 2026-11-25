@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:capture_flag",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "flag_neutral": "textures/models/flags/flag_neutral",
+        "flag_nato": "textures/models/flags/flag_nato",
+        "flag_redfang": "textures/models/flags/flag_redfang"
+      },
+      "geometry": {
+        "default": "geometry.frontline.capture_flag"
+      },
+      "animations": {
+        "wave": "animation.frontline.flag.wave",
+        "raise": "animation.frontline.flag.raise"
+      },
+      "scripts": {
+        "animate": [
+          "wave",
+          "raise"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.capture_flag"
+      ]
+    }
+  }
+}

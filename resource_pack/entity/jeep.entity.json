@@ -1,0 +1,33 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:jeep",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "nato": "textures/models/vehicles/jeep_nato",
+        "redfang": "textures/models/vehicles/jeep_redfang"
+      },
+      "geometry": {
+        "default": "geometry.frontline.vehicle_jeep"
+      },
+      "animations": {
+        "wheels": "animation.frontline.jeep.wheels"
+      },
+      "scripts": {
+        "animate": [
+          "wheels"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.jeep"
+      ],
+      "spawn_egg": {
+        "base_color": "#5a6a3a",
+        "overlay_color": "#2c2f34"
+      }
+    }
+  }
+}

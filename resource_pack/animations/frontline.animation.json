@@ -1,0 +1,448 @@
+{
+  "format_version": "1.10.0",
+  "animations": {
+    "animation.frontline.hold.rifle.third_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            -2.86,
+            -0.0,
+            -172.0
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.rifle.first_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            15.27,
+            -56.18,
+            123.37
+          ],
+          "position": [
+            -1.44,
+            6.36,
+            -2.46
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.pistol.third_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            -2.86,
+            -0.0,
+            -176.0
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.pistol.first_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            14.6,
+            -56.23,
+            123.83
+          ],
+          "position": [
+            -1.96,
+            6.6,
+            -3.11
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.launcher.third_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            -2.86,
+            -0.0,
+            -172.0
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.launcher.first_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            15.02,
+            -56.11,
+            122.77
+          ],
+          "position": [
+            -2.19,
+            4.91,
+            -2.77
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.blade.third_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            100.81,
+            -0.0,
+            -180.0
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.blade.first_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            54.92,
+            -51.75,
+            99.98
+          ],
+          "position": [
+            -0.43,
+            6.03,
+            -3.4
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.gear.third_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            100.81,
+            -0.0,
+            -180.0
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.gear.first_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            54.92,
+            -51.75,
+            99.98
+          ],
+          "position": [
+            -0.43,
+            6.03,
+            -3.4
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.grenade.third_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            100.81,
+            -0.0,
+            -180.0
+          ],
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.hold.grenade.first_person": {
+      "loop": true,
+      "bones": {
+        "item": {
+          "rotation": [
+            54.92,
+            -51.75,
+            99.98
+          ],
+          "position": [
+            -0.43,
+            6.03,
+            -3.4
+          ],
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.player.aim_rifle": {
+      "loop": true,
+      "bones": {
+        "rightArm": {
+          "rotation": [
+            "(-72.0 + q.target_x_rotation) * (1.0 - v.is_first_person)",
+            "(-8.0) * (1.0 - v.is_first_person)",
+            "(0.0) * (1.0 - v.is_first_person)"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "(-86.0 + q.target_x_rotation) * (1.0 - v.is_first_person)",
+            "(38.0) * (1.0 - v.is_first_person)",
+            "(0.0) * (1.0 - v.is_first_person)"
+          ]
+        }
+      }
+    },
+    "animation.frontline.player.aim_pistol": {
+      "loop": true,
+      "bones": {
+        "rightArm": {
+          "rotation": [
+            "(-72.0 + q.target_x_rotation) * (1.0 - v.is_first_person)",
+            "(-4.0) * (1.0 - v.is_first_person)",
+            "(0.0) * (1.0 - v.is_first_person)"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "(-80.0 + q.target_x_rotation) * (1.0 - v.is_first_person)",
+            "(42.0) * (1.0 - v.is_first_person)",
+            "(0.0) * (1.0 - v.is_first_person)"
+          ]
+        }
+      }
+    },
+    "animation.frontline.player.aim_launcher": {
+      "loop": true,
+      "bones": {
+        "rightArm": {
+          "rotation": [
+            "(-72.0 + q.target_x_rotation) * (1.0 - v.is_first_person)",
+            "(-8.0) * (1.0 - v.is_first_person)",
+            "(0.0) * (1.0 - v.is_first_person)"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "(-86.0 + q.target_x_rotation) * (1.0 - v.is_first_person)",
+            "(34.0) * (1.0 - v.is_first_person)",
+            "(0.0) * (1.0 - v.is_first_person)"
+          ]
+        }
+      }
+    },
+    "animation.frontline.soldier.look": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "query.target_x_rotation",
+            "query.target_y_rotation",
+            0.0
+          ]
+        }
+      }
+    },
+    "animation.frontline.soldier.walk": {
+      "loop": true,
+      "bones": {
+        "rightLeg": {
+          "rotation": [
+            "math.cos(query.modified_distance_moved * 38.17) * 45.0 * math.clamp(query.modified_move_speed, 0.0, 1.0)",
+            0.0,
+            0.0
+          ]
+        },
+        "leftLeg": {
+          "rotation": [
+            "math.cos(query.modified_distance_moved * 38.17 + 180.0) * 45.0 * math.clamp(query.modified_move_speed, 0.0, 1.0)",
+            0.0,
+            0.0
+          ]
+        },
+        "body": {
+          "rotation": [
+            "4.0 * math.clamp(query.modified_move_speed, 0.0, 1.0)",
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "animation.frontline.soldier.aim": {
+      "loop": true,
+      "bones": {
+        "rightArm": {
+          "rotation": [
+            "-90.0 + query.target_x_rotation",
+            -8.0,
+            0.0
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "-86.0 + query.target_x_rotation",
+            38.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "animation.frontline.soldier.gun": {
+      "loop": true,
+      "bones": {
+        "gun": {
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.projectile.small": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "scale": 0.34
+        }
+      }
+    },
+    "animation.frontline.jeep.wheels": {
+      "loop": true,
+      "bones": {
+        "wheel_rl": {
+          "rotation": [
+            "query.modified_distance_moved * 150.0",
+            0,
+            0
+          ]
+        },
+        "wheel_rr": {
+          "rotation": [
+            "query.modified_distance_moved * 150.0",
+            0,
+            0
+          ]
+        },
+        "wheel_fl": {
+          "rotation": [
+            "query.modified_distance_moved * 150.0",
+            "math.clamp(query.target_y_rotation, -30, 30) * 0.5",
+            0
+          ]
+        },
+        "wheel_fr": {
+          "rotation": [
+            "query.modified_distance_moved * 150.0",
+            "math.clamp(query.target_y_rotation, -30, 30) * 0.5",
+            0
+          ]
+        }
+      }
+    },
+    "animation.frontline.tank.turret": {
+      "loop": true,
+      "bones": {
+        "turret": {
+          "rotation": [
+            0,
+            "query.property('frontline:turret')",
+            0
+          ]
+        },
+        "barrel": {
+          "rotation": [
+            "query.property('frontline:pitch')",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.frontline.flag.wave": {
+      "loop": true,
+      "bones": {
+        "cloth0": {
+          "rotation": [
+            0,
+            "math.sin(query.life_time * 220.0 - 0) * 6",
+            0
+          ]
+        },
+        "cloth1": {
+          "rotation": [
+            0,
+            "math.sin(query.life_time * 220.0 - 70) * 11",
+            0
+          ]
+        },
+        "cloth2": {
+          "rotation": [
+            0,
+            "math.sin(query.life_time * 220.0 - 140) * 16",
+            0
+          ]
+        },
+        "cloth3": {
+          "rotation": [
+            0,
+            "math.sin(query.life_time * 220.0 - 210) * 21",
+            0
+          ]
+        }
+      }
+    },
+    "animation.frontline.flag.raise": {
+      "loop": true,
+      "bones": {
+        "cloth": {
+          "position": [
+            0,
+            "(query.property('frontline:raise') - 1.0) * 22.0",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

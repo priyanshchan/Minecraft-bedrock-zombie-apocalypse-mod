@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.80",
+  "minecraft:block": {
+    "description": {
+      "identifier": "frontline:sandbags",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "frontline_sandbags",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#b8a77a",
+      "minecraft:geometry": "geometry.frontline.block_sandbags",
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1.2
+      },
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 8
+      }
+    }
+  }
+}

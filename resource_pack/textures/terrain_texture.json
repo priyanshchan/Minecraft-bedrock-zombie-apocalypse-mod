@@ -1,0 +1,29 @@
+{
+  "resource_pack_name": "frontline",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "frontline_ammo_crate": {
+      "textures": "textures/blocks/frontline/ammo_crate"
+    },
+    "frontline_barbed_wire": {
+      "textures": "textures/blocks/frontline/barbed_wire"
+    },
+    "frontline_flag_nato": {
+      "textures": "textures/blocks/frontline/flag_nato"
+    },
+    "frontline_flag_neutral": {
+      "textures": "textures/blocks/frontline/flag_neutral"
+    },
+    "frontline_flag_redfang": {
+      "textures": "textures/blocks/frontline/flag_redfang"
+    },
+    "frontline_sandbags": {
+      "textures": "textures/blocks/frontline/sandbags"
+    },
+    "frontline_spawn_beacon": {
+      "textures": "textures/blocks/frontline/spawn_beacon"
+    }
+  }
+}

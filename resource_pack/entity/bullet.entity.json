@@ -1,0 +1,22 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:bullet",
+      "materials": {
+        "default": "entity_emissive_alpha"
+      },
+      "textures": {
+        "default": "textures/models/projectiles/bullet"
+      },
+      "geometry": {
+        "default": "geometry.frontline.projectile_bullet"
+      },
+      "animations": {},
+      "scripts": {},
+      "render_controllers": [
+        "controller.render.frontline.single"
+      ]
+    }
+  }
+}

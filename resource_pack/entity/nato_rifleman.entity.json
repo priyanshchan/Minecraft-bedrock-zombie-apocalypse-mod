@@ -1,0 +1,42 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:nato_rifleman",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "skin_0": "textures/models/soldiers/nato_woodland",
+        "skin_1": "textures/models/soldiers/nato_woodland_b",
+        "skin_2": "textures/models/soldiers/nato_desert"
+      },
+      "geometry": {
+        "skin_0": "geometry.frontline.soldier_nato_woodland",
+        "skin_1": "geometry.frontline.soldier_nato_woodland_b",
+        "skin_2": "geometry.frontline.soldier_nato_desert"
+      },
+      "animations": {
+        "look": "animation.frontline.soldier.look",
+        "walk": "animation.frontline.soldier.walk",
+        "aim": "animation.frontline.soldier.aim",
+        "gun": "animation.frontline.soldier.gun"
+      },
+      "scripts": {
+        "animate": [
+          "look",
+          "walk",
+          "aim",
+          "gun"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.nato_rifleman"
+      ],
+      "spawn_egg": {
+        "base_color": "#4f5d34",
+        "overlay_color": "#3f7fd0"
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:nato_marksman",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "skin_0": "textures/models/soldiers/nato_marksman"
+      },
+      "geometry": {
+        "skin_0": "geometry.frontline.soldier_nato_marksman"
+      },
+      "animations": {
+        "look": "animation.frontline.soldier.look",
+        "walk": "animation.frontline.soldier.walk",
+        "aim": "animation.frontline.soldier.aim",
+        "gun": "animation.frontline.soldier.gun"
+      },
+      "scripts": {
+        "animate": [
+          "look",
+          "walk",
+          "aim",
+          "gun"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.nato_marksman"
+      ],
+      "spawn_egg": {
+        "base_color": "#5f6e3c",
+        "overlay_color": "#9ccff0"
+      }
+    }
+  }
+}

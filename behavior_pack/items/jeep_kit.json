@@ -1,0 +1,26 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:jeep_kit",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_jeep_kit"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.jeep_kit.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "rare",
+      "minecraft:entity_placer": {
+        "entity": "frontline:jeep"
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:repair_tool",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_repair_tool"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.repair_tool.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "uncommon",
+      "minecraft:can_destroy_in_creative": false
+    }
+  }
+}

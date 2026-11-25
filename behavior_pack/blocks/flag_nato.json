@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.80",
+  "minecraft:block": {
+    "description": {
+      "identifier": "frontline:flag_nato",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "frontline_flag_nato",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#3f7fd0",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:destructible_by_mining": false,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:light_emission": 10,
+      "minecraft:loot": "loot_tables/empty.json"
+    }
+  }
+}

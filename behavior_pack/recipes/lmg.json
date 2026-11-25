@@ -1,0 +1,37 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:lmg"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IIII",
+      "BPI ",
+      "B C "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "P": {
+        "item": "minecraft:blackstone"
+      },
+      "C": {
+        "item": "minecraft:copper_ingot"
+      },
+      "B": {
+        "item": "minecraft:iron_block"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:lmg",
+      "count": 1
+    }
+  }
+}

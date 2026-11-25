@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:smoke_grenade",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/models/projectiles/smoke_grenade"
+      },
+      "geometry": {
+        "default": "geometry.frontline.projectile_smoke_grenade"
+      },
+      "animations": {
+        "scale": "animation.frontline.projectile.small"
+      },
+      "scripts": {
+        "animate": [
+          "scale"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.single"
+      ]
+    }
+  }
+}
