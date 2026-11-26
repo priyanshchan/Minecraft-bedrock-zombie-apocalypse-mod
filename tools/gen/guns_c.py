@@ -60,6 +60,11 @@ def pipe(g, f0, f1, cu, cs, r, t, color, n=16, inner=DARK, noise=2, bone=None, k
     return out
 
 
+def _ang(c):
+    """The angle of a pipe or cone segment about its axis (0 for the plain rods of a LOW build)."""
+    return getattr(c, "ang", 0.0)
+
+
 def cone(g, f0, f1, cu, cs, r0, r1, t, color, n=16, inner=DARK, noise=2, bone=None):
     """A hollow cone along f, outer radius r0 at f0 and r1 at f1: n tilted wall segments turned about the axis.
     At LOW detail, two stepped rods."""
@@ -565,148 +570,265 @@ def awm():
 # =========================================================================== launchers
 
 def carl_gustaf():
-    """Carl Gustaf M4 84mm recoilless rifle: a banded smooth tube open at both ends, the hinged venturi with its
-    locking lever, shoulder rest, cheek pad, carry handle, trigger group with safety, fore grip, side sight."""
+    """Carl Gustaf M4 84mm recoilless rifle: the carbon-wrapped tube with its breech ring, rubber muzzle bumper and
+    rifled bore, the venturi (throat and flared nozzle) hinged on the left with its locking handle on the right,
+    the shot counter, trigger mechanism with pistol grip, safety and cocking lever, the firing rod back to the
+    breech, the adjustable front grip, shoulder rest and cheek pad, carry handle, top accessory rail, the 3x sight
+    on its bracket on the left, and an HEAT round loaded in the tube."""
     g = gun("carl_gustaf", "launcher", "launcher_rear")
     U = 22
-    TUBE = CARBON
-    pipe(g, -40, 50, U, 0, 9, 2, TUBE, n=16)
+    R = 7.5  # the tube's outer radius
+    TUBE = "#3b4037"     # carbon fibre over the liner
+    FIT = "#26282b"      # black fittings
+    # ---- the tube: sixteen staves of carbon, a weave on each, a stencilled line on the left
+    for c in pipe(g, -40, 46, U, 0, R, 1.5, TUBE, n=16):
+        if hi():
+            weave(c, ("up",), 1.03, 0.97)
+            if _ang(c) in (247.5, 270.0):
+                dashes(c.front, 0, c.front.w, 30, 44, shade(WHITE, 0.7), seed=int(_ang(c)))
+    # bands where the carry handle, the grips and the rail clamp on
+    for f0, f1 in ((-7, -3), (12, 21)):
+        for c in pipe(g, f0, f1, U, 0, R + 0.5, 1, FIT, n=16):
+            ribbed(c, ("up",), 3, shade(FIT, 0.7), start=0)
+    # the muzzle: a thick black bumper with a rubber lip; the bore's rifling shows inside
+    for c in pipe(g, 42, 50, U, 0, R + 0.9, 2.5, FIT, n=16):
+        for y in range(0, c.back.h, 2):
+            c.back.px(c.back.w // 2, y, shade(DARK, 1.6))  # the lands of the rifling, twisting into the bore
+    pipe(g, 50, 51.5, U, 0, R + 0.6, 2, RUBBER, n=16)
+    # the breech ring the venturi closes against, its hinge on the left and the latch on the right
+    pipe(g, -40, -35, U, 0, R + 0.9, 2.5, STEEL, n=16)
+    for u0, u1 in ((15.5, 20), (24, 28.5)):
+        g.box(-40, -35, u0, u1, R - 0.5, 10, STEEL, 1)  # frame knuckle arms
+        vcyl(g, -40, 9, u0, u1, 1.4, STEEL)
     if hi():
-        for f0 in (-22, 14, 38):  # reinforcing bands
-            pipe(g, f0, f0 + 2, U, 0, 9.4, 1, shade(TUBE, 1.3), n=16)
-    pipe(g, 46, 52, U, 0, 10, 2, BLACK, n=16)  # muzzle ring
-    pipe(g, -42, -38, U, 0, 9.8, 2, STEEL, n=16)  # breech collar
-    # ---- grips, trigger group
-    g.pistol_grip(-12, -6, 13, 14, 6, POLY, angle=8)
-    g.trigger(-12, 13)
-    g.bevel(-16, 4, 9, 14, -3, 3, BLACK, 1)  # firing mechanism housing under the tube
+        vcyl(g, -40, 9, 15, 29, 0.6, SILVER)  # the hinge pin
+        g.box(-38, -35, 20, 24, -10.5, -8, STEEL, 1)  # the latch's keeper on the right
+        # the electronic shot counter on the ring's upper left
+        sc = g.box(-38.5, -35.5, 27, 30, 4, 7.5, FIT, 1, roll=-40, pivot=(-37, U, 0))
+        mark(sc, "up", -38, -36, 0, 0, "#7a8a6a", 5, 7)
+    # ---- trigger mechanism, pistol grip, safety, cocking lever, firing rod
+    g.bevel(-16, 4, 11, 15.5, -3, 3, FIT, 1)
+    g.pistol_grip(-13, -6, 12, 14, 6, POLY, angle=10)
+    g.box(-6, 5, 4, 5.5, -1.5, 1.5, FIT, 1)  # trigger guard
+    g.box(3.5, 5, 4, 11.5, -1.5, 1.5, FIT, 1)
+    g.box(-2.5, -1, 7.5, 11.5, -0.5, 0.5, SILVER, 1)  # trigger, curved
+    g.box(-2.5, -1, 6, 8, -0.5, 0.5, SILVER, 1, tilt=-30, pivot=(-1.75, 8))
     if hi():
-        g.box(-9, -5, 11, 13, 2.5, 4.5, STEEL, 1, tilt=-12)  # safety lever on the left
-        g.box(-4, 0, 10, 12, 2.5, 3.5, DARK, 1)
-        g.pin(-1, 11, 3, "left")
-    g.bevel(8, 14, 0, 11, -2.5, 2.5, POLY, 1)  # fore grip
-    g.box(7, 15, 8, 12, -3, 3, BLACK)  # its clamp
-    g.box(7.5, 14.5, -1.5, 0, -3, 3, RUBBER, 1)  # grip base
-    # ---- shoulder rest and cheek pad
-    pc = g.bevel(-34, -14, 8, 13, -5, 5, RUBBER, 1.5)
-    g.box(-26, -22, 12, 15, -1.5, 1.5, BLACK, 1)  # rest bracket
-    g.box(-18, -16, 11, 14, -1.5, 1.5, BLACK, 1)
+        g.box(-12, -8, 12.5, 14, 3, 4, STEEL, 1)  # the safety on the left
+        g.box(-12, -10.5, 11, 13, 3, 4, STEEL, 1, tilt=-20, pivot=(-11, 13))
+        stud(g, -8, 13.25, 3, "left")
+        mark(g.box(-7, -4, 12, 14.5, 3, 3.3, FIT, 0), "left", -7, -6, 12.5, 13.5, RED)  # S / F
+        g.box(0, 4, 11.5, 13.5, -4, -3, STEEL, 1)  # the cocking lever on the right
+        g.box(3, 5, 10.5, 14, -4.5, -3, STEEL, 1)
+        stud(g, -13, 13, -3, "right")
+        stud(g, 1, 13, 3, "left")
+        g.rod(-38, -16, 15.8, -6.2, 0.55, SILVER)  # the firing rod back to the breech
+        g.box(-18, -15, 14.5, 16.5, -6.8, -5.5, STEEL, 1)  # its guides
+        g.box(-36, -34, 15, 17, -7.2, -5.5, STEEL, 1)
+    # ---- front grip, under the front band
+    g.box(13, 21, 12.5, 15, -3, 3, FIT, 2)
+    g.pistol_grip(14, 20, 13, 13, 5, POLY, angle=-6)
     if hi():
-        for c in pc[:2]:
-            ribs(c, ("right", "left"), 3, shade(RUBBER, 1.5))
-    g.bevel(-34, -16, 31, 34, -3.5, 3.5, RUBBER, 1)  # cheek pad
-    g.box(-30, -20, 30, 31, -2, 2, BLACK, 1)
-    # ---- carry handle
-    g.box(-6, -3, 30, 32, -1.5, 1.5, BLACK)
-    g.box(11, 14, 30, 32, -1.5, 1.5, BLACK)
-    hb = g.bevel(-6, 14, 32, 35, -2, 2, BLACK, 1)
+        scyl(g, 17, 13.5, 3, 4.5, 1.3, STEEL)  # its adjustment knob
+    # ---- shoulder rest under the rear of the tube, cheek pad on the left
+    g.bevel(-35, -15, 13, 15.5, -3, 3, FIT, 1)  # the rest's slide rail
+    PADC = "#303236"
+    rest = g.bevel(-32, -20, 7, 13.5, -4.5, 4.5, PADC, 2)  # the pad that sits on the shoulder
+    g.box(-23, -17, 8, 13.5, -4, 4, PADC, 2, tilt=30, pivot=(-20, 13.5))  # its front, curving up to the rail
+    g.box(-35, -29, 8, 13.5, -4, 4, PADC, 2, tilt=-30, pivot=(-32, 13.5))  # and its back
+    if hi():
+        for c in rest[:2]:
+            ribs(c, ("right", "left"), 2, shade(PADC, 0.7))
+        scyl(g, -26, 14, -4.5, -3, 1.3, STEEL)  # the rest's lock knob on the right
+    cp = g.bevel(-37, -19, 19.5, 27, R - 0.5, R + 2.5, RUBBER, 1.2)
+    g.box(-36, -20, 21, 25.5, R + 2.5, R + 3, shade(RUBBER, 1.2), 1)
+    if hi():
+        for c in cp[:2]:
+            ribs(c, ("left",), 3, shade(RUBBER, 1.35))
+    # ---- carry handle, top rail, sling swivels
+    for f0 in (-6, 12):
+        g.box(f0, f0 + 3, U + R, U + R + 4, -1.5, 1.5, FIT, 2)
+    hb = g.bevel(-7, 16, U + R + 3.5, U + R + 6.5, -2, 2, FIT, 1)
     if hi():
         for c in hb[:2]:
-            ribs(c, ("up",), 2, shade(BLACK, 0.7))
-        g.box(-4, 12, 31, 32, -1, 1, DARK, 1)
-        sling_swivel(g, 30, 13, 0, True)
-        sling_swivel(g, -36, 31, 0, False)
-    # ---- the venturi: a hollow hourglass that swings open on a hinge on the left
+            ribs(c, ("up", "right", "left"), 2, shade(FIT, 0.7))
+        g.box(-4, 12, U + R + 3, U + R + 3.5, -1, 1, DARK, 1)
+    g.box(24, 40, U + R - 0.5, U + R + 0.5, -2.5, 2.5, FIT, 2)
+    g.teeth_rail(24, 40, U + R + 0.5, -2.5, 2.5, FIT)
+    if hi():
+        sling_swivel(g, 36, U - R, 0, True)
+        sling_swivel(g, -37, U - R - 0.5, 0, True)
+    # ---- the venturi: collar, throat, flared nozzle with a rubber rim; it swings open on the hinge on the left
     g.part("breech", -40, U, 9)
-    cone(g, -48, -40, U, 0, 6.0, 9.4, 1, TUBE, n=12, bone="breech")
-    cone(g, -60, -48, U, 0, 10.5, 6.0, 1, TUBE, n=12, bone="breech")
-    g.rod(-47, -46, U, 0, 7.0, STEEL, bone="breech")  # throat ring
-    g.rod(-61, -59.5, U, 0, 10.8, BLACK, bone="breech")  # nozzle lip
-    g.box(-44, -36, 20, 24, -10.5, -8.5, STEEL, 1, bone="breech")  # locking lever on the right
-    g.box(-37, -34, 17, 24, -11, -9, BLACK, 1, bone="breech", tilt=0)
-    g.box(-44, -40, 19, 25, 8.5, 11.5, STEEL, 1, bone="breech")  # hinge knuckle on the left
-    g.pin(-42, 22, 9, "left")
-    # ---- the round, loaded in the tube
+    pipe(g, -43, -40, U, 0, R + 0.9, 2.5, FIT, bone="breech")  # the collar that seats in the ring
+    cone(g, -49, -43, U, 0, 6.0, 7.8, 1.5, TUBE, n=16, bone="breech")
+    pipe(g, -50, -48, U, 0, 6.4, 1, STEEL, n=16, bone="breech")  # the throat ring
+    for c in cone(g, -60, -49, U, 0, 10.0, 6.0, 1.5, TUBE, n=16, bone="breech"):
+        if hi():
+            weave(c, ("up",), 1.03, 0.97)
+    pipe(g, -61.5, -59.5, U, 0, 10.4, 2, RUBBER, n=16, bone="breech")  # the nozzle's rubber rim
+    g.box(-45, -40, 20, 24, R, 10, FIT, 1, bone="breech")  # hinge arm and knuckle
+    vcyl(g, -40, 9, 20, 24, 1.4, FIT, bone="breech")
+    g.box(-44, -40, 20, 24, -10.5, -R + 0.5, FIT, 1, bone="breech")  # the latch arm on the right
+    g.box(-41, -36, 20.5, 23.5, -11, -10, STEEL, 1, bone="breech")
+    lever = g.box(-54, -42, 21, 23.5, -9.5, -7.5, FIT, 1, bone="breech")  # the locking handle, back along it
+    scyl(g, -53, 22.25, -13, -9.5, 2.0, POLY, bone="breech")  # and its grip
+    scyl(g, -53, 22.25, -13.5, -13, 1.5, shade(POLY, 0.8), bone="breech")
+    if hi():
+        mark(lever, "right", -52, -44, 23, 23.5, shade(FIT, 1.5))
+        stud(g, -43, 22.25, -9.5, "right", bone="breech")
+    # ---- the round, loaded in the tube: base with its blow-out disc, case, driving band, HEAT projectile
     g.part("rocket", -24, U)
-    g.rod(-38, -37, U, 0, 5.6, BRASS, bone="rocket")  # case base
-    g.rod(-37, -24, U, 0, 5.4, "#8a7a3a", bone="rocket")  # cartridge case
-    g.rod(-24, -22, U, 0, 6.2, COPPER, bone="rocket")  # driving band
-    g.rod(-22, -10, U, 0, 6.0, "#6a7040", bone="rocket")  # HEAT warhead
-    g.ring(-18, -17, U, 0, 6.2, "#d8c040", bone="rocket")
+    RB = "rocket"
+    g.rod(-38.5, -37.5, U, 0, 4.1, FIT, bone=RB)
+    g.box(-38.7, -37.7, U - 2, U + 2, -2, 2, "#9b2a24", 1, bone=RB)  # the red base disc
+    pipe(g, -37.5, -22, U, 0, 5.8, 1.5, "#8e9189", n=12, inner=None, bone=RB)  # aluminium case
+    g.rod(-37.5, -22, U, 0, 3.4, "#8e9189", bone=RB)
+    g.rod(-22, -20.5, U, 0, 4.3, COPPER, bone=RB)  # driving band
+    g.rod(-20.5, -10, U, 0, 4.1, "#59603e", bone=RB)  # projectile body
+    g.ring(-17, -16, U, 0, 4.25, "#d8c040", bone=RB)  # HEAT: yellow band
+    cone(g, -10, -3, U, 0, 5.6, 2.2, 1.5, "#59603e", n=12, inner=None, bone=RB)  # ogive
+    g.rod(-3, -1, U, 0, 1.1, STEEL, bone=RB)  # nose fuze
     mag_bones(g, -24, U)
-    g.muzzle = (52.0, float(U))
-    # ---- the sight: a bracket and a short telescope on the left
-    g.mount("optic", 4, 30, 12, length=8)
+    g.muzzle = (51.5, float(U))
+    # ---- the 3x sight on its bracket off the side rail on the left
+    g.mount("optic", 4, 31, 11.5, length=8)
     g.use("def_optic")
-    g.box(-4, 10, 28, 30, 6, 10, DARK)
-    g.box(-1, 8, 26, 28, 8, 12, BLACK)
-    g.rod(-6, 14, 32, 12, 2.6, BLACK)
-    g.rod(10, 16, 32, 12, 3.4, BLACK)  # objective bell
-    g.rod(-10, -6, 32, 12, 3.2, RUBBER)  # eye cup
-    g.lens(16, 29, 35, 9, 15)
-    g.lens(-11, 30, 34, 10, 14, "#7fd0f5")
-    g.box(0, 4, 33, 36, 11, 13, STEEL, 1)  # elevation turret
+    g.box(-4, 12, 19.5, 24.5, R - 0.5, R + 1, FIT, 2)  # side rail
+    for f in range(-3, 11, 3):
+        g.box(f, f + 2, 19.5, 24.5, R + 1, R + 1.6, shade(FIT, 1.1), 1)
+    g.box(0, 9, 20, 25, R + 1.5, R + 3.5, STEEL, 1)  # the bracket's clamp
+    scyl(g, 4.5, 22.5, R + 3.5, R + 5, 1.5, FIT)  # its clamp knob
+    g.box(1, 8, 25, 28.5, R + 2, R + 5, STEEL, 1)  # bracket arm up to the sight
+    SC = "#2b2d31"
+    for c in g.rod(-6, 12, 31, 11.5, 2.2, SC):
+        roll_mark(c, "left", -4, 8, 30, shade(SILVER, 0.6))
+    cone(g, 12, 14, 31, 11.5, 3.0, 3.8, 1, SC, n=12)  # objective bell
+    pipe(g, 14, 18, 31, 11.5, 3.8, 1, SC, n=12)  # sunshade
+    g.lens(16, 28.5, 33.5, 9, 14)
+    g.rod(-9, -6, 31, 11.5, 2.6, SC)
+    pipe(g, -12, -9, 31, 11.5, 3.4, 1, RUBBER, n=12)  # eyecup
+    g.lens(-10.5, 29.5, 32.5, 10, 13, "#7fd0f5")
+    drum = vcyl(g, 3, 11.5, 33, 36, 2.2, SC)  # range drum with its scale
+    for c in drum:
+        for face in (c.right, c.left):
+            for y in range(0, face.h, 2):
+                face.px(face.w - 1, y, WHITE)
+    vcyl(g, 3, 11.5, 36, 36.8, 1.6, shade(SC, 0.8))
+    scyl(g, 3, 31, 13, 15.5, 1.8, SC)  # the deflection knob
     g.use("frame")
     return g
 
 
 def rpg7():
-    """RPG-7 with a PG-7V: tube with the flared nozzle and the muzzle flange, wooden heat shield in its two halves
-    clamped by bands, trigger group with hammer and safety, pistol and fore grip, folding sights, the PGO-7
-    optic on its side bracket, and the PG-7V round (sustainer, tapered shoulder, warhead, ogive, fuse probe)."""
+    """RPG-7 with a PG-7V: the slim tube with its breech nut and the flared blast nozzle with its rim, the wooden
+    heat guard in two halves held by three bands, the trigger mechanism with its external hammer, cross-bolt
+    safety, trigger and pistol grip, the front grip on its clamp, folding iron sights, the muzzle with the notch
+    for the round's index pin, sling swivels, the PGO-7 optic on its dovetail bracket on the left, and the PG-7V
+    round in the muzzle: sustainer tail, conical boattail, warhead body, long ogive and piezo nose fuze."""
     g = gun("rpg7", "launcher", "launcher_front")
     U = 20
-    pipe(g, -40, 36, U, 0, 4, 1, BLUED, n=12)  # tube
-    cone(g, -56, -40, U, 0, 7.0, 4.2, 1, BLUED, n=12)  # rear nozzle
-    g.rod(-57, -55.5, U, 0, 7.3, STEEL)
-    g.rod(-42, -40, U, 0, 4.7, STEEL)
-    g.rod(30, 34, U, 0, 4.6, BLUED)  # muzzle flange
-    pipe(g, 34, 36, U, 0, 5, 1, BLUED, n=12)
-    # heat shield: two wooden halves with a split and three steel bands
-    for i, c in enumerate(g.rod(-14, 14, U, 0, 6, WOOD)):
-        grain(c, WOOD, i + 3, flat=False)
-    for f0 in (-14, -2, 12):
-        g.ring(f0, f0 + 2, U, 0, 6.3, STEEL)
-    g.box(-12, 12, U - 0.5, U + 0.5, -6.2, 6.2, WOOD_D, 1)  # the seam between the halves
-    for f in (-8, 6):
-        g.pin(f, U + 1, 6, "left")
-        g.pin(f, U + 1, -6, "right")
-    # ---- trigger group
-    g.pistol_grip(-4, 2, 15, 14, 6, WOOD, angle=10, stipple=False)
-    g.bevel(-9, 6, 13, 19, -3, 3, BLUED, 1)  # mechanism housing
-    g.trigger(-4, 15)
-    g.box(-2, 1, 12, 14, 2.5, 4.5, DARK, 1)  # safety on the left
-    g.box(-8, -5, 17, 19, 3, 5.5, STEEL, 1, tilt=20)  # cocking lever
-    g.pin(2, 16, 3, "left")
-    g.pistol_grip(14, 20, 15, 12, 6, WOOD, angle=10, stipple=False)
-    g.box(11, 21, 14, 16, -3, 3, BLUED, 1)  # fore grip clamp
-    # ---- iron sights, folded forward
-    g.box(26, 28, 24, 30, -1, 1, BLUED)
-    g.box(25, 29, 29, 30.5, -1.6, 1.6, BLUED)
-    g.box(25.5, 26, 24, 30, -1.6, -1, BLUED)
-    g.box(25.5, 26, 24, 30, 1, 1.6, BLUED)
-    g.box(2, 4, 24, 29, -1.5, 1.5, BLUED)
-    g.box(2, 4, 27, 28, -0.5, 0.5, DARK)
-    sling_swivel(g, 30, 14, 0, True)
-    sling_swivel(g, -30, 14, 0, True)
-    # ---- the PG-7V rocket
+    R = 3.0  # the tube's outer radius
+    T = BLUED
+    # ---- tube, breech nut and blast nozzle
+    for c in pipe(g, -42, 36, U, 0, R, 1, T, n=12):
+        if _ang(c) == 0.0:
+            mark(c, "up", 34, 36, 0, 0, DARK, -0.5, 0.5)  # the notch for the round's index pin
+    pipe(g, -45, -40, U, 0, 3.7, 1, shade(T, 1.15), n=12)  # the breech nut
+    for c in pipe(g, -44, -42, U, 0, 3.9, 1, shade(T, 1.15), n=12):
+        ribbed(c, ("up",), 1, shade(T, 0.75), start=0)
+    cone(g, -46, -44, U, 0, 3.0, 3.7, 1, T, n=12)  # the nozzle's throat
+    cone(g, -58, -46, U, 0, 5.6, 3.0, 1, T, n=12)  # the flared nozzle
+    pipe(g, -59, -57, U, 0, 5.9, 1.5, shade(T, 1.2), n=12)  # its rim
+    # ---- the muzzle: a thicker ring with the front sight's base
+    pipe(g, 32, 36, U, 0, R + 0.4, 1, shade(T, 1.1), n=12)
+    # ---- wooden heat guard: two halves split along the sides, three steel bands
+    WR = 4.4
+    for c in pipe(g, -17, 11, U, 0, WR, 1.4, WOOD, n=12, inner=WOOD_D):
+        if hi():
+            grain(c, WOOD, int(_ang(c)) + 3, sides=("up",), flat=False)
+        if _ang(c) in (90.0, 270.0):
+            c.front.vline(c.front.w // 2, WOOD_D)  # the seam between the halves
+    for f0 in (-17, -4, 9.5):
+        for c in pipe(g, f0, f0 + 1.5, U, 0, WR + 0.3, 1, STEEL, n=12):
+            c.front.fill(shade(STEEL, 0.85 + 0.25 * math.cos(math.radians(_ang(c)))))
+    if hi():
+        for f in (-16.25, -3.25, 10.25):  # the bands' clamp screws on the left
+            g.box(f - 1, f + 1, U - 1.5, U + 1.5, WR, WR + 1, STEEL, 1)
+            stud(g, f, U, WR + 1, "left")
+    # ---- trigger mechanism: housing, hammer, safety, trigger and guard, pistol grip
+    g.bevel(-10, 6, 12, 17.5, -2.5, 2.5, T, 1)
+    g.box(-9, 5, 16.5, 18, -2, 2, shade(T, 0.8), 1)  # its saddle on the tube
+    pg = g.pistol_grip(-4.5, 1.5, 13, 14, 5.5, WOOD, angle=10, stipple=False)
+    g.box(1, 11, 7, 8.5, -1.25, 1.25, T, 1)  # trigger guard
+    g.box(9.5, 11, 7, 12.5, -1.25, 1.25, T, 1)
+    g.box(4, 5.5, 9.5, 12.5, -0.5, 0.5, STEEL, 1)  # trigger
+    g.box(4, 5.5, 8.5, 10, -0.5, 0.5, STEEL, 1, tilt=-30, pivot=(4.75, 10))
+    if hi():
+        g.box(-10.5, -8.5, 13, 16.5, -1, 1, STEEL, 1, tilt=30, pivot=(-9, 13))  # the external hammer, cocked
+        g.box(-12, -9.5, 15.5, 16.5, -1, 1, shade(STEEL, 1.2), 1, tilt=30, pivot=(-9, 13))  # its spur
+        g.box(-1, 1, 14, 15.5, 2.5, 3.5, STEEL, 1)  # cross-bolt safety, pushed through to the left
+        g.box(-1, 1, 14, 15.5, -3, -2.5, RED, 1)
+        for f in (-6, 3):
+            stud(g, f, 14, 2.5, "left")
+            stud(g, f, 14, -2.5, "right")
+    # ---- front grip on its clamp, under the bare tube
+    g.box(12, 21, U - R - 1.5, U - R + 0.5, -2.5, 2.5, T, 2)
+    for k in (1, -1):
+        g.box(12.5, 20.5, U - 2, U + 1, k * 2.6 - 0.5, k * 2.6 + 0.5, T, 1)  # the clamp's straps
+    fg = g.pistol_grip(13.5, 19.5, 15.5, 12, 5.5, WOOD, angle=6, stipple=False)
+    if hi():
+        for i, c in enumerate((pg, fg)):
+            grain(c, WOOD, 40 + i, sides=("right", "left", "up"), every=(2, 3))
+        stud(g, 16.5, U - 0.5, 3.1, "left")
+    # ---- folding iron sights: the rear leaf with its range scale, the front post with its ears
+    g.box(11.5, 15.5, U + R - 0.5, U + R + 1, -1.5, 1.5, T, 1)
+    leaf = g.box(12.5, 14, U + R + 1, U + R + 6, -1.5, 1.5, T, 1, tilt=-12, pivot=(13.25, U + R + 1))
+    for y in range(0, leaf.left.h, 1):
+        if y % 2 == 0:
+            leaf.left.px(0, y, WHITE)
+    g.box(27, 31, U + R - 0.5, U + R + 1, -1.5, 1.5, T, 1)
+    g.box(28.5, 29.5, U + R + 1, U + R + 5.5, -0.5, 0.5, T, 1)  # post
+    for k in (1, -1):
+        g.box(28, 30, U + R + 1, U + R + 5, k * 1.75 - 0.5, k * 1.75 + 0.5, T, 1)  # ears
+    if hi():
+        sling_swivel(g, 26, U - R, 0, True)
+        sling_swivel(g, -35, U - R, 0, True)
+    # ---- the PG-7V round, its tail in the muzzle
     g.part("rocket", 40, U)
-    G1, G2 = "#3a4228", "#4a5530"
-    g.rod(36, 44, U, 0, 2.5, G1, bone="rocket")  # sustainer neck
-    g.rod(44, 46, U, 0, 4.2, G1, bone="rocket")  # tapering shoulder
-    g.rod(46, 48, U, 0, 5.2, G2, bone="rocket")
-    g.rod(48, 50, U, 0, 6.0, G2, bone="rocket")
-    g.rod(50, 52, U, 0, 6.8, G2, bone="rocket")
-    g.rod(52, 60, U, 0, 7.0, G2, bone="rocket")  # warhead body
-    g.ring(52, 53, U, 0, 7.2, BRASS, bone="rocket")
-    g.ring(57, 58, U, 0, 7.2, "#d8c040", bone="rocket")
-    g.rod(60, 63, U, 0, 6.2, G2, bone="rocket")  # ogive
-    g.rod(63, 66, U, 0, 5.0, G2, bone="rocket")
-    g.rod(66, 69, U, 0, 3.8, G2, bone="rocket")
-    g.rod(69, 71, U, 0, 2.6, G1, bone="rocket")
-    g.rod(71, 74, U, 0, 1.2, DARK, bone="rocket")  # fuse probe
+    RB = "rocket"
+    G1, G2 = "#3a4228", "#4e5833"
+    g.rod(30, 41, U, 0, 1.6, G1, bone=RB)  # sustainer motor, its index pin in the muzzle notch
+    g.box(34.5, 35.5, U + 1.8, U + 3, -0.5, 0.5, STEEL, 1, bone=RB)
+    cone(g, 40, 47, U, 0, 2.0, 4.4, 1, G1, n=12, inner=None, bone=RB)  # boattail
+    body = pipe(g, 47, 51, U, 0, 4.4, 1, G2, n=12, inner=None, bone=RB)  # warhead body
+    for c in body:
+        mark(c, "up", 49, 50, 0, 0, "#c8b03a")  # the yellow HEAT band
+        if hi() and _ang(c) in (240.0, 270.0, 300.0):
+            dashes(c.front, 0, c.front.w, 3, 4, shade(G2, 0.6), seed=int(_ang(c)))  # stencilled lot number
+    cone(g, 51, 68, U, 0, 4.4, 1.4, 1, G2, n=12, inner=None, bone=RB)  # the long ogive
+    g.rod(67.5, 70.5, U, 0, 0.9, STEEL, bone=RB)  # piezo nose fuze
+    g.rod(70.5, 72, U, 0, 0.6, shade(STEEL, 1.2), bone=RB)
     mag_bones(g, 40, U)
-    g.muzzle = (74.0, float(U))
-    # ---- the PGO-7 optic on its bracket on the left
-    g.mount("optic", 2, 28, 8, length=8)
+    g.muzzle = (72.0, float(U))
+    # ---- the PGO-7 on its dovetail bracket on the left
+    g.mount("optic", 2, 27, 8, length=8)
     g.use("def_optic")
-    g.box(-4, 8, 22, 26, 4, 8, BLUED)
-    g.box(-2, 6, 26, 28, 6, 10, DARK)
-    g.rod(-8, 10, 29, 10.5, 2.6, BLACK)
-    g.rod(10, 14, 29, 10.5, 3.3, BLACK)
-    g.rod(-16, -8, 29, 10.5, 2.5, RUBBER)
-    g.box(0, 3, 31.5, 34, 9.5, 11.5, STEEL, 1)
-    g.lens(14, 26, 32, 7, 14)
-    g.lens(-17, 27, 31, 9, 12, "#7fd0f5")
+    g.box(-8, 6, U - 1, U + 3, WR, WR + 1.5, STEEL, 1)  # the dovetail on the launcher
+    g.box(-6, 6, U - 1.5, U + 4, WR + 1.5, WR + 3, BLACK, 2)  # bracket clamp
+    g.box(-12, -5, U + 0.5, U + 2, WR + 3, WR + 4, BLACK, 1)  # its locking lever, back along it
+    g.box(-1, 5, U + 4, 25.5, WR + 2, WR + 5, BLACK, 2)  # the arm up to the sight
+    PG = "#2c2e2a"
+    g.bevel(-8, 10, 24.5, 30.5, 6, 11, PG, 1)  # the sight's body
+    g.bevel(-4, 6, 30.5, 32.5, 7, 10, PG, 0.75)  # the reticle housing on top
+    vcyl(g, 1, 8.5, 32.5, 34.5, 1.4, shade(PG, 1.2))  # elevation knob
+    scyl(g, 1, 27.5, 11, 12.5, 1.5, shade(PG, 1.2))  # deflection knob
+    scyl(g, -3, 29, 11, 12, 1.0, STEEL)  # the illuminator's socket
+    pipe(g, 10, 14, 27.5, 8.5, 3.2, 1, PG, n=12)  # objective with the rubber cover's rim
+    pipe(g, 14, 15, 27.5, 8.5, 3.4, 1, RUBBER, n=12)
+    g.lens(12, 25.5, 29.5, 6.5, 10.5)
+    g.rod(-10, -8, 27.5, 8.5, 1.8, PG)
+    pipe(g, -16, -10, 27.5, 8.5, 2.8, 1, RUBBER, n=12)  # eyecup
+    g.lens(-14, 26, 29, 7, 10, "#7fd0f5")
     g.use("frame")
     return g
