@@ -152,6 +152,11 @@ def items():
     })
 
 
+# Diagnostic build: these guns get no cooldown-driven animations (fire, reload, jams, attachments), to tell whether
+# those queries or the models stop guns drawing in game.
+DIAG_NO_COOLDOWN = {"glock17", "m1911", "deagle"}
+
+
 def attachment_animation(g):
     """A looping animation that shows each attachment of gun g only while it is fitted, and hides the factory part it
     replaces, by scaling the bones to nothing. Each attachment's bone a_<id> shows while the cooldown category
@@ -187,10 +192,12 @@ def attachables():
                       "third": f"animation.{NS}.hold.{g.hold}.third_person"}
         animate = [{"first": "c.is_first_person"}, {"third": "!c.is_first_person"}]
         for action, name, condition in gun_animate.get(key, []):
+            if key in DIAG_NO_COOLDOWN:
+                continue
             animations[action] = name
             animate.append({action: condition})
         controller = "controller.render.item_default"
-        if getattr(g, "attachments", None):
+        if getattr(g, "attachments", None) and key not in DIAG_NO_COOLDOWN:
             name = f"animation.{NS}.gun.{key}.attachments"
             ANIMATIONS[name] = attachment_animation(g)
             animations["attachments"] = name
