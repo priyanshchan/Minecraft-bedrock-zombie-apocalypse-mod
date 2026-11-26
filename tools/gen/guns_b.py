@@ -973,7 +973,7 @@ def svd():
     g.mag_profile = dict(f0=MF0, top=MTOP, width=MW, segs=segs, color=RC, kind="dmr")
     # ------------------------------------------------ PSO-1 4x24 scope on its side-rail mount
     g.use("frame")
-    g.mount("optic", 8, 22, 4, length=12)
+    g.mount("optic", 8, 20, 3, length=12)
     g.use("def_optic")
     U, S = 28.0, 2.0  # the scope's axis
     g.box(2, 18, 9, 16.5, 6, 8, RC)  # the clamp over the dovetail

@@ -331,7 +331,7 @@ def pkm():
     g.box(97, 98, 18, 23, -0.5, 0.5, DARK, 1)  # post
     disc(g, 97.5, 17.5, -2, 2, 1.0, shade(RC, 1.2))
     g.muzzle = (112.0, B)
-    g.mount("muzzle", 104, B, bore=2.4)
+    g.mount("muzzle", 104, B, bore=2.2)
     g.use("def_muzzle")  # slotted flash hider, four long slots
     g.rod(104, 106, B, 0, 3.0, RC)
     g.rod(105.5, 111.5, B, 0, 2.0, DARK, 0)
@@ -341,7 +341,7 @@ def pkm():
     bore(g, 112, B, 1.5)
     g.use("frame")
     # ------------------------------------------------ bipod, folded back under the gas cylinder
-    g.mount("underbarrel", 80, 6.5)
+    g.mount("underbarrel", 80, 6)
     g.use("def_underbarrel")
     g.rod(78, 82, 8, 0, 2.6, BLACK)  # clamp round the gas cylinder
     g.box(78.5, 81.5, 4.5, 7, -3, 3, BLACK, 2)  # yoke
@@ -352,7 +352,7 @@ def pkm():
         g.box(59, 62.5, 3.5, 6.5, ds - 1.2, ds + 1.2, BLACK, 1)  # spade feet
     g.box(66, 68, 4.5, 6.5, -3.6, 3.6, STEEL, 1)  # the clip that holds the legs together
     g.use("frame")
-    g.mount("optic", 2, 26, 2, length=16, default=False)
+    g.mount("optic", 2, 24.5, 2, length=16, default=False)
     g.mount("side", 52, B, 3.2, length=10, default=False)
     # ------------------------------------------------ 100-round box on the right, the belt rising into the feed
     mag_bones(g, 14, 4)
