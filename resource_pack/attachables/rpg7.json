@@ -45,7 +45,7 @@
         ]
       },
       "render_controllers": [
-        "controller.render.frontline.gun_rpg7"
+        "controller.render.item_default"
       ]
     }
   }

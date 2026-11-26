@@ -46,7 +46,7 @@ Numbers multiply the gun's own value (0.7 = 30% less). `spread`: hip-fire spread
 
 - Every attachment is modelled onto every gun it fits, in a bone `a_<id>` under the gun's `att_<slot>` bone (under `mag` for magazines), placed from the gun's mount.
 - Each attachment item has a cooldown category `frontline_att_<id>`. While a gun with attachments is in hand, the scripts keep the categories of its fitted attachments running.
-- The gun's render controller (`controller.render.frontline.gun_<gun>`) shows `a_<id>` while `q.cooldown_time_remaining('frontline_att_<id>') > 0`, and hides the factory part `def_<slot>` while any attachment of that slot shows.
+- The gun's looping animation `animation.frontline.gun.<gun>.attachments` scales `a_<id>` to full size while `q.cooldown_time_remaining('frontline_att_<id>') > 0` (and to nothing otherwise), and scales the factory part `def_<slot>` to nothing while any attachment of that slot shows. Guns draw with the standard item render controller, so the gun always draws even if that query is not answered.
 - Cooldowns are the holder's own, so the attachments are drawn for the player holding the gun.
 
 ## Mounts per gun

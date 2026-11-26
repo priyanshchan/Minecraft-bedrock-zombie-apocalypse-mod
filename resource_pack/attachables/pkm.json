@@ -20,7 +20,8 @@
         "fire": "animation.frontline.gun.pkm.fire",
         "reload": "animation.frontline.gun.pkm.reload",
         "jam": "animation.frontline.gun.pkm.jam",
-        "malfunction": "animation.frontline.gun.pkm.malfunction"
+        "malfunction": "animation.frontline.gun.pkm.malfunction",
+        "attachments": "animation.frontline.gun.pkm.attachments"
       },
       "scripts": {
         "animate": [
@@ -41,11 +42,12 @@
           },
           {
             "malfunction": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 3.70) < 0.026"
-          }
+          },
+          "attachments"
         ]
       },
       "render_controllers": [
-        "controller.render.frontline.gun_pkm"
+        "controller.render.item_default"
       ]
     }
   }

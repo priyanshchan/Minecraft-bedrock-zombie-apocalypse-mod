@@ -20,7 +20,8 @@
         "fire": "animation.frontline.gun.glock17.fire",
         "reload": "animation.frontline.gun.glock17.reload",
         "jam": "animation.frontline.gun.glock17.jam",
-        "malfunction": "animation.frontline.gun.glock17.malfunction"
+        "malfunction": "animation.frontline.gun.glock17.malfunction",
+        "attachments": "animation.frontline.gun.glock17.attachments"
       },
       "scripts": {
         "animate": [
@@ -41,11 +42,12 @@
           },
           {
             "malfunction": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 2.40) < 0.026"
-          }
+          },
+          "attachments"
         ]
       },
       "render_controllers": [
-        "controller.render.frontline.gun_glock17"
+        "controller.render.item_default"
       ]
     }
   }

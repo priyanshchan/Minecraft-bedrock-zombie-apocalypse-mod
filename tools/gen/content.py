@@ -152,22 +152,26 @@ def items():
     })
 
 
-def visibility(g):
-    """part_visibility for a gun: each attachment bone shows while its cooldown category runs (the scripts keep it
-    running while that attachment is fitted to the gun in hand); a factory part hides while any attachment of its
-    slot shows."""
-    rules = [{"*": True}]
+def attachment_animation(g):
+    """A looping animation that shows each attachment of gun g only while it is fitted, and hides the factory part it
+    replaces, by scaling the bones to nothing. Each attachment's bone a_<id> shows while the cooldown category
+    frontline_att_<id> runs on the holder (the scripts keep it running while that attachment is fitted to the gun in
+    hand). Done with scale in an animation rather than render-controller part visibility so that, if a version of the
+    game does not answer the query, the attachments stay hidden and the gun itself still draws."""
+    bones = {}
     by_slot = {}
     for att_id in getattr(g, "attachments", []):
         slot = attach.CATALOGUE[att_id][1]
         by_slot.setdefault(slot, []).append(att_id)
-        rules.append({f"a_{att_id}": f"q.cooldown_time_remaining('{attach.category(att_id)}') > 0"})
+        on = f"(q.cooldown_time_remaining('{attach.category(att_id)}') > 0.0 ? 1.0 : 0.0)"
+        bones[f"a_{att_id}"] = {"scale": [on, on, on]}
     for slot, ids in by_slot.items():
         part = "def_mag" if slot == "magazine" else f"def_{slot}"
         if part in g.bones:
-            shown = " || ".join(f"q.cooldown_time_remaining('{attach.category(a)}') > 0" for a in ids)
-            rules.append({part: f"!({shown})"})
-    return rules
+            shown = " || ".join(f"q.cooldown_time_remaining('{attach.category(a)}') > 0.0" for a in ids)
+            off = f"(({shown}) ? 0.0 : 1.0)"
+            bones[part] = {"scale": [off, off, off]}
+    return {"loop": True, "bones": bones}
 
 
 def attachables():
@@ -186,15 +190,11 @@ def attachables():
             animations[action] = name
             animate.append({action: condition})
         controller = "controller.render.item_default"
-        if key in gunanims.TIMING:
-            # Each gun renders through a controller of its own that shows its fitted attachments.
-            controller = f"controller.render.{NS}.gun_{key}"
-            RENDER_CONTROLLERS[controller] = {
-                "geometry": "Geometry.default",
-                "materials": [{"*": "Material.default"}],
-                "textures": ["Texture.default"],
-                "part_visibility": visibility(g),
-            }
+        if getattr(g, "attachments", None):
+            name = f"animation.{NS}.gun.{key}.attachments"
+            ANIMATIONS[name] = attachment_animation(g)
+            animations["attachments"] = name
+            animate.append("attachments")
         write(RP / "attachables" / f"{key}.json", {
             "format_version": "1.10.0",
             "minecraft:attachable": {"description": {
@@ -274,9 +274,10 @@ def gun_data(built):
               "bone (under `mag` for magazines), placed from the gun's mount.",
               "- Each attachment item has a cooldown category `frontline_att_<id>`. While a gun with attachments is "
               "in hand, the scripts keep the categories of its fitted attachments running.",
-              "- The gun's render controller (`controller.render.frontline.gun_<gun>`) shows `a_<id>` while "
-              "`q.cooldown_time_remaining('frontline_att_<id>') > 0`, and hides the factory part `def_<slot>` while "
-              "any attachment of that slot shows.",
+              "- The gun's looping animation `animation.frontline.gun.<gun>.attachments` scales `a_<id>` to full size while "
+              "`q.cooldown_time_remaining('frontline_att_<id>') > 0` (and to nothing otherwise), and scales the factory "
+              "part `def_<slot>` to nothing while any attachment of that slot shows. Guns draw with the standard item "
+              "render controller, so the gun always draws even if that query is not answered.",
               "- Cooldowns are the holder's own, so the attachments are drawn for the player holding the gun.", "",
               "## Mounts per gun", "",
               "Positions are in the gun's own frame and units (quarter pixels): `f` forward along the barrel, `u` up, "

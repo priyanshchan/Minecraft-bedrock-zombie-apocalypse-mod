@@ -45,7 +45,7 @@
         ]
       },
       "render_controllers": [
-        "controller.render.frontline.gun_carl_gustaf"
+        "controller.render.item_default"
       ]
     }
   }
