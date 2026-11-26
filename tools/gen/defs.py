@@ -14,7 +14,7 @@ RP = ROOT / "resource_pack"
 
 NS = "frontline"
 TITLE = "Frontline: NATO vs Red Fang"
-VERSION = [1, 1, 0]
+VERSION = [1, 2, 0]
 MIN_ENGINE = [1, 21, 90]
 DESCRIPTION = (
     "Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, "
@@ -35,24 +35,71 @@ TEAMS = {
 }
 
 # ------------------------------------------------------------------ items
-# Firearms (stats live in behavior_pack/scripts/weapons.js): id, name, rarity
+# Firearms: id, name, rarity. Their stats are in GUN_STATS (written to behavior_pack/scripts/gundata.js).
 GUNS = [
-    ("service_pistol", "Service Pistol", "common"),
-    ("smg", "Talon SMG", "uncommon"),
-    ("assault_rifle", "Vanguard Assault Rifle", "uncommon"),
-    ("lmg", "Bulwark LMG", "rare"),
-    ("shotgun", "Breacher Shotgun", "uncommon"),
-    ("sniper_rifle", "Longshot Sniper Rifle", "rare"),
-    ("rocket_launcher", "Hornet Rocket Launcher", "rare"),
+    ("glock17", "Glock 17", "common"),
+    ("m1911", "Colt M1911A1", "common"),
+    ("mp5", "H&K MP5A3", "uncommon"),
+    ("ump45", "H&K UMP45", "uncommon"),
+    ("m4a1", "Colt M4A1", "uncommon"),
+    ("ak47", "AKM (AK-47)", "uncommon"),
+    ("m249", "FN M249 SAW", "rare"),
+    ("rem870", "Remington 870", "uncommon"),
+    ("awm", "Accuracy International AWM", "rare"),
+    ("svd", "SVD Dragunov", "rare"),
+    ("carl_gustaf", "Carl Gustaf M4", "rare"),
+    ("rpg7", "RPG-7", "rare"),
 ]
 
+# Cartridges: id, name, stack, muzzle velocity m/s (in the guns that fire them), drag per block, bullet mass g.
+# The drag is the fraction of speed lost per block flown at the start (v = v0 * e^(-drag * distance)).
 AMMO = [
-    ("pistol_ammo", "Pistol Ammo"),
-    ("rifle_ammo", "Rifle Ammo"),
-    ("shotgun_shells", "Shotgun Shells"),
-    ("sniper_rounds", "Sniper Rounds"),
-    ("rocket", "Rocket"),
+    ("ammo_9mm", "9x19mm Parabellum", 64),
+    ("ammo_45acp", ".45 ACP", 64),
+    ("ammo_556", "5.56x45mm NATO", 64),
+    ("ammo_762x39", "7.62x39mm", 64),
+    ("ammo_762x54r", "7.62x54mmR", 64),
+    ("ammo_338", ".338 Lapua Magnum", 32),
+    ("ammo_12g", "12 Gauge 00 Buckshot", 32),
+    ("ammo_84mm", "84mm HEAT Round", 4),
+    ("ammo_pg7v", "PG-7V Rocket", 4),
 ]
+CALIBER = {a[0]: a[1] for a in AMMO}
+
+# Per gun: what it fires, how and how well. The script reads these through gundata.js.
+#   ammo, mag (rounds), mode (auto | semi | pump | bolt | launcher), rpm (rounds per minute; semi: the fastest
+#   follow-up), damage (per bullet or pellet at the muzzle), pellets, velocity (m/s), drag (per block),
+#   headshot (multiplier), hip / ads (spread in degrees, hip fire / crouched), vrec / hrec (degrees of
+#   vertical / random horizontal recoil per shot), bloom (degrees added per shot, decaying), sound, jam
+#   (chance per round of a stoppage), pose (third-person hold).
+GUN_STATS = {
+    "glock17": dict(ammo="ammo_9mm", mag=17, mode="semi", rpm=500, damage=5.5, velocity=375, drag=0.0024, headshot=1.8,
+                    hip=2.0, ads=0.9, vrec=1.5, hrec=0.6, bloom=0.5, sound="pistol", jam=0.0015, pose="pistol"),
+    "m1911": dict(ammo="ammo_45acp", mag=7, mode="semi", rpm=420, damage=7.5, velocity=253, drag=0.0021, headshot=1.8,
+                  hip=2.2, ads=1.0, vrec=2.6, hrec=0.8, bloom=0.7, sound="heavy_pistol", jam=0.0025, pose="pistol"),
+    "mp5": dict(ammo="ammo_9mm", mag=30, mode="auto", rpm=800, damage=4.5, velocity=400, drag=0.0024, headshot=1.6,
+                hip=2.4, ads=0.9, vrec=0.65, hrec=0.45, bloom=0.22, sound="smg", jam=0.002, pose="rifle"),
+    "ump45": dict(ammo="ammo_45acp", mag=25, mode="auto", rpm=600, damage=6.0, velocity=285, drag=0.0021, headshot=1.6,
+                  hip=2.6, ads=1.0, vrec=0.95, hrec=0.55, bloom=0.28, sound="smg", jam=0.0025, pose="rifle"),
+    "m4a1": dict(ammo="ammo_556", mag=30, mode="auto", rpm=800, damage=6.0, velocity=910, drag=0.0012, headshot=1.9,
+                 hip=2.4, ads=0.45, vrec=0.85, hrec=0.45, bloom=0.22, sound="assault_rifle", jam=0.003, pose="rifle"),
+    "ak47": dict(ammo="ammo_762x39", mag=30, mode="auto", rpm=600, damage=7.0, velocity=715, drag=0.0011, headshot=1.9,
+                 hip=2.8, ads=0.6, vrec=1.35, hrec=0.8, bloom=0.3, sound="ak47", jam=0.0015, pose="rifle"),
+    "m249": dict(ammo="ammo_556", mag=200, mode="auto", rpm=800, damage=5.5, velocity=915, drag=0.0012, headshot=1.7,
+                 hip=3.6, ads=1.0, vrec=0.8, hrec=0.65, bloom=0.2, sound="lmg", jam=0.004, pose="rifle"),
+    "rem870": dict(ammo="ammo_12g", mag=4, mode="pump", rpm=70, damage=3.2, pellets=9, velocity=400, drag=0.006,
+                   headshot=1.3, hip=5.5, ads=4.2, vrec=4.5, hrec=1.2, bloom=0.0, sound="shotgun", jam=0.004, pose="rifle"),
+    "awm": dict(ammo="ammo_338", mag=5, mode="bolt", rpm=40, damage=26.0, velocity=914, drag=0.0005, headshot=2.5,
+                hip=4.5, ads=0.05, vrec=5.5, hrec=1.0, bloom=0.0, sound="sniper", jam=0.001, pose="rifle"),
+    "svd": dict(ammo="ammo_762x54r", mag=10, mode="semi", rpm=240, damage=13.0, velocity=830, drag=0.0008, headshot=2.2,
+                hip=3.2, ads=0.18, vrec=3.0, hrec=0.8, bloom=0.6, sound="dmr", jam=0.002, pose="rifle"),
+    "carl_gustaf": dict(ammo="ammo_84mm", mag=1, mode="launcher", rpm=20, damage=0, velocity=120, drag=0.0, headshot=1.0,
+                        hip=1.2, ads=0.4, vrec=6.0, hrec=1.0, bloom=0.0, sound="rocket_launch", jam=0.006, pose="launcher",
+                        projectile="rocket", power=4.2),
+    "rpg7": dict(ammo="ammo_pg7v", mag=1, mode="launcher", rpm=20, damage=0, velocity=115, drag=0.0, headshot=1.0,
+                 hip=1.6, ads=0.6, vrec=5.0, hrec=1.2, bloom=0.0, sound="rocket_launch", jam=0.01, pose="launcher",
+                 projectile="rocket", power=3.4),
+}
 
 # Thrown items: id, name, projectile entity
 THROWABLES = [
@@ -92,19 +139,19 @@ BLOCKS = [
 ]
 
 # ------------------------------------------------------------------ soldiers
-# weapon: rifle | sniper | launcher (decides model, projectile and firing rhythm)
+# weapon: rifle | sniper | launcher (decides projectile and firing rhythm); gun: the model they carry
 SOLDIERS = {
-    "nato_rifleman": dict(team="nato", name="NATO Rifleman", hp=30, speed=0.28, weapon="rifle", xp=6,
+    "nato_rifleman": dict(gun="m4a1", team="nato", name="NATO Rifleman", hp=30, speed=0.28, weapon="rifle", xp=6,
                           skins=["nato_woodland", "nato_woodland_b", "nato_desert"], egg=("#4f5d34", "#3f7fd0")),
-    "nato_marksman": dict(team="nato", name="NATO Marksman", hp=24, speed=0.26, weapon="sniper", xp=8,
+    "nato_marksman": dict(gun="awm", team="nato", name="NATO Marksman", hp=24, speed=0.26, weapon="sniper", xp=8,
                           skins=["nato_marksman"], egg=("#5f6e3c", "#9ccff0")),
-    "nato_heavy": dict(team="nato", name="NATO Anti-Tank Gunner", hp=36, speed=0.25, weapon="launcher", xp=10,
+    "nato_heavy": dict(gun="carl_gustaf", team="nato", name="NATO Anti-Tank Gunner", hp=36, speed=0.25, weapon="launcher", xp=10,
                        skins=["nato_heavy"], egg=("#3a4424", "#25507e")),
-    "redfang_fighter": dict(team="redfang", name="Red Fang Fighter", hp=28, speed=0.29, weapon="rifle", xp=6,
+    "redfang_fighter": dict(gun="ak47", team="redfang", name="Red Fang Fighter", hp=28, speed=0.29, weapon="rifle", xp=6,
                             skins=["redfang_black", "redfang_olive", "redfang_hoodie"], egg=("#1e1e22", "#c8302c")),
-    "redfang_sniper": dict(team="redfang", name="Red Fang Sniper", hp=22, speed=0.26, weapon="sniper", xp=8,
+    "redfang_sniper": dict(gun="svd", team="redfang", name="Red Fang Sniper", hp=22, speed=0.26, weapon="sniper", xp=8,
                            skins=["redfang_sniper"], egg=("#3a3a2e", "#e05a4a")),
-    "redfang_rpg": dict(team="redfang", name="Red Fang RPG Gunner", hp=32, speed=0.25, weapon="launcher", xp=10,
+    "redfang_rpg": dict(gun="rpg7", team="redfang", name="Red Fang RPG Gunner", hp=32, speed=0.25, weapon="launcher", xp=10,
                         skins=["redfang_rpg"], egg=("#2a2a2e", "#7e1a17")),
 }
 
@@ -135,13 +182,20 @@ SOUNDS = [
     "pistol", "smg", "assault_rifle", "lmg", "shotgun", "sniper", "rocket_launch", "explosion", "tank_fire",
     "dry_fire", "reload", "grenade_pin", "hitmarker", "kill", "capture", "capture_lost", "alarm", "battle_start",
     "victory", "defeat", "radio", "heal", "resupply", "repair", "click", "engine",
+    "heavy_pistol", "ak47", "dmr", "suppressed", "attach", "bullet_crack",
 ]
-LOUD_SOUNDS = {"pistol", "smg", "assault_rifle", "lmg", "shotgun", "sniper", "rocket_launch", "explosion",
+LOUD_SOUNDS = {"pistol", "heavy_pistol", "smg", "assault_rifle", "ak47", "lmg", "shotgun", "sniper", "dmr", "rocket_launch", "explosion",
                "tank_fire", "alarm", "battle_start", "victory", "defeat"}
 
 
+def attachment_items():
+    """Attachment items: (id, name, slot), from the catalogue in attach.py."""
+    from attach import CATALOGUE
+    return [(k, v[0], v[1]) for k, v in CATALOGUE.items()]
+
+
 def item_ids():
-    ids = [g[0] for g in GUNS] + [a[0] for a in AMMO] + [t[0] for t in THROWABLES] + [g[0] for g in GEAR]
+    ids = [g[0] for g in GUNS] + [a[0] for a in AMMO] + [a[0] for a in attachment_items()] + [t[0] for t in THROWABLES] + [g[0] for g in GEAR]
     ids += [m[0] for m in MELEE] + [f[0] for f in FOOD] + [v[0] for v in VEHICLE_KITS]
     return ids
 

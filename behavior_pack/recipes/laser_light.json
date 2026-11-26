@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:laser_light"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ITG",
+      " R "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "T": {
+        "item": "minecraft:torch"
+      },
+      "G": {
+        "item": "minecraft:glass_pane"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:laser_light",
+      "count": 1
+    }
+  }
+}

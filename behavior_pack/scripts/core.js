@@ -55,6 +55,9 @@ export const DEFAULT_SETTINGS = {
   botDamage: 1,
   hud: true,
   malfunctions: true,
+  cameraRecoil: true,
+  bulletDrop: 1,
+  tracers: true,
 };
 
 /** @type {typeof DEFAULT_SETTINGS | undefined} */

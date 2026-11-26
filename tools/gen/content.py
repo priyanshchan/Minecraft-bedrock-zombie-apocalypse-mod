@@ -14,8 +14,9 @@ import gunanims
 import held as H
 import holds
 import models as M
-from defs import (AI_WEAPONS, AMMO, BLOCKS, BP, DESCRIPTION, FOOD, GEAR, GUNS, MELEE, MIN_ENGINE, NS, PROJECTILES, ROOT, RP,
-                  SOLDIERS, TEAMS, THROWABLES, TITLE, UUIDS, VEHICLE_KITS, VEHICLES, VERSION)
+import attach
+from defs import (AI_WEAPONS, AMMO, BLOCKS, BP, CALIBER, DESCRIPTION, FOOD, GEAR, GUN_STATS, GUNS, MELEE, MIN_ENGINE, NS,
+                  PROJECTILES, ROOT, RP, SOLDIERS, TEAMS, THROWABLES, TITLE, UUIDS, VEHICLE_KITS, VEHICLES, VERSION)
 from poses import POSES
 
 LANG: list[str] = []
@@ -105,6 +106,7 @@ def item(name, display, category="items", stack=64, rarity=None, extra=None):
 
 def items():
     for name, display, rarity in GUNS:
+        display = f"{display} ({CALIBER[GUN_STATS[name]['ammo']]})"
         item(name, display, "equipment", 1, rarity, {
             "minecraft:hand_equipped": True,
             "minecraft:can_destroy_in_creative": False,
@@ -112,8 +114,15 @@ def items():
             # the 3D model which animation to play (see gunanims.py).
             "minecraft:cooldown": {"category": f"{NS}_{name}", "duration": 0.05},
         })
-    for name, display in AMMO:
-        item(name, display, "equipment", 16 if name == "rocket" else 64)
+    for name, display, stack in AMMO:
+        item(name, display, "equipment", stack)
+    # Attachments. Each has a cooldown category of its own: while one is fitted to the gun in hand, the scripts
+    # keep that category's cooldown running and the gun's model shows the attachment (see attachables()).
+    for att_id, (display, slot, _guns, _mods) in attach.CATALOGUE.items():
+        item(att_id, display, "equipment", 16, "uncommon" if slot == "optic" else None, {
+            "minecraft:cooldown": {"category": attach.category(att_id), "duration": 0.05},
+            "minecraft:can_destroy_in_creative": False,
+        })
     for name, display, projectile in THROWABLES:
         item(name, display, "equipment", 4, None, {
             "minecraft:throwable": {"do_swing_animation": True, "launch_power_scale": 1.0, "max_launch_power": 1.3},
@@ -143,11 +152,29 @@ def items():
     })
 
 
+def visibility(g):
+    """part_visibility for a gun: each attachment bone shows while its cooldown category runs (the scripts keep it
+    running while that attachment is fitted to the gun in hand); a factory part hides while any attachment of its
+    slot shows."""
+    rules = [{"*": True}]
+    by_slot = {}
+    for att_id in getattr(g, "attachments", []):
+        slot = attach.CATALOGUE[att_id][1]
+        by_slot.setdefault(slot, []).append(att_id)
+        rules.append({f"a_{att_id}": f"q.cooldown_time_remaining('{attach.category(att_id)}') > 0"})
+    for slot, ids in by_slot.items():
+        part = "def_mag" if slot == "magazine" else f"def_{slot}"
+        if part in g.bones:
+            shown = " || ".join(f"q.cooldown_time_remaining('{attach.category(a)}') > 0" for a in ids)
+            rules.append({part: f"!({shown})"})
+    return rules
+
+
 def attachables():
     """The 3D models drawn in the hand in place of the flat item icon, with the guns' animations."""
     built = H.build_all()
     hold_table = holds.compute()
-    gun_anims, gun_animate = gunanims.attachable_animations(NS)
+    gun_anims, gun_animate = gunanims.attachable_animations(NS, {k: built[k] for k in gunanims.TIMING})
     ANIMATIONS.update(gun_anims)
     ANIMATIONS.update(gunanims.player_animations(NS))
     for key, g in built.items():
@@ -158,6 +185,16 @@ def attachables():
         for action, name, condition in gun_animate.get(key, []):
             animations[action] = name
             animate.append({action: condition})
+        controller = "controller.render.item_default"
+        if key in gunanims.TIMING:
+            # Each gun renders through a controller of its own that shows its fitted attachments.
+            controller = f"controller.render.{NS}.gun_{key}"
+            RENDER_CONTROLLERS[controller] = {
+                "geometry": "Geometry.default",
+                "materials": [{"*": "Material.default"}],
+                "textures": ["Texture.default"],
+                "part_visibility": visibility(g),
+            }
         write(RP / "attachables" / f"{key}.json", {
             "format_version": "1.10.0",
             "minecraft:attachable": {"description": {
@@ -169,17 +206,9 @@ def attachables():
                 "geometry": {"default": f"geometry.{NS}.held_{key}"},
                 "animations": animations,
                 "scripts": {"animate": animate},
-                "render_controllers": [f"controller.render.{NS}.gun" if g.mounts else "controller.render.item_default"],
+                "render_controllers": [controller],
             }},
         })
-    # Guns render through a controller of their own, so attachments can later show their parts and hide
-    # the factory ones (part_visibility on the att_* / def_* bones, see docs/attachments.md).
-    RENDER_CONTROLLERS[f"controller.render.{NS}.gun"] = {
-        "geometry": "Geometry.default",
-        "materials": [{"*": "Material.default"}],
-        "textures": ["Texture.default"],
-        "part_visibility": [{"*": True}],
-    }
     for kind, (third, first) in hold_table.items():
         for view, (rot, pos), sc in (("third_person", third, H.SCALE), ("first_person", first, H.FP_SCALE)):
             ANIMATIONS[f"animation.{NS}.hold.{kind}.{view}"] = {
@@ -199,53 +228,62 @@ def attachables():
 
 
 def gun_data(built):
-    """Writes the guns' timings and attachment mounts for the scripts, and the mount table for the docs."""
-    data = {"timing": gunanims.TIMING,
-            "mounts": {nid(k): {slot: m for slot, m in built[k].mounts.items()} for k in gunanims.TIMING}}
-    js = ("// Generated by tools/gen/content.py from held.py and gunanims.py - do not edit.\n"
-          "// timing: ticks of each animated action per gun (the cooldown lengths the 3D models listen for).\n"
-          "// mounts: the attachment mounts of each gun (bone att_<slot>), in quarter-pixel gun units.\n"
+    """Writes everything the scripts need to know about the guns and attachments (gundata.js), and the attachment
+    reference (docs/attachments.md)."""
+    names = dict((g[0], g[1]) for g in GUNS)
+    guns = {}
+    for k in gunanims.TIMING:
+        st = dict(GUN_STATS[k])
+        st["ammo"] = nid(st["ammo"])
+        if "projectile" in st:
+            st["projectile"] = nid(st["projectile"])
+        st["sound"] = f"{NS}.{st['sound']}"
+        guns[nid(k)] = {"key": k, "name": names[k], "caliber": CALIBER[GUN_STATS[k]["ammo"]], **st,
+                        "timing": gunanims.TIMING[k],
+                        "slots": [s for s in attach.SLOT_ORDER if s in built[k].mounts or
+                                  (s == "magazine" and built[k].mag_profile is not None)],
+                        "mounts": {slot: m for slot, m in built[k].mounts.items()}}
+    atts = {nid(a): {"key": a, "name": v[0], "slot": v[1], "guns": [nid(x) for x in v[2]], "mods": v[3],
+                     "category": attach.category(a)}
+            for a, v in attach.CATALOGUE.items()}
+    data = {"guns": guns, "attachments": atts, "slots": attach.SLOT_ORDER}
+    js = ("// Generated by tools/gen/content.py from defs.py, attach.py, guns*.py and gunanims.py - do not edit.\n"
+          "// guns: stats, animation timings (the cooldown lengths the 3D models listen for), slots and mounts.\n"
+          "// attachments: name, slot, the guns each fits, its effects and the cooldown category that shows it.\n"
           f"export const GUN_DATA = {json.dumps(data, indent=2)};\n")
     (BP / "scripts" / "gundata.js").write_text(js, encoding="utf-8")
-    lines = ["# Weapon attachments: mounts and conventions", "",
-             "Generated by `tools/gen/content.py` from `tools/gen/held.py`. Every gun is built so attachments can be "
-             "added later without touching its model.", "",
-             "## Bones", "",
-             "| Bone | What it holds |", "| --- | --- |",
-             "| `item` | the hold transform per view (do not put boxes here) |",
-             "| `gun` | the whole weapon; reload, jam and malfunction animations move it |",
-             "| `frame` | the fixed parts |",
-             "| `mag` > `def_mag` | the magazine; an extended magazine goes in `mag` next to `def_mag`, which it hides |",
-             "| `bolt`, `charging_handle`, `slide`, `pump`, `cover`, `rocket`, `shell` | moving parts (animated) |",
-             "| `att_optic` > `def_optic` | top rail: optics; `def_optic` is the iron sights or factory scope |",
-             "| `att_muzzle` > `def_muzzle` | muzzle thread: suppressors, compensators; `def_muzzle` is the flash hider |",
-             "| `att_underbarrel` > `def_underbarrel` | under rail: grips, bipods, launchers |",
-             "| `att_side` | side rail: lasers, lights |",
-             "| `att_stock` > `def_stock` | stock |", "",
-             "Each `att_*` bone pivots at its mount point and carries a locator of the same name. "
-             "Positions below are in the gun's own frame and units (quarter pixels): `f` forward along the barrel, "
-             "`u` up, `s` to the gun's left; `length` is the usable rail length.", "",
-             "## Mounts per gun", ""]
+    lines = ["# Weapon attachments", "",
+             "Generated by `tools/gen/content.py` from `tools/gen/attach.py`. Fit attachments with the **Gunsmith** "
+             "(Field Radio > Gunsmith, or use an attachment item while it is in your inventory).", "",
+             "## Effects", "",
+             "Numbers multiply the gun's own value (0.7 = 30% less). `spread`: hip-fire spread; `ads`: spread while "
+             "crouched (aiming); `vrec` / `hrec`: vertical / horizontal recoil; `velocity`: muzzle velocity (flatter "
+             "and longer flight); `noise`: how loud; `reload`: reload time; `mag`: magazine size; `mag_add`: extra "
+             "rounds; `zoom`: magnification while aiming; `nv`: night vision while aiming; `laser`: a laser dot; "
+             "`light`: lights up where you aim; `flash`: hides the muzzle flash; `bipod`: much steadier when crouched.", "",
+             "| Attachment | Slot | Effects | Fits |", "| --- | --- | --- | --- |"]
+    for a, (name, slot, gs, mods) in attach.CATALOGUE.items():
+        eff = ", ".join(f"{k} ×{v}" if isinstance(v, float) else f"{k} {v}" for k, v in mods.items())
+        lines.append(f"| {name} | {slot} | {eff} | {', '.join(names[x] for x in gs)} |")
+    lines += ["", "## How a fitted attachment shows on the gun", "",
+              "- Every attachment is modelled onto every gun it fits, in a bone `a_<id>` under the gun's `att_<slot>` "
+              "bone (under `mag` for magazines), placed from the gun's mount.",
+              "- Each attachment item has a cooldown category `frontline_att_<id>`. While a gun with attachments is "
+              "in hand, the scripts keep the categories of its fitted attachments running.",
+              "- The gun's render controller (`controller.render.frontline.gun_<gun>`) shows `a_<id>` while "
+              "`q.cooldown_time_remaining('frontline_att_<id>') > 0`, and hides the factory part `def_<slot>` while "
+              "any attachment of that slot shows.",
+              "- Cooldowns are the holder's own, so the attachments are drawn for the player holding the gun.", "",
+              "## Mounts per gun", "",
+              "Positions are in the gun's own frame and units (quarter pixels): `f` forward along the barrel, `u` up, "
+              "`s` to the gun's left; `length` is the usable rail length.", ""]
     for k in gunanims.TIMING:
-        lines.append(f"### {k}")
-        lines.append("")
-        lines.append("| Slot | f | u | s | rail length |")
-        lines.append("| --- | --- | --- | --- | --- |")
+        lines += [f"### {names[k]} ({CALIBER[GUN_STATS[k]['ammo']]})", "", "| Slot | f | u | s | rail length |",
+                  "| --- | --- | --- | --- | --- |"]
         for slot, m in built[k].mounts.items():
             lines.append(f"| {slot} | {m['f']} | {m['u']} | {m['s']} | {m['length'] or '-'} |")
-        lines.append("")
-    lines += ["## Adding an attachment later", "",
-              "1. Model it in `tools/gen/held.py` as a function that adds boxes to a gun's `att_<slot>` bone "
-              "(e.g. `def red_dot(g)` using `g.use(\"att_optic\")`), and call it for every gun whose slot fits.",
-              "2. Show it only when fitted: give each attachment a `part_visibility` entry in "
-              "`controller.render.frontline.gun`, and hide the matching `def_<slot>` part when it is on. The condition "
-              "reads the holder's fitted attachments from an entity property the scripts set "
-              "(`frontline:att_<slot>`, needs a `player.json` with those properties).",
-              "3. Add the attachment item and register it in `behavior_pack/scripts/attachments.js` "
-              "(`registerAttachment`) with its slot, the guns it fits and its stat changes (spread, recoil, range, "
-              "damage, magazine size, reload time, loudness).",
-              "4. The scripts already store fitted attachments on the gun item (`fl:att`) and apply every "
-              "attachment's stat changes when the gun fires and reloads.", ""]
+        fits = [attach.CATALOGUE[a][0] for a in getattr(built[k], "attachments", [])]
+        lines += ["", f"Takes: {', '.join(fits) if fits else 'none'}.", ""]
     (ROOT / "docs" / "attachments.md").write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -672,17 +710,23 @@ def entry(name, weight=1, lo=1, hi=1):
 
 
 def loot_tables():
-    common = {"rolls": 1, "entries": [entry("rifle_ammo", 4, 4, 12), entry("pistol_ammo", 3, 4, 10),
-                                      entry("field_ration", 2), entry("medkit", 1), {"type": "empty", "weight": 3}]}
+    common = {"rolls": 1, "entries": [entry("field_ration", 2), entry("medkit", 1), {"type": "empty", "weight": 3}]}
     special = {
-        "nato_marksman": [entry("sniper_rounds", 3, 2, 5)], "redfang_sniper": [entry("sniper_rounds", 3, 2, 5)],
-        "nato_heavy": [entry("rocket", 3, 1, 2)], "redfang_rpg": [entry("rocket", 3, 1, 2)],
-        "nato_rifleman": [entry("frag_grenade", 2), entry("assault_rifle", 1)],
-        "redfang_fighter": [entry("frag_grenade", 2), entry("smg", 1)],
+        "nato_rifleman": [entry("ammo_556", 4, 6, 20), entry("ammo_9mm", 2, 6, 17), entry("frag_grenade", 1),
+                          entry("m4a1", 1), entry("red_dot", 1), entry("vertical_grip", 1), entry("flash_hider", 1)],
+        "nato_marksman": [entry("ammo_338", 4, 2, 6), entry("ammo_9mm", 2, 6, 17), entry("variable_6x", 1),
+                          entry("bipod", 1), entry("rifle_suppressor", 1)],
+        "nato_heavy": [entry("ammo_84mm", 3, 1, 2), entry("ammo_9mm", 2, 6, 17), entry("flashlight", 1),
+                       entry("laser_sight", 1)],
+        "redfang_fighter": [entry("ammo_762x39", 4, 6, 20), entry("ammo_45acp", 2, 4, 10), entry("frag_grenade", 1),
+                            entry("ak47", 1), entry("holo_sight", 1), entry("compensator", 1), entry("drum_mag", 1)],
+        "redfang_sniper": [entry("ammo_762x54r", 4, 3, 10), entry("combat_4x", 1), entry("muzzle_brake", 1),
+                           entry("night_vision_4x", 1)],
+        "redfang_rpg": [entry("ammo_pg7v", 3, 1, 2), entry("ammo_45acp", 2, 4, 10), entry("angled_grip", 1)],
     }
     for name in SOLDIERS:
         pools = [common, {"conditions": [{"condition": "killed_by_player"},
-                                          {"condition": "random_chance_with_looting", "chance": 0.25,
+                                          {"condition": "random_chance_with_looting", "chance": 0.45,
                                            "looting_multiplier": 0.05}],
                           "rolls": 1, "entries": special[name]}]
         write(BP / "loot_tables" / "entities" / f"{name}.json", {"pools": pools})
@@ -709,22 +753,73 @@ def shapeless(ident, ingredients, result, count=1):
         "result": {"item": nid(result), "count": count}}})
 
 
+_I, _N, _C, _R = "minecraft:iron_ingot", "minecraft:iron_nugget", "minecraft:copper_ingot", "minecraft:redstone"
+_GL, _GP, _BS = "minecraft:glass", "minecraft:glass_pane", "minecraft:blackstone"
+_SPY, _WOOL, _LEATHER = "minecraft:spyglass", "#minecraft:wool", "minecraft:leather"
+ATTACHMENT_RECIPES = {  # id: (pattern, key, count)
+    "reflex_sight": (["NGN"], {"N": _N, "G": _GP}, 1),
+    "red_dot": (["NGN", " R "], {"N": _I, "G": _GP, "R": _R}, 1),
+    "holo_sight": (["IGI", "NRN"], {"I": _I, "G": _GP, "N": _N, "R": _R}, 1),
+    "holo_magnifier": (["IGI", "NRS"], {"I": _I, "G": _GP, "N": _N, "R": _R, "S": _SPY}, 1),
+    "prism_2x": (["GIG", " R "], {"I": _I, "G": _GL, "R": _R}, 1),
+    "combat_4x": (["IGS"], {"I": _I, "G": _GL, "S": _SPY}, 1),
+    "variable_6x": (["IGS", " C "], {"I": _I, "G": _GL, "S": _SPY, "C": _C}, 1),
+    "marksman_8x": (["ISS", " C "], {"I": _I, "S": _SPY, "C": _C}, 1),
+    "sniper_12x": (["SSS", "ICI"], {"I": _I, "S": _SPY, "C": _C}, 1),
+    "night_vision_4x": (["IGS", "ERE"], {"I": _I, "G": _GL, "S": _SPY, "R": _R, "E": "minecraft:emerald"}, 1),
+    "pistol_suppressor": (["IWI"], {"I": _I, "W": _WOOL}, 1),
+    "rifle_suppressor": (["IWI", "IWI"], {"I": _I, "W": _WOOL}, 1),
+    "compensator": ([" N ", "NIN"], {"I": _I, "N": _N}, 1),
+    "muzzle_brake": (["NIN", "NIN"], {"I": _I, "N": _N}, 1),
+    "flash_hider": (["N N", " I "], {"I": _I, "N": _N}, 1),
+    "full_choke": (["NIN"], {"I": _I, "N": _N}, 1),
+    "cylinder_choke": (["NCN"], {"C": _C, "N": _N}, 1),
+    "vertical_grip": (["I", "B", "B"], {"I": _I, "B": _BS}, 1),
+    "angled_grip": (["IB", " B"], {"I": _I, "B": _BS}, 1),
+    "stubby_grip": (["I", "B"], {"I": _I, "B": _BS}, 1),
+    "handstop": (["IN"], {"I": _I, "N": _N}, 1),
+    "bipod": (["NIN", "I I"], {"I": _I, "N": _N}, 1),
+    "laser_sight": (["IRG"], {"I": _I, "R": _R, "G": _GP}, 1),
+    "flashlight": (["ITG"], {"I": _I, "T": "minecraft:torch", "G": _GP}, 1),
+    "laser_light": (["ITG", " R "], {"I": _I, "T": "minecraft:torch", "G": _GP, "R": _R}, 1),
+    "heavy_stock": (["BBI", "B  "], {"I": _I, "B": _BS}, 1),
+    "light_stock": (["NNI", "N  "], {"I": _I, "N": _N}, 1),
+    "precision_stock": (["LBI", "B  "], {"I": _I, "B": _BS, "L": _LEATHER}, 1),
+    "extended_mag": (["I", "I", "I"], {"I": _I}, 1),
+    "drum_mag": (["III", "I I", "III"], {"I": _I}, 1),
+    "quick_mag": (["I", "I", "L"], {"I": _I, "L": _LEATHER}, 1),
+    "extended_tube": (["III"], {"I": _I}, 1),
+    "big_box": (["III", "LIL"], {"I": _I, "L": _LEATHER}, 1),
+}
+
+
 def recipes():
     I, G, N, C, R = "minecraft:iron_ingot", "minecraft:gunpowder", "minecraft:iron_nugget", "minecraft:copper_ingot", "minecraft:redstone"
-    shaped("service_pistol", ["II", " P"], {"I": I, "P": "minecraft:blackstone"}, "service_pistol")
-    shaped("smg", ["III", " PI"], {"I": I, "P": "minecraft:blackstone"}, "smg")
-    shaped("assault_rifle", ["IIII", " PI ", "  C "], {"I": I, "P": "minecraft:blackstone", "C": C}, "assault_rifle")
-    shaped("lmg", ["IIII", "BPI ", "B C "], {"I": I, "P": "minecraft:blackstone", "C": C, "B": "minecraft:iron_block"}, "lmg")
-    shaped("shotgun", ["III", "WPI"], {"I": I, "P": "minecraft:blackstone", "W": "#minecraft:planks"}, "shotgun")
-    shaped("sniper_rifle", ["GIII", " PI ", " W  "], {"I": I, "P": "minecraft:blackstone", "G": "minecraft:spyglass",
-                                                      "W": "#minecraft:planks"}, "sniper_rifle")
-    shaped("rocket_launcher", ["III", "TPT", "III"], {"I": I, "P": "minecraft:blackstone", "T": "minecraft:tnt"},
-           "rocket_launcher")
-    shapeless("pistol_ammo", [G, C, N], "pistol_ammo", 12)
-    shapeless("rifle_ammo", [G, G, C, N], "rifle_ammo", 16)
-    shapeless("shotgun_shells", [G, "minecraft:paper", N, N], "shotgun_shells", 6)
-    shapeless("sniper_rounds", [G, G, C, C], "sniper_rounds", 5)
-    shapeless("rocket", ["minecraft:tnt", I, G], "rocket", 2)
+    P, W, B = "minecraft:blackstone", "#minecraft:planks", "minecraft:iron_block"
+    shaped("glock17", ["II", " P"], {"I": I, "P": P}, "glock17")
+    shaped("m1911", ["II", " W"], {"I": I, "W": W}, "m1911")
+    shaped("mp5", ["III", " PI"], {"I": I, "P": P}, "mp5")
+    shaped("ump45", ["III", "PPI"], {"I": I, "P": P}, "ump45")
+    shaped("m4a1", ["IIII", " PI ", "  C "], {"I": I, "P": P, "C": C}, "m4a1")
+    shaped("ak47", ["IIII", "WPI ", "  C "], {"I": I, "P": P, "C": C, "W": W}, "ak47")
+    shaped("m249", ["IIII", "BPI ", "B C "], {"I": I, "P": P, "C": C, "B": B}, "m249")
+    shaped("rem870", ["III", "WPI"], {"I": I, "P": P, "W": W}, "rem870")
+    shaped("awm", ["GIII", " PI ", " P  "], {"I": I, "P": P, "G": "minecraft:spyglass"}, "awm")
+    shaped("svd", ["GIII", " PI ", " W  "], {"I": I, "P": P, "G": "minecraft:spyglass", "W": W}, "svd")
+    shaped("carl_gustaf", ["III", "TPT", "CCC"], {"I": I, "P": P, "T": "minecraft:tnt", "C": C}, "carl_gustaf")
+    shaped("rpg7", ["III", "TPT", "WWW"], {"I": I, "P": P, "T": "minecraft:tnt", "W": W}, "rpg7")
+    shapeless("ammo_9mm", [G, C, N], "ammo_9mm", 17)
+    shapeless("ammo_45acp", [G, C, N, N], "ammo_45acp", 14)
+    shapeless("ammo_556", [G, G, C, N], "ammo_556", 30)
+    shapeless("ammo_762x39", [G, G, C, I], "ammo_762x39", 30)
+    shapeless("ammo_762x54r", [G, G, C, C, N], "ammo_762x54r", 10)
+    shapeless("ammo_338", [G, G, G, C, I], "ammo_338", 5)
+    shapeless("ammo_12g", [G, "minecraft:paper", N, N], "ammo_12g", 8)
+    shapeless("ammo_84mm", ["minecraft:tnt", I, G, C], "ammo_84mm", 1)
+    shapeless("ammo_pg7v", ["minecraft:tnt", I, G], "ammo_pg7v", 1)
+    for att_id, recipe in ATTACHMENT_RECIPES.items():
+        pattern, key, count = recipe
+        shaped(att_id, pattern, key, att_id, count)
     shaped("frag_grenade", [" N ", "NGN", " N "], {"N": I, "G": G}, "frag_grenade", 2)
     shaped("smoke_grenade", [" N ", "NCN", " N "], {"N": I, "C": "minecraft:coal"}, "smoke_grenade", 2)
     shaped("combat_knife", ["I", "S"], {"I": I, "S": "minecraft:stick"}, "combat_knife")
@@ -810,6 +905,18 @@ def particles():
                       **dot(0.35, [1.0, 0.2, 0.15, 1.0])}, "particles_add")
     particle("capture_nato", burst(14, 1.5, 1.0, -2, 0.12, [0.3, 0.55, 1.0, 1.0], radius=1.0), "particles_add")
     particle("capture_redfang", burst(14, 1.5, 1.0, -2, 0.12, [1.0, 0.3, 0.25, 1.0], radius=1.0), "particles_add")
+    particle("laser_dot", {"minecraft:emitter_rate_instant": {"num_particles": 1},
+                           "minecraft:emitter_lifetime_once": {"active_time": 0.05}, "minecraft:emitter_shape_point": {},
+                           "minecraft:particle_lifetime_expression": {"max_lifetime": 0.11},
+                           **dot(0.09, [1.0, 0.08, 0.05, 1.0])}, "particles_add")
+    particle("laser_beam", {"minecraft:emitter_rate_instant": {"num_particles": 1},
+                            "minecraft:emitter_lifetime_once": {"active_time": 0.05}, "minecraft:emitter_shape_point": {},
+                            "minecraft:particle_lifetime_expression": {"max_lifetime": 0.11},
+                            **dot(0.025, [1.0, 0.1, 0.08, 0.7])}, "particles_add")
+    particle("bullet_trail", {"minecraft:emitter_rate_instant": {"num_particles": 1},
+                              "minecraft:emitter_lifetime_once": {"active_time": 0.05}, "minecraft:emitter_shape_point": {},
+                              "minecraft:particle_lifetime_expression": {"max_lifetime": 0.12},
+                              **dot(0.045, [1.0, 0.9, 0.55, 0.9])}, "particles_add")
     particle("wreck_fire", smoke(4, 1.5, 2.5, 0.4, 1.6, [0.25, 0.22, 0.2, 0.9], radius=0.8))
 
 

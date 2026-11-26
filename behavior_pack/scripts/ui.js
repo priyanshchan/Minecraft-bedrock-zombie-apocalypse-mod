@@ -2,8 +2,9 @@
 import { EquipmentSlot, ItemStack, system, world } from "@minecraft/server";
 import { ActionFormData, FormCancelationReason, MessageFormData, ModalFormData } from "@minecraft/server-ui";
 import {
-  countItem, cue, getNumber, giveItem, id, NS, safe, settings, TEAMS, teamOf, tell, updateSettings,
+  container, countItem, cue, getNumber, giveItem, id, NS, safe, settings, TEAMS, teamOf, tell, updateSettings,
 } from "./core.js";
+import { gunsmith, gunWith } from "./gunsmith.js";
 import { current, deployPoints, endBattle, groundAt, startBattle } from "./battle.js";
 import { beacons } from "./gear.js";
 import { joinTeam, rankFor, RANKS } from "./teams.js";
@@ -28,28 +29,45 @@ async function show(player, form) {
 export const CLASSES = {
   assault: {
     name: "Assault", desc: "Assault rifle, frag grenades and medkits: take ground and keep your squad alive.",
-    kit: [["assault_rifle", 1], ["service_pistol", 1], ["rifle_ammo", 90], ["pistol_ammo", 36], ["frag_grenade", 2], ["medkit", 3], ["combat_knife", 1]],
+    kit: {
+      nato: [["m4a1", 1, ["red_dot", "vertical_grip"]], ["glock17", 1], ["ammo_556", 120], ["ammo_9mm", 51], ["frag_grenade", 2], ["medkit", 3], ["combat_knife", 1]],
+      redfang: [["ak47", 1, ["compensator"]], ["m1911", 1], ["ammo_762x39", 120], ["ammo_45acp", 28], ["frag_grenade", 2], ["medkit", 3], ["combat_knife", 1]],
+    },
   },
   engineer: {
-    name: "Engineer", desc: "SMG, rocket launcher and a repair tool: kill armour, fix your own.",
-    kit: [["smg", 1], ["service_pistol", 1], ["rocket_launcher", 1], ["rocket", 4], ["pistol_ammo", 120], ["repair_tool", 1], ["combat_knife", 1]],
+    name: "Engineer", desc: "SMG, anti-tank launcher and a repair tool: kill armour, fix your own.",
+    kit: {
+      nato: [["mp5", 1, ["reflex_sight"]], ["glock17", 1], ["carl_gustaf", 1], ["ammo_84mm", 4], ["ammo_9mm", 120], ["repair_tool", 1], ["combat_knife", 1]],
+      redfang: [["ump45", 1], ["m1911", 1], ["rpg7", 1], ["ammo_pg7v", 4], ["ammo_45acp", 100], ["repair_tool", 1], ["combat_knife", 1]],
+    },
   },
   support: {
-    name: "Support", desc: "LMG, ammo boxes and smoke: suppress the enemy and keep everyone firing.",
-    kit: [["lmg", 1], ["service_pistol", 1], ["rifle_ammo", 200], ["pistol_ammo", 36], ["ammo_box", 3], ["smoke_grenade", 2], ["combat_knife", 1]],
+    name: "Support", desc: "Light machine gun, ammo boxes and smoke: suppress the enemy and keep everyone firing.",
+    kit: {
+      nato: [["m249", 1, ["holo_sight"]], ["glock17", 1], ["ammo_556", 400], ["ammo_9mm", 34], ["ammo_box", 3], ["smoke_grenade", 2], ["combat_knife", 1]],
+      redfang: [["m249", 1], ["m1911", 1], ["ammo_556", 400], ["ammo_45acp", 28], ["ammo_box", 3], ["smoke_grenade", 2], ["combat_knife", 1]],
+    },
   },
   recon: {
     name: "Recon", desc: "Sniper rifle, binoculars and a spawn beacon: spot targets, pick them off, open a new front.",
-    kit: [["sniper_rifle", 1], ["service_pistol", 1], ["sniper_rounds", 25], ["pistol_ammo", 36], ["binoculars", 1], ["spawn_beacon", 1], ["smoke_grenade", 1], ["combat_knife", 1]],
+    kit: {
+      nato: [["awm", 1], ["glock17", 1, ["pistol_suppressor"]], ["ammo_338", 25], ["ammo_9mm", 34], ["binoculars", 1], ["spawn_beacon", 1], ["smoke_grenade", 1], ["combat_knife", 1]],
+      redfang: [["svd", 1], ["m1911", 1], ["ammo_762x54r", 40], ["ammo_45acp", 28], ["binoculars", 1], ["spawn_beacon", 1], ["smoke_grenade", 1], ["combat_knife", 1]],
+    },
   },
 };
 
-/** Tops a player's inventory up to a class kit (never takes anything away). @param {import("@minecraft/server").Player} player @param {keyof typeof CLASSES} cls */
+/** Tops a player's inventory up to their side's class kit (never takes anything away). @param {import("@minecraft/server").Player} player @param {keyof typeof CLASSES} cls */
 export function giveKit(player, cls) {
-  for (const [item, n] of CLASSES[cls].kit) {
+  const team = teamOf(player) ?? "nato";
+  for (const [item, n, atts] of /** @type {Array<[string, number, string[]?]>} */ (CLASSES[cls].kit[team])) {
     const full = id(String(item));
     const have = countItem(player, full);
-    if (have < Number(n)) giveItem(player, full, Number(n) - have);
+    if (have >= Number(n)) continue;
+    if (atts && Number(n) === 1) {
+      const rest = container(player)?.addItem(gunWith(full, atts));
+      if (rest) safe(() => player.dimension.spawnItem(rest, player.location));
+    } else giveItem(player, full, Number(n) - have);
   }
   if (countItem(player, id("field_ration")) < 2) giveItem(player, id("field_ration"), 2 - countItem(player, id("field_ration")));
   const eq = player.getComponent("minecraft:equippable");
@@ -70,8 +88,8 @@ export async function chooseTeam(player) {
   const form = new ActionFormData()
     .title("§lChoose your side")
     .body("§9NATO§r and the §cRed Fang§r cell fight for every flag.\n\nYour side decides who your soldiers are, which flags you capture and who shoots at you.")
-    .button("§9§lNATO\n§r§8Coalition forces", "textures/items/frontline/assault_rifle")
-    .button("§c§lRED FANG\n§r§8The terror cell", "textures/items/frontline/smg");
+    .button("§9§lNATO\n§r§8Coalition forces", "textures/items/frontline/m4a1")
+    .button("§c§lRED FANG\n§r§8The terror cell", "textures/items/frontline/ak47");
   const res = await show(player, form);
   if (!res || res.canceled || res.selection === undefined) return teamOf(player);
   const team = res.selection === 0 ? "nato" : "redfang";
@@ -131,6 +149,7 @@ export async function radio(player) {
     options.push(["§lStart a conquest battle\n§r§8Flags, tickets, AI soldiers", () => setupBattle(player)]);
   }
   options.push([team ? `§lChange side\n§r§8Now ${TEAMS[team].color}${TEAMS[team].name}` : "§lChoose a side\n§r§8NATO or Red Fang", () => chooseTeam(player)]);
+  options.push(["§lGunsmith\n§r§8Fit scopes, muzzles, grips...", () => gunsmith(player)]);
   options.push(["§lService record\n§r§8Rank, score, kills", () => record(player)]);
   options.push(["§lField manual\n§r§8How everything works", () => manual(player)]);
   options.push(["§lSettings\n§r§8World rules", () => settingsForm(player)]);
@@ -201,12 +220,28 @@ async function record(player) {
 
 const MANUAL = {
   "Controls": [
-    "§lGuns§r: use (right-click / hold-tap) to fire. Rifles fire short bursts.",
+    "§lGuns§r: use (right-click / hold-tap) to fire. Hold it down for automatic fire; pistols, the SVD, the shotgun and the AWM fire once per press.",
     "§lReload§r: automatic when empty, or double-tap crouch. Your gun's own reload plays: magazine out, a fresh one in, the bolt or slide racked.",
     "§lJams§r: now and then a gun stops. JAMMED: double-tap crouch to tap and rack it (one round lost). MALFUNCTION: double-tap crouch to strip the magazine, rack and reload (two rounds lost). Turn them off in Settings.",
-    "§lAim§r: crouch to steady your aim (much tighter spread). Sprinting spreads it.",
+    "§lAim§r: crouch to aim (much tighter spread, less recoil, scopes zoom). Sprinting and jumping spread your shots.",
     "§lHeadshots§r deal extra damage; sniper headshots kill almost anything.",
     "Spare ammo is an item in your inventory; each gun shows magazine | reserve on the HUD.",
+  ],
+  "Ballistics": [
+    "Every round is a real bullet in flight, at its cartridge's muzzle velocity: 9x19mm 375 m/s, .45 ACP 253 m/s, 5.56x45mm 910 m/s, 7.62x39mm 715 m/s, 7.62x54mmR 830 m/s, .338 Lapua 914 m/s, buckshot 400 m/s (1 block = 1 m).",
+    "Bullets slow down in the air and fall with gravity. Close up they land at once; far away they take time to arrive and drop: lead moving targets and aim a little high at long range. Slow pistol rounds drop the most.",
+    "Sights are zeroed at 25 blocks (pistols) and 100 blocks (rifles).",
+    "A bullet loses damage as it slows. Near misses crack past your ears.",
+    "Recoil kicks your view up and to the side with every shot and settles after the burst. Sustained fire also spreads your shots (bloom): fire in short bursts.",
+    "Spread: crouching aims (much tighter), moving widens it, sprinting and jumping widen it a lot.",
+  ],
+  "Attachments": [
+    "Fit attachments at the §lGunsmith§r (Field Radio), or use an attachment item. They show on the gun in your hand.",
+    "§lOptics§r: reflex, red dot, holographic, 2x prism, 3x magnifier, 4x combat, 1-6x, 8x, 12x and a 4x night-vision scope. Magnified optics zoom while you crouch (turn on FOV changes in Video settings); the night-vision scope lights up the dark.",
+    "§lMuzzles§r: suppressors (quiet, no flash), compensator (less sideways recoil), muzzle brake (less vertical recoil), flash hider, shotgun chokes (tighter pattern).",
+    "§lUnderbarrel§r: vertical grip (vertical recoil), angled grip (horizontal recoil), stubby grip, handstop, bipod (braced while crouched).",
+    "§lSide rail§r: laser sight (tighter hip fire, a red dot where you aim), flashlight (lights up where you aim), laser-light module.",
+    "§lStocks§r and §lmagazines§r: heavy, lightweight and precision stocks; extended, drum and quick-pull magazines, extended shotgun tube, 300-round box.",
   ],
   "Classes": Object.values(CLASSES).map((c) => `§l${c.name}§r: ${c.desc}`),
   "Conquest": [
@@ -254,13 +289,17 @@ async function settingsForm(player) {
     .slider("Minutes between patrols", 2, 10, { defaultValue: s.patrolMinutes, valueStep: 1 })
     .dropdown("AI damage", ["Low", "Normal", "High"], { defaultValueIndex: Math.max(0, damage.indexOf(s.botDamage)) })
     .toggle("Status bar (HUD)", { defaultValue: s.hud })
-    .toggle("Weapon jams and malfunctions", { defaultValue: s.malfunctions });
+    .toggle("Weapon jams and malfunctions", { defaultValue: s.malfunctions })
+    .toggle("Recoil moves the view", { defaultValue: s.cameraRecoil })
+    .dropdown("Bullet drop", ["Off", "Realistic", "Heavy (x3)"], { defaultValueIndex: s.bulletDrop <= 0 ? 0 : s.bulletDrop > 1 ? 2 : 1 })
+    .toggle("Tracers", { defaultValue: s.tracers });
   const res = await show(player, form);
   if (!res || res.canceled || !res.formValues) return;
   const v = res.formValues.filter((x) => x !== undefined);
   updateSettings({
     friendlyFire: Boolean(v[0]), destruction: Boolean(v[1]), patrols: Boolean(v[2]), patrolMinutes: Number(v[3]),
     botDamage: damage[Number(v[4])] ?? 1, hud: Boolean(v[5]), malfunctions: Boolean(v[6]),
+    cameraRecoil: Boolean(v[7]), bulletDrop: [0, 1, 3][Number(v[8])] ?? 1, tracers: Boolean(v[9]),
   });
   tell(player, "§aSettings saved.");
 }

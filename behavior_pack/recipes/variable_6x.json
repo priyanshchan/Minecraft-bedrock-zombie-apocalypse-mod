@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:variable_6x"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IGS",
+      " C "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "G": {
+        "item": "minecraft:glass"
+      },
+      "S": {
+        "item": "minecraft:spyglass"
+      },
+      "C": {
+        "item": "minecraft:copper_ingot"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:variable_6x",
+      "count": 1
+    }
+  }
+}

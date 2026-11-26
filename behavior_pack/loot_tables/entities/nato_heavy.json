@@ -5,34 +5,6 @@
       "entries": [
         {
           "type": "item",
-          "name": "frontline:rifle_ammo",
-          "weight": 4,
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 4,
-                "max": 12
-              }
-            }
-          ]
-        },
-        {
-          "type": "item",
-          "name": "frontline:pistol_ammo",
-          "weight": 3,
-          "functions": [
-            {
-              "function": "set_count",
-              "count": {
-                "min": 4,
-                "max": 10
-              }
-            }
-          ]
-        },
-        {
-          "type": "item",
           "name": "frontline:field_ration",
           "weight": 2
         },
@@ -54,7 +26,7 @@
         },
         {
           "condition": "random_chance_with_looting",
-          "chance": 0.25,
+          "chance": 0.45,
           "looting_multiplier": 0.05
         }
       ],
@@ -62,7 +34,7 @@
       "entries": [
         {
           "type": "item",
-          "name": "frontline:rocket",
+          "name": "frontline:ammo_84mm",
           "weight": 3,
           "functions": [
             {
@@ -73,6 +45,30 @@
               }
             }
           ]
+        },
+        {
+          "type": "item",
+          "name": "frontline:ammo_9mm",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 6,
+                "max": 17
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "frontline:flashlight",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "frontline:laser_sight",
+          "weight": 1
         }
       ]
     }

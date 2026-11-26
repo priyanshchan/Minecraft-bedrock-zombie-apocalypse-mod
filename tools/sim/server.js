@@ -41,8 +41,8 @@ export class ItemStack {
   constructor(typeId, amount = 1) {
     this.typeId = typeId;
     this.amount = amount;
-    const single = ["service_pistol", "smg", "assault_rifle", "lmg", "shotgun", "sniper_rifle", "rocket_launcher", "combat_knife",
-      "field_radio", "binoculars", "repair_tool", "jeep_kit", "tank_kit"].map((n) => `frontline:${n}`);
+    const single = ["glock17", "m1911", "mp5", "ump45", "m4a1", "ak47", "m249", "rem870", "awm", "svd", "carl_gustaf", "rpg7",
+      "combat_knife", "field_radio", "binoculars", "repair_tool", "jeep_kit", "tank_kit"].map((n) => `frontline:${n}`);
     this.maxAmount = single.includes(typeId) || /helmet|chestplate/.test(typeId) ? 1 : typeId.endsWith("grenade") ? 4 : 64;
     this.props = new Map();
   }
@@ -90,6 +90,8 @@ function makeEntity(typeId, location, dim) {
     getHeadLocation() { return { x: this.location.x, y: this.location.y + 1.62, z: this.location.z }; },
     getViewDirection() { return this.view; },
     addEffect(t, d, o) { this.effects.set(typeof t === "string" ? t : t.id, { d, o }); },
+    removeEffect(t) { return this.effects.delete(typeof t === "string" ? t : t.id); },
+    getVelocity() { return { x: 0, y: 0, z: 0 }; }, isOnGround: true,
     playAnimation(n, o) { this.anims.push({ n, o }); },
     runCommand(c) { commands.push(c); return { successCount: 1 }; },
     matches(q) { return (q.families ?? []).every((f) => familiesOf(this).includes(f)); },
@@ -190,7 +192,18 @@ function makeDimension(id) {
     getEntities: (q = {}) => entities.filter((e) => matchQuery(e, q, dim)),
     getPlayers: () => world.getAllPlayers().filter((p) => p.dimension === dim),
     getEntitiesFromRay: (o, d, opt) => raycast(dim, o, d, opt?.maxDistance ?? 64, undefined).filter((h) => !(opt?.excludeTypes ?? []).includes(h.entity.typeId)),
-    getBlockFromRay: () => undefined,
+    getBlockFromRay(o, d, opt) {
+      // march along the ray to the first solid block
+      const max = opt?.maxDistance ?? 64;
+      for (let t = 0; t <= max; t += 0.05) {
+        const p = { x: o.x + d.x * t, y: o.y + d.y * t, z: o.z + d.z * t };
+        const b = blockAt(dim, p);
+        if (!b.isAir && !b.typeId.startsWith("minecraft:light_block")) {
+          return { block: b, face: "Up", faceLocation: { x: p.x - b.location.x, y: p.y - b.location.y, z: p.z - b.location.z } };
+        }
+      }
+      return undefined;
+    },
     spawnParticle: (effect, l) => particles.push({ effect, l }),
     playSound: (s, l, o) => sounds.push({ s, l, o }),
     createExplosion: (l, r, o) => (explosions.push({ l, r, o }), true),

@@ -9,6 +9,7 @@ import * as gear from "./gear.js";
 import * as battle from "./battle.js";
 import * as patrols from "./patrols.js";
 import * as ui from "./ui.js";
+import * as gunsmith from "./gunsmith.js";
 
 let started = false;
 const PLACEABLE = new Set(["sandbags", "barbed_wire", "ammo_crate", "spawn_beacon", "jeep_kit", "tank_kit"].map(id));
@@ -19,6 +20,7 @@ function start() {
   teams.init();
   vehicles.init(); // before weapons: in a tank's commander seat every item fires the cannon
   weapons.init();
+  gunsmith.init();
   explosives.init();
   gear.init();
   battle.init();

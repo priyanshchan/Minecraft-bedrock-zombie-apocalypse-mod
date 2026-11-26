@@ -128,6 +128,41 @@ def s_sniper():
     return gunshot(3, 95, 0.03, 0.1, 1.4, 8500)
 
 
+def s_heavy_pistol():  # .45 ACP: a deeper, rounder thump
+    return gunshot(21, 110, 0.03, 0.07, 0.55, 6000)
+
+
+def s_ak47():  # 7.62x39: a harsher, lower bark than the 5.56
+    return gunshot(22, 105, 0.034, 0.075, 0.65, 6200)
+
+
+def s_dmr():  # 7.62x54R semi-auto: a loud crack with a long tail
+    return gunshot(23, 100, 0.03, 0.09, 1.1, 8000)
+
+
+def s_suppressed():  # through a suppressor: a muffled thud and the action cycling
+    n = int(SR * 0.35)
+    thud = filt(noise(n, 24), 80, 1400) * decay(n, 0.03)
+    pop = osc(140, n) * decay(n, 0.02) * 0.6
+    x = np.tanh((thud + pop) * 1.6)
+    place(x, s_click(25, 2600) * 0.35, 0.03)
+    return x
+
+
+def s_attach():  # an attachment clicking onto a rail
+    out = np.zeros(int(SR * 0.3))
+    place(out, filt(noise(int(0.05 * SR), 26), 600, 4000) * decay(int(0.05 * SR), 0.01) * 0.6, 0.0)
+    place(out, s_click(27, 2800), 0.09)
+    place(out, s_click(28, 3400) * 0.8, 0.16)
+    return out
+
+
+def s_bullet_crack():  # a supersonic round passing close by
+    n = int(SR * 0.12)
+    x = filt(noise(n, 29), 1500, None) * decay(n, 0.006)
+    return x + osc(4200, n) * decay(n, 0.004) * 0.3
+
+
 def s_click(seed=7, ping=3200):
     n = int(0.06 * SR)
     tick = filt(noise(n, seed), 2000, None) * decay(n, 0.003)
@@ -317,11 +352,13 @@ BUILDERS = {
     "kill": s_kill, "capture": s_capture, "capture_lost": s_capture_lost, "alarm": s_alarm,
     "battle_start": s_battle_start, "victory": s_victory, "defeat": s_defeat, "radio": s_radio, "heal": s_heal,
     "resupply": s_resupply, "repair": s_repair, "click": s_click_ui, "engine": s_engine,
+    "heavy_pistol": s_heavy_pistol, "ak47": s_ak47, "dmr": s_dmr, "suppressed": s_suppressed, "attach": s_attach,
+    "bullet_crack": s_bullet_crack,
 }
 
 CATEGORY = {"explosion": "weather", "tank_fire": "hostile", "alarm": "ambient", "battle_start": "ambient",
             "engine": "neutral"}
-RANGE = {"sniper": 160.0, "explosion": 160.0, "tank_fire": 160.0, "lmg": 112.0, "assault_rifle": 112.0,
+RANGE = {"heavy_pistol": 80.0, "ak47": 112.0, "dmr": 140.0, "suppressed": 24.0, "bullet_crack": 6.0, "sniper": 160.0, "explosion": 160.0, "tank_fire": 160.0, "lmg": 112.0, "assault_rifle": 112.0,
          "shotgun": 96.0, "pistol": 80.0, "smg": 80.0, "rocket_launch": 112.0, "alarm": 160.0,
          "battle_start": 200.0, "engine": 24.0}
 VOLUME = {"alarm": 0.6, "click": 0.6, "hitmarker": 0.8, "engine": 0.5, "victory": 0.9, "defeat": 0.9}

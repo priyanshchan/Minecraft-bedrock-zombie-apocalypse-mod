@@ -63,7 +63,7 @@ def brighten(img, f=1.22):
 def items():
     out = RP / "textures" / "items" / NS
     out.mkdir(parents=True, exist_ok=True)
-    built = H.build_all()
+    built = H.build_all(bare=True)  # icons show the guns as they come
     built.update(M.props())
     icons = {}
     for key in item_ids():

@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:night_vision_4x"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IGS",
+      "ERE"
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "G": {
+        "item": "minecraft:glass"
+      },
+      "S": {
+        "item": "minecraft:spyglass"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      },
+      "E": {
+        "item": "minecraft:emerald"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:night_vision_4x",
+      "count": 1
+    }
+  }
+}

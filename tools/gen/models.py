@@ -143,15 +143,19 @@ OUTFITS = {
                         boots="#1e1c1a", pants="#2a2a26", headgear="beanie", headgear_col="#7e1a17", heavy=True),
 }
 
-# Which gun each soldier carries: a held-item builder (the player's guns) or one of the Red Fang patterns below.
-SOLDIER_GUNS = {
-    "nato_rifleman": "assault_rifle", "nato_marksman": "sniper_rifle", "nato_heavy": "rocket_launcher",
-    "redfang_fighter": "fang_rifle", "redfang_sniper": "fang_dmr", "redfang_rpg": "fang_rpg",
-}
+SOLDIER_GUN_CUBES = 90  # parts of a soldier's gun drawn (the largest); the player's own gun has them all
 
 
-def gun_builder(name):
-    return H.FANG.get(name) or H.ALL[name]
+def soldier_gun(name):
+    """The gun a soldier carries: the player's model of it, built light (plain rods, no pins) and bare, since
+    many soldiers are on screen at once."""
+    import guns as G
+    from kit import LOW
+    LOW[0] = True
+    try:
+        return G.GUNS[name]().finish()
+    finally:
+        LOW[0] = False
 
 
 def gun_cubes(g):
@@ -360,12 +364,17 @@ def soldier(key, outfit_key, res=2):
             paint(holster, "#26251f", noise=2)
 
     # ---- the gun, as held in the aiming pose
-    gun_key = SOLDIER_GUNS[key]
-    g = gun_builder(gun_key)()
+    from defs import SOLDIERS
+    g = soldier_gun(SOLDIERS[key]["gun"])
+    # a level of detail for crowds: the soldier's gun keeps its largest parts (they make the silhouette)
+    parts = gun_cubes(g)
+    keep = set(map(id, sorted(parts, key=lambda c: -(c.size[0] * c.size[1] * c.size[2]))[:SOLDIER_GUN_CUBES]))
     third, _first = holds.compute()[g.hold]
     gun = m.bone("gun", H.GRIP, "rightItem", rotation=third[0])
     gun.scale = H.SCALE
-    for c in gun_cubes(g):
+    for c in parts:
+        if id(c) not in keep:
+            continue
         c.img = c.img.resize((c.img.width * res, c.img.height * res), Image.NEAREST)
         c.res = res
         c.bone = "gun"
@@ -788,46 +797,81 @@ BLOCK_MODELS = {"sandbags": sandbags, "barbed_wire": barbed_wire, "ammo_crate": 
 # =========================================================================== small props for item icons
 
 def prop(key, build):
-    g = H.Held(key, "gear")
+    # ammunition is drawn side-on and tilted like the guns; other props from above
+    g = H.Held(key, "pistol" if key.startswith("ammo_") and key not in ("ammo_9mm", "ammo_45acp") else "gear")
     build(g)
     return g
 
 
-def _pistol_ammo(g):
-    box = g.box(-6, 8, -4, 4, -4, 4, "#c9a43a")
+BRASS_C, COPPER_C, STEEL_C = "#c9a43a", "#b0703a", "#8d9299"
+
+
+def _rounds(g, n, length, r, tip_len, spacing, case=BRASS_C, tip=COPPER_C):
+    """A row of loose cartridges standing side by side."""
+    for i in range(n):
+        s = (i - (n - 1) / 2) * spacing
+        g.rod(-length / 2, length / 2 - tip_len, 0, s, r, case)
+        g.rod(-length / 2 - 1, -length / 2, 0, s, r * 0.9, shade(case, 0.8))
+        g.rod(length / 2 - tip_len, length / 2 - tip_len / 3, 0, s, r * 0.75, tip)
+        g.rod(length / 2 - tip_len / 3, length / 2, 0, s, max(0.5, r * 0.4), tip)
+
+
+def _ammo_box(g, colour, label, rounds):
+    box = g.box(-8, 8, -5, 3, -6, 6, colour)
     for side in ("right", "left"):
-        H.mark(box, side, -6, 8, -4, -3, "#8a6a1a")
-        H.mark(box, side, -6, 8, 3, 4, "#8a6a1a")
-    g.box(-6, 8, 4, 5, -4, 4, "#8a6a1a")
-    for sx in (-2.5, 0, 2.5):
-        g.rod(8, 11, 0, sx, 1.2, "#b0703a")
+        H.mark(box, side, -6, 6, -3, 1, label)
+    g.box(-8, 8, 3, 4, -6, 6, shade(colour, 0.8))
+    for i, s in enumerate((-3, 0, 3)):
+        g.rod(4, 4 + rounds[0], -1, s, rounds[1], BRASS_C)
+        g.rod(4 + rounds[0], 4 + rounds[0] + 2, -1, s, rounds[1] * 0.7, COPPER_C)
 
 
-def _rifle_ammo(g):
-    mag = g.box(-8, 8, -3, 3, -2, 2, "#3a3530")
-    H.ribs(mag, ("right", "left"), 3, "#2a2622")
-    g.rod(8, 12, 1, 0, 1.2, "#c9a43a")
-    g.rod(12, 14, 1, 0, 0.8, "#b0703a")
+def _ammo_9mm(g):
+    _ammo_box(g, "#2d3b6a", "#e9e7df", (4, 1.2))
 
 
-def _shotgun_shells(g):
+def _ammo_45acp(g):
+    _ammo_box(g, "#6a2d2d", "#e9e7df", (4, 1.5))
+
+
+def _ammo_556(g):  # a 10-round stripper clip of 5.56
+    g.box(-1, 1, -4, 4, -8, 8, STEEL_C)
+    _rounds(g, 5, 18, 1.1, 6, 3)
+
+
+def _ammo_762x39(g):
+    _rounds(g, 4, 18, 1.4, 6, 3.4, case="#9a8a5a")
+
+
+def _ammo_762x54r(g):
+    _rounds(g, 4, 24, 1.5, 8, 3.6)
+
+
+def _ammo_338(g):
+    _rounds(g, 3, 30, 1.9, 10, 4.6)
+
+
+def _ammo_12g(g):
     for sx in (-3, 3):
         g.rod(-4, 8, 0, sx, 2.2, "#c8302c")
-        g.rod(-7, -4, 0, sx, 2.4, "#c9a43a")
+        g.rod(-7, -4, 0, sx, 2.4, BRASS_C)
 
 
-def _sniper_rounds(g):
-    for sx in (-4, 0, 4):
-        g.rod(-8, 6, 0, sx, 1.5, "#c9a43a")
-        g.rod(6, 11, 0, sx, 0.9, "#b0703a")
+def _ammo_84mm(g):
+    g.rod(-14, 6, 0, 0, 4, "#6a7040")
+    g.rod(6, 12, 0, 0, 3, "#4a5530")
+    g.rod(12, 15, 0, 0, 1.5, "#1d1f23")
+    g.rod(-16, -14, 0, 0, 4.2, BRASS_C)
 
 
-def _rocket(g):
-    g.rod(-10, 8, 0, 0, 3, "#5b6339")
-    g.rod(8, 13, 0, 0, 2, "#454b2b")
-    g.rod(13, 15, 0, 0, 1, "#1d1f23")
-    g.box(-12, -8, -5, 5, -0.5, 0.5, "#3d4148")
-    g.box(-12, -8, -0.5, 0.5, -5, 5, "#3d4148")
+def _ammo_pg7v(g):
+    g.rod(-14, -2, 0, 0, 1.5, "#3a4228")
+    g.rod(-2, 4, 0, 0, 3.5, "#4a5530")
+    g.rod(4, 10, 0, 0, 4.5, "#4a5530")
+    g.rod(10, 14, 0, 0, 3, "#4a5530")
+    g.rod(14, 17, 0, 0, 1.5, "#1d1f23")
+    g.box(-16, -12, -4, 4, -0.5, 0.5, "#3d4148")
+    g.box(-16, -12, -0.5, 0.5, -4, 4, "#3d4148")
 
 
 def _field_ration(g):
@@ -837,9 +881,14 @@ def _field_ration(g):
     g.box(8, 9, -1.5, 1.5, -6, 6, "#6a5838")
 
 
-PROPS = {"pistol_ammo": _pistol_ammo, "rifle_ammo": _rifle_ammo, "shotgun_shells": _shotgun_shells,
-         "sniper_rounds": _sniper_rounds, "rocket": _rocket, "field_ration": _field_ration}
+PROPS = {"ammo_9mm": _ammo_9mm, "ammo_45acp": _ammo_45acp, "ammo_556": _ammo_556, "ammo_762x39": _ammo_762x39,
+         "ammo_762x54r": _ammo_762x54r, "ammo_338": _ammo_338, "ammo_12g": _ammo_12g, "ammo_84mm": _ammo_84mm,
+         "ammo_pg7v": _ammo_pg7v, "field_ration": _field_ration}
 
 
 def props():
-    return {k: prop(k, fn).finish() for k, fn in PROPS.items()}
+    """Models for the icons of items that are not held as 3D models: ammunition, rations and attachments."""
+    import attach
+    out = {k: prop(k, fn).finish() for k, fn in PROPS.items()}
+    out.update({k: attach.standalone(k) for k in attach.CATALOGUE})
+    return out

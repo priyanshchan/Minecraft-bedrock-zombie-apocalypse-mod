@@ -312,6 +312,78 @@
           "load_on_low_memory": true
         }
       ]
+    },
+    "frontline.heavy_pistol": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 80.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/heavy_pistol",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.ak47": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 112.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/ak47",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.dmr": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 140.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/dmr",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.suppressed": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 24.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/suppressed",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.attach": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/attach",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.bullet_crack": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 6.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/bullet_crack",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
     }
   }
 }

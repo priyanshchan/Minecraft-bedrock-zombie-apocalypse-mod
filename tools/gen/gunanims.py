@@ -12,15 +12,21 @@ Rotations: x tilts the muzzle (negative = muzzle up), y rolls the gun about the 
 """
 from __future__ import annotations
 
-# Ticks of each action, per gun (also used by scripts/weapons.js through defs: keep in step).
+# Ticks of each action, per gun (the scripts read them from gundata.js). The four lengths of a gun differ by at
+# least a tick, so the model can tell them apart.
 TIMING = {
-    "assault_rifle": {"fire": 3, "reload": 46, "jam": 28, "malfunction": 64},
-    "smg": {"fire": 3, "reload": 40, "jam": 26, "malfunction": 60},
-    "lmg": {"fire": 3, "reload": 90, "jam": 30, "malfunction": 70},
-    "shotgun": {"fire": 14, "reload": 72, "jam": 32, "malfunction": 58},
-    "sniper_rifle": {"fire": 24, "reload": 66, "jam": 34, "malfunction": 74},
-    "service_pistol": {"fire": 3, "reload": 32, "jam": 22, "malfunction": 50},
-    "rocket_launcher": {"fire": 8, "reload": 70, "jam": 36, "malfunction": 80},
+    "glock17": {"fire": 3, "reload": 30, "jam": 22, "malfunction": 48},
+    "m1911": {"fire": 4, "reload": 34, "jam": 24, "malfunction": 52},
+    "mp5": {"fire": 2, "reload": 42, "jam": 26, "malfunction": 60},
+    "ump45": {"fire": 3, "reload": 40, "jam": 27, "malfunction": 61},
+    "m4a1": {"fire": 3, "reload": 46, "jam": 28, "malfunction": 64},
+    "ak47": {"fire": 4, "reload": 50, "jam": 29, "malfunction": 66},
+    "m249": {"fire": 2, "reload": 100, "jam": 30, "malfunction": 72},
+    "rem870": {"fire": 16, "reload": 72, "jam": 32, "malfunction": 58},
+    "awm": {"fire": 30, "reload": 70, "jam": 34, "malfunction": 76},
+    "svd": {"fire": 5, "reload": 54, "jam": 31, "malfunction": 68},
+    "carl_gustaf": {"fire": 8, "reload": 80, "jam": 36, "malfunction": 84},
+    "rpg7": {"fire": 8, "reload": 70, "jam": 37, "malfunction": 81},
 }
 
 SLOT = "'slot.weapon.mainhand', 0"
@@ -35,8 +41,9 @@ def active(seconds):
 class Anim:
     """Keyframes per bone and channel; values are lerped linearly between keys."""
 
-    def __init__(self, length):
+    def __init__(self, length, bones=None):
         self.length = length
+        self.bones = bones  # the model's bones: tracks for any other bone are left out
         self.tracks: dict[str, dict[str, dict[float, list[float]]]] = {}
 
     def key(self, bone, channel, t, value):
@@ -58,6 +65,8 @@ class Anim:
     def json(self):
         bones = {}
         for bone, channels in self.tracks.items():
+            if self.bones is not None and bone not in self.bones:
+                continue
             bones[bone] = {}
             for channel, keys in channels.items():
                 zero = [1, 1, 1] if channel == "scale" else [0, 0, 0]
@@ -131,20 +140,33 @@ def seconds(gun, action):
     return TIMING[gun][action] / 20
 
 
-def build(gun):
-    """{action: Anim} for one gun."""
+def build(gun, family=None, bones=None):
+    """{action: Anim} for one gun. `family` is how the gun works (the model's `anim`: pistol, ar, lmg, pump,
+    bolt, launcher_rear, launcher_front); `bones` the model's bones (tracks for missing parts are left out)."""
+    if family is None or bones is None:
+        import guns as G
+        g = G.GUNS[gun]()
+        family, bones = g.anim, set(g.bones)
     t = {k: seconds(gun, k) for k in TIMING[gun]}
     out = {}
     cant, lift = (-20, -50, -10), (0, 0, -12)  # rolled over and lifted: the magwell faces the eye
 
-    if gun in ("assault_rifle", "smg", "lmg"):
+    def mk(length):  # every animation of this gun knows its bones
+        return Anim(length, bones)
+
+    lmg = family == "lmg"
+    if family in ("ar", "lmg"):
         handle = "charging_handle"
-        fire = Anim(t["fire"])
-        recoil(fire, {"lmg": 3.5}.get(gun, 4.5), 2.5, "bolt" if gun != "lmg" else None, 8)
+        fire = mk(t["fire"])
+        recoil(fire, {"m249": 3.5, "ak47": 5.5, "svd": 7.0, "mp5": 3.5}.get(gun, 4.5), 2.5, None if lmg else "bolt", 8)
+        if "bolt" not in bones and not lmg:  # AK and SVD: the carrier and its handle cycle
+            fire.rest(handle, "position", 0.0)
+            fire.key(handle, "position", 0.04, (0, -8, 0))
+            fire.rest(handle, "position", min(fire.length, 0.13))
         out["fire"] = fire
 
-        r = Anim(t["reload"])
-        if gun == "lmg":
+        r = mk(t["reload"])
+        if lmg:
             tilt(r, 0.35, 3.9, (-10, -40, -8), (0, 0, -10))
             r.rest("cover", "rotation", 0.5)
             r.key("cover", "rotation", 0.8, (-70, 0, 0))
@@ -154,28 +176,28 @@ def build(gun):
             rack(r, handle, 3.7, 12, 0.15, 0.1, 0.12)
         else:
             tilt(r, 0.25, t["reload"] - 0.45, cant, lift)
-            mag_swap(r, 0.3, 1.35 if gun == "assault_rifle" else 1.2, 32, (8, 0, 0))
+            mag_swap(r, 0.3, min(1.35, t["reload"] - 1.0), 32, (8, 0, 0))
             rack(r, handle, t["reload"] - 0.75, 10)
             rack(r, "bolt", t["reload"] - 0.75, 8)
         out["reload"] = r
 
-        j = Anim(t["jam"])  # tap, rack, bang
+        j = mk(t["jam"])  # tap, rack, bang
         tilt(j, 0.15, t["jam"] - 0.3, (-10, -35, -6), (0, 0, -6))
         j.rest("mag", "position", 0.3)
         j.key("mag", "position", 0.36, (0, 0, -2))
         j.rest("mag", "position", 0.42)
         rack(j, handle, 0.55, 12)
-        if gun != "lmg":  # the LMG's bolt is hidden inside; only its handle shows
+        if not lmg:  # the LMG's bolt is hidden inside; only its handle shows
             rack(j, "bolt", 0.55, 8)
         out["jam"] = j
 
-        m = Anim(t["malfunction"])  # double feed: lock back, strip the mag, rack three times, reload, rack
+        m = mk(t["malfunction"])  # double feed: lock back, strip the mag, rack three times, reload, rack
         tilt(m, 0.2, t["malfunction"] - 0.35, cant, lift)
         m.rest(handle, "position", 0.3)
         m.key(handle, "position", 0.45, (0, -12, 0))
         m.key(handle, "position", 0.6, (0, -12, 0))
         m.rest(handle, "position", 0.7)
-        if gun == "lmg":
+        if lmg:
             m.rest("cover", "rotation", 0.7)
             m.key("cover", "rotation", 0.95, (-70, 0, 0))
             m.key("cover", "rotation", 2.6, (-70, 0, 0))
@@ -191,22 +213,26 @@ def build(gun):
             rack(m, "bolt", 2.4, 8)
         out["malfunction"] = m
 
-    elif gun == "service_pistol":
-        fire = Anim(t["fire"])
-        recoil(fire, 7, 2, "slide", 7)
+    elif family == "pistol":
+        fire = mk(t["fire"])
+        recoil(fire, 9 if gun == "m1911" else 7, 2, "slide", 7)
+        if "hammer" in bones:  # the hammer is thrown back by the slide and stays cocked
+            fire.rest("hammer", "rotation", 0.0)
+            fire.key("hammer", "rotation", 0.04, (-20, 0, 0))
+            fire.rest("hammer", "rotation", min(fire.length, 0.12))
         out["fire"] = fire
-        r = Anim(t["reload"])
+        r = mk(t["reload"])
         tilt(r, 0.15, t["reload"] - 0.25, (-15, -45, -10), (0, 0, -8))
         r.key("slide", "position", 0.0, (0, -7, 0))  # empty: the slide was locked back
         r.key("slide", "position", 1.05, (0, -7, 0))
         r.rest("slide", "position", 1.12)
         mag_swap(r, 0.12, 0.85, 26)
         out["reload"] = r
-        j = Anim(t["jam"])
+        j = mk(t["jam"])
         tilt(j, 0.1, t["jam"] - 0.2, (-10, -35, -6), (0, 0, -5))
         rack(j, "slide", 0.4, 7)
         out["jam"] = j
-        m = Anim(t["malfunction"])
+        m = mk(t["malfunction"])
         tilt(m, 0.15, t["malfunction"] - 0.25, (-15, -45, -10), (0, 0, -8))
         m.rest("slide", "position", 0.25)
         m.key("slide", "position", 0.4, (0, -7, 0))
@@ -215,12 +241,12 @@ def build(gun):
         rack(m, "slide", 1.9, 7)
         out["malfunction"] = m
 
-    elif gun == "shotgun":
-        fire = Anim(t["fire"])
+    elif family == "pump":
+        fire = mk(t["fire"])
         recoil(fire, 12, 4)
         rack(fire, "pump", 0.28, 11, 0.1, 0.06, 0.1)
         out["fire"] = fire
-        r = Anim(t["reload"])
+        r = mk(t["reload"])
         tilt(r, 0.3, t["reload"] - 0.5, (-20, -80, -10), (0, 0, -12))
         for i in range(4):
             s0 = 0.45 + i * 0.6
@@ -230,12 +256,12 @@ def build(gun):
             r.rest("shell", "position", s0 + 0.45)
         rack(r, "pump", t["reload"] - 0.8, 11, 0.12, 0.06, 0.12)
         out["reload"] = r
-        j = Anim(t["jam"])  # short-stroked pump: slam it back and forward
+        j = mk(t["jam"])  # short-stroked pump: slam it back and forward
         tilt(j, 0.12, t["jam"] - 0.25, (-10, -30, -6), (0, 0, -6))
         rack(j, "pump", 0.35, 11, 0.12, 0.1, 0.12)
         rack(j, "pump", 0.85, 11, 0.1, 0.05, 0.1)
         out["jam"] = j
-        m = Anim(t["malfunction"])  # a shell stuck in the port: rack, clear it, reload one
+        m = mk(t["malfunction"])  # a shell stuck in the port: rack, clear it, reload one
         tilt(m, 0.2, t["malfunction"] - 0.35, (-20, -80, -10), (0, 0, -12))
         rack(m, "pump", 0.35, 11, 0.12, 0.6, 0.12)
         m.rest("shell", "position", 0.4)
@@ -248,7 +274,7 @@ def build(gun):
         rack(m, "pump", 2.2, 11)
         out["malfunction"] = m
 
-    elif gun == "sniper_rifle":
+    elif family == "bolt":
         def bolt_cycle(a, t0):
             a.rest("bolt", "rotation", t0)
             a.key("bolt", "rotation", t0 + 0.12, (0, -65, 0))
@@ -259,11 +285,11 @@ def build(gun):
             a.key("bolt", "rotation", t0 + 0.5, (0, -65, 0))
             a.rest("bolt", "rotation", t0 + 0.6)
 
-        fire = Anim(t["fire"])
+        fire = mk(t["fire"])
         recoil(fire, 14, 5)
         bolt_cycle(fire, 0.4)
         out["fire"] = fire
-        r = Anim(t["reload"])
+        r = mk(t["reload"])
         tilt(r, 0.25, t["reload"] - 0.4, cant, lift)
         r.rest("bolt", "rotation", 0.3)
         r.key("bolt", "rotation", 0.42, (0, -65, 0))
@@ -275,12 +301,12 @@ def build(gun):
         r.rest("bolt", "position", 2.35)
         mag_swap(r, 0.8, 1.9, 22)
         out["reload"] = r
-        j = Anim(t["jam"])
+        j = mk(t["jam"])
         tilt(j, 0.15, t["jam"] - 0.3, (-10, -35, -6), (0, 0, -6))
         bolt_cycle(j, 0.35)
         bolt_cycle(j, 0.95)
         out["jam"] = j
-        m = Anim(t["malfunction"])
+        m = mk(t["malfunction"])
         tilt(m, 0.2, t["malfunction"] - 0.35, cant, lift)
         m.rest("bolt", "rotation", 0.3)
         m.key("bolt", "rotation", 0.42, (0, -65, 0))
@@ -296,11 +322,44 @@ def build(gun):
         mag_swap(m, 1.0, 2.5, 22)
         out["malfunction"] = m
 
-    elif gun == "rocket_launcher":
-        fire = Anim(t["fire"])
+    elif family == "launcher_rear":  # Carl Gustaf: swing the venturi open, a round in from behind, close it
+        fire = mk(t["fire"])
+        recoil(fire, 7, 6)
+        out["fire"] = fire
+        r = mk(t["reload"])
+        tilt(r, 0.3, t["reload"] - 0.5, (12, -20, -8), (0, 6, -4))
+        r.rest("breech", "rotation", 0.4)
+        r.key("breech", "rotation", 0.75, (0, 0, -95))
+        r.key("breech", "rotation", 3.0, (0, 0, -95))
+        r.rest("breech", "rotation", 3.35)
+        r.rest("rocket", "scale", 0.0, 0.8)
+        r.key("rocket", "scale", 0.85, (0, 0, 0))
+        r.key("rocket", "scale", 1.5, (0, 0, 0))
+        r.rest("rocket", "scale", 1.55)
+        r.rest("rocket", "position", 0.0, 0.8)
+        r.key("rocket", "position", 0.85, (0, -60, 0))
+        r.key("rocket", "position", 1.55, (0, -60, 0))
+        r.key("rocket", "position", 2.1, (0, -24, 0))
+        r.rest("rocket", "position", 2.6)
+        out["reload"] = r
+        for action, length in (("jam", t["jam"]), ("malfunction", t["malfunction"])):  # a misfire: open, re-seat, close
+            a = mk(length)
+            tilt(a, 0.3, length - 0.5, (10, -18, -6), (0, 5, -3))
+            a.rest("breech", "rotation", 0.5)
+            a.key("breech", "rotation", 0.8, (0, 0, -95))
+            a.key("breech", "rotation", length - 1.0, (0, 0, -95))
+            a.rest("breech", "rotation", length - 0.7)
+            a.rest("rocket", "position", 0.9)
+            a.key("rocket", "position", 1.2, (0, -14, 0))
+            a.key("rocket", "position", length - 1.4, (0, -14, 0))
+            a.rest("rocket", "position", length - 1.1)
+            out[action] = a
+
+    elif family == "launcher_front":
+        fire = mk(t["fire"])
         recoil(fire, 8, 5)
         out["fire"] = fire
-        r = Anim(t["reload"])
+        r = mk(t["reload"])
         tilt(r, 0.3, t["reload"] - 0.5, (10, -30, -10), (0, 8, -6))
         r.rest("rocket", "scale", 0.0, 0.45)
         r.key("rocket", "scale", 0.5, (0, 0, 0))
@@ -313,7 +372,7 @@ def build(gun):
         r.key("rocket", "position", 0.5, (0, 0, 0))
         out["reload"] = r
         for action, length in (("jam", t["jam"]), ("malfunction", t["malfunction"])):  # a misfire: wait, re-seat
-            a = Anim(length)
+            a = mk(length)
             tilt(a, 0.3, length - 0.5, (8, -25, -8), (0, 6, -4))
             a.rest("rocket", "position", 0.6)
             a.key("rocket", "position", 0.9, (0, 10, 0))
@@ -323,12 +382,15 @@ def build(gun):
     return out
 
 
-def attachable_animations(ns):
-    """Animation JSON for every gun: {name: animation} and, per gun, the animate entries."""
+def attachable_animations(ns, models=None):
+    """Animation JSON for every gun: {name: animation} and, per gun, the animate entries. `models` maps each gun
+    to its built model (for its animation family and bones)."""
     anims, animate = {}, {}
     for gun in TIMING:
         entries = []
-        for action, a in build(gun).items():
+        g = models[gun] if models else None
+        built = build(gun, g.anim, set(g.bones)) if g else build(gun)
+        for action, a in built.items():
             name = f"animation.{ns}.gun.{gun}.{action}"
             anims[name] = a.json()
             entries.append((action, name, active(seconds(gun, action))))

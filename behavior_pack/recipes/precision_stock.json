@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:precision_stock"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "LBI",
+      "B  "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "B": {
+        "item": "minecraft:blackstone"
+      },
+      "L": {
+        "item": "minecraft:leather"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:precision_stock",
+      "count": 1
+    }
+  }
+}
