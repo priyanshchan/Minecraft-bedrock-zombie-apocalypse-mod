@@ -2,11 +2,11 @@
   "format_version": 2,
   "header": {
     "name": "Frontline: NATO vs Red Fang [RP]",
-    "description": "Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, pick a class, drive jeeps and tanks and fight beside AI soldiers. \u00a77v1.0.0",
+    "description": "Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, pick a class, drive jeeps and tanks and fight beside AI soldiers. \u00a77v1.1.0",
     "uuid": "318b6965-393b-4691-ab71-abf4a284c06d",
     "version": [
       1,
-      0,
+      1,
       0
     ],
     "min_engine_version": [
@@ -21,7 +21,7 @@
       "uuid": "9fe53dce-673d-42f1-af07-9d09b79d714c",
       "version": [
         1,
-        0,
+        1,
         0
       ]
     }
@@ -31,7 +31,7 @@
       "uuid": "42f759db-d178-41e6-9c35-e3f792dd35be",
       "version": [
         1,
-        0,
+        1,
         0
       ]
     }

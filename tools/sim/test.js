@@ -79,6 +79,9 @@ await advance(60);
 check(weapons.magOf(alice, "frontline:assault_rifle") === 30, "double-tapping crouch reloads to a full magazine");
 check(core.countItem(alice, "frontline:rifle_ammo") === 57, "the reload takes the rounds from the reserve");
 check(alice.bar.includes("Vanguard AR"), "the HUD shows the gun and its ammo");
+check(alice.cooldowns.some((c) => c.category === "frontline_assault_rifle" && c.ticks === 3), "each shot starts the gun's fire animation (a 3-tick cooldown)");
+check(alice.cooldowns.some((c) => c.category === "frontline_assault_rifle" && c.ticks === 46), "a reload starts the gun's reload animation (46 ticks)");
+check(alice.anims.some((a) => a.n === "animation.frontline.player.reload"), "others see the reload arm motion");
 
 // a teammate in the line of fire is not shot
 const buddy = world.getDimension("minecraft:overworld").spawnEntity("frontline:nato_rifleman", { x: 0.5, y: 64, z: 5.5 });
@@ -104,6 +107,61 @@ alice.isSneaking = false;
 check(!foe2.isValid, "one burst to the head kills");
 check(alice.messages.some((m) => m.includes("HEADSHOT")), "the kill feed marks the headshot");
 
+
+// ---- stoppages: a jam is cleared by double-tapping crouch, a malfunction strips and reloads
+const AR = "frontline:assault_rifle";
+alice.inventory.slots[0] = rifle;
+alice.selectedSlotIndex = 0;
+weapons.GUNS[AR].jam = 1; // every round jams
+await advance(20);
+const beforeJam = weapons.magOf(alice, AR);
+world.afterEvents.itemUse.fire({ source: alice, itemStack: rifle });
+await advance(10);
+const kind = weapons.stoppage(alice, AR);
+check(kind === "jam" || kind === "malfunction", "a round can jam the gun");
+check(weapons.magOf(alice, AR) === beforeJam - 1, "a stoppage stops the burst after the round that jammed");
+world.afterEvents.itemUse.fire({ source: alice, itemStack: rifle });
+await advance(10);
+check(weapons.magOf(alice, AR) === beforeJam - 1, "a stopped gun does not fire");
+check(alice.bar.includes("JAMMED") || alice.bar.includes("MALFUNCTION"), "the status bar says the gun is stopped");
+weapons.GUNS[AR].jam = 0;
+for (const down of [true, false, true, false]) {
+  alice.isSneaking = down;
+  await advance(2);
+}
+check(alice.cooldowns.some((c) => c.category === "frontline_assault_rifle" && c.ticks === (kind === "jam" ? 28 : 64)), "clearing plays the gun's clearing animation");
+await advance(70);
+check(!weapons.stoppage(alice, AR), "double-tapping crouch clears the stoppage");
+check(weapons.magOf(alice, AR) === (kind === "jam" ? beforeJam - 2 : 30), "a jam loses the stuck round; a malfunction strips and reloads");
+// the same seeded run gives the other kind of stoppage too
+weapons.GUNS[AR].jam = 1;
+let other;
+for (let i = 0; i < 12 && !other; i++) {
+  await advance(20);
+  world.afterEvents.itemUse.fire({ source: alice, itemStack: rifle });
+  await advance(4);
+  const k = weapons.stoppage(alice, AR);
+  if (k && k !== kind) other = k;
+  if (k) {
+    for (const down of [true, false, true, false]) {
+      alice.isSneaking = down;
+      await advance(2);
+    }
+    await advance(70);
+  }
+}
+weapons.GUNS[AR].jam = 0;
+check(other !== undefined && !weapons.stoppage(alice, AR), "both kinds of stoppage happen and both clear");
+
+// ---- attachments: an extended magazine (registered as a future attachment would be) grows the magazine
+const att = await load("attachments.js");
+att.registerAttachment({ id: "frontline:test_extended_mag", slot: "magazine", name: "Extended Magazine", guns: [AR], mods: { magazine: 10, reload: 1.1 } });
+check(att.slotsOf(AR).includes("optic") && att.slotsOf(AR).includes("muzzle") && att.slotsOf(AR).includes("underbarrel"), "the rifle offers optic, muzzle and underbarrel slots");
+check(att.fit(rifle, "magazine", "frontline:test_extended_mag"), "an attachment fits its slot");
+check(!att.fit(rifle, "optic", "frontline:test_extended_mag"), "an attachment does not fit another slot");
+check(weapons.magSize(alice, AR) === 40, "an extended magazine adds rounds");
+att.fit(rifle, "magazine", undefined);
+check(weapons.magSize(alice, AR) === 30, "removing it restores the magazine");
 
 // ---- the rocket launcher fires a rocket entity; a hit explodes
 const launcher = new ItemStack("frontline:rocket_launcher", 1);

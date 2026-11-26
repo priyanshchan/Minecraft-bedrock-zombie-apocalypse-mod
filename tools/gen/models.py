@@ -150,88 +150,15 @@ SOLDIER_GUNS = {
 }
 
 
-def fang_rifle():
-    """A stamped-steel rifle with wooden furniture and a curved magazine: the Red Fang's standard arm."""
-    g = H.Held("fang_rifle", "rifle")
-    wood, dark_wood = "#7a4a28", "#5a3418"
-    g.pistol_grip(-3, 1, 3, 8, 3, dark_wood, angle=18)
-    recv = g.box(-4, 11, 2, 8, -2, 2, H.STEEL)
-    for face in g.sides(recv):
-        face.fill(H.DARK, 2, 2, 4, 9)
-    g.box(-4, 11, 8, 9, -1.5, 1.5, H.GUNMETAL)  # dust cover
-    g.trigger(-1, 2)
-    mag = g.box(4, 9, -4, 2, -1.5, 1.5, "#3a3530")
-    mag2 = g.box(5, 10, -10, -4, -1.5, 1.5, "#3a3530", tilt=22, pivot=(6.5, -4))
-    for c in (mag, mag2):
-        for face in g.sides(c):
-            for row in range(1, face.h, 3):
-                face.hline(row, "#2a2622")
-    hand = g.box(11, 20, 3, 8, -2, 2, wood)
-    for face in g.sides(hand):
-        face.hline(1, dark_wood)
-        face.hline(face.h - 2, dark_wood)
-    g.box(11, 18, 8, 10, -1.5, 1.5, wood)  # upper handguard
-    g.cylinder(20, 31, 7, 0, 1, H.GUNMETAL)
-    g.cylinder(18, 26, 9.5, 0, 1, H.STEEL)  # gas tube
-    g.box(27, 29, 7, 12, -1, 1, H.DARK)  # front sight
-    g.box(31, 34, 6, 8, -1.5, 1.5, H.DARK)  # muzzle nut
-    g.box(-1, 2, 9, 10, -1, 1, H.DARK)  # rear sight
-    stock = g.box(-18, -4, 1, 8, -2, 2, wood, tilt=-6, pivot=(-4, 5))
-    for face in g.sides(stock):
-        face.hline(face.h // 2, dark_wood)
-    g.box(-19, -18, 0, 8, -2, 2, H.DARK, tilt=-6, pivot=(-4, 5))
-    g.box(6, 8, 6, 8, 2, 4, H.SILVER, noise=1)  # charging handle
-    g.muzzle = (34.0, 7.0)
-    return g
-
-
-def fang_dmr():
-    g = H.Held("fang_dmr", "rifle")
-    wood, dark_wood = "#6e4424", "#4e2c14"
-    g.pistol_grip(-3, 1, 3, 8, 3, dark_wood, angle=18)
-    g.box(-5, 11, 2, 8, -2, 2, H.STEEL)
-    g.trigger(-1, 2)
-    g.box(4, 8, -5, 2, -1.5, 1.5, "#2e2a26")
-    g.box(11, 24, 3, 9, -2, 2, wood)
-    g.cylinder(24, 46, 7, 0, 1, H.GUNMETAL)
-    g.box(46, 50, 5.5, 8.5, -1.5, 1.5, H.DARK)
-    stock = g.box(-22, -5, 0, 8, -2, 2, wood)
-    for face in g.sides(stock):
-        face.fill(shade(wood, 0.6), 4, 2, 8, 5)  # thumbhole
-    g.box(-23, -22, -1, 8, -2, 2, H.DARK)
-    g.box(-1, 1, 8, 10, -1, 1, H.DARK)
-    g.box(7, 9, 8, 10, -1, 1, H.DARK)
-    g.cylinder(-3, 11, 11.5, 0, 1.5, "#2a2a2a")
-    g.cylinder(11, 15, 11.5, 0, 2, "#2a2a2a")
-    g.lens(15, 10, 13, -1.5, 1.5)
-    g.muzzle = (50.0, 7.0)
-    return g
-
-
-def fang_rpg():
-    g = H.Held("fang_rpg", "launcher")
-    wood = "#7a4a28"
-    g.cylinder(-24, 14, 8, 0, 2.5, H.GUNMETAL)  # tube
-    g.cylinder(-6, 6, 8, 0, 3, wood)  # heat shield
-    g.cylinder(-30, -24, 8, 0, 3.5, H.DARK)  # rear flare
-    g.cylinder(14, 18, 8, 0, 2, "#4a5530")  # warhead neck
-    g.cylinder(18, 22, 8, 0, 4, "#4a5530")  # warhead
-    g.cylinder(22, 26, 8, 0, 3, "#4a5530")
-    g.cylinder(26, 29, 8, 0, 1.5, "#3a4228")
-    g.cylinder(29, 31, 8, 0, 0.6, H.DARK)
-    g.pistol_grip(-2, 2, 5, 8, 3, H.DARK)
-    g.pistol_grip(6, 9, 5, 7, 3, H.DARK)
-    g.trigger(0, 4)
-    g.box(-1, 5, 11, 14, 2, 4, H.DARK)  # sight
-    g.muzzle = (31.0, 8.0)
-    return g
-
-
-FANG_GUNS = {"fang_rifle": fang_rifle, "fang_dmr": fang_dmr, "fang_rpg": fang_rpg}
-
-
 def gun_builder(name):
-    return FANG_GUNS.get(name) or H.ALL[name]
+    return H.FANG.get(name) or H.ALL[name]
+
+
+def gun_cubes(g):
+    """Every box of a held model (all its bones below `item`), in model space: the parts carry no rotation of
+    their own at rest, so the boxes can be gathered into one bone."""
+    skeleton = {b[0] for b in H.SKELETON} | {"item"}
+    return [c for b in g.model.bones if b.name not in skeleton for c in b.cubes]
 
 
 def soldier(key, outfit_key, res=2):
@@ -438,7 +365,7 @@ def soldier(key, outfit_key, res=2):
     third, _first = holds.compute()[g.hold]
     gun = m.bone("gun", H.GRIP, "rightItem", rotation=third[0])
     gun.scale = H.SCALE
-    for c in g.bone.cubes:
+    for c in gun_cubes(g):
         c.img = c.img.resize((c.img.width * res, c.img.height * res), Image.NEAREST)
         c.res = res
         c.bone = "gun"
@@ -719,7 +646,7 @@ def projectile_models():
         g = builder()
         m = Model(f"projectile_{key}", bounds=(1, 1, 0))
         bone = m.bone("root", (0, 0, 0))
-        for c in g.bone.cubes:
+        for c in gun_cubes(g):
             ox, oy, oz = c.origin
             c.origin = (ox - H.GRIP[0], oy - H.GRIP[1], oz - H.GRIP[2])
             if c.pivot:
@@ -867,48 +794,47 @@ def prop(key, build):
 
 
 def _pistol_ammo(g):
-    box = g.box(-4, 6, -3, 3, -3, 3, "#c9a43a")
-    for face in g.sides(box) + (g.up(box),):
-        face.border("#8a6a1a")
-    g.box(-4, 6, 3, 4, -3, 3, "#8a6a1a")
-    for s in (-2, 0, 2):
-        g.box(6, 8, -1, 1, s - 1, s + 1, "#b08a3a")
+    box = g.box(-6, 8, -4, 4, -4, 4, "#c9a43a")
+    for side in ("right", "left"):
+        H.mark(box, side, -6, 8, -4, -3, "#8a6a1a")
+        H.mark(box, side, -6, 8, 3, 4, "#8a6a1a")
+    g.box(-6, 8, 4, 5, -4, 4, "#8a6a1a")
+    for sx in (-2.5, 0, 2.5):
+        g.rod(8, 11, 0, sx, 1.2, "#b0703a")
 
 
 def _rifle_ammo(g):
-    mag = g.box(-6, 6, -2, 2, -1.5, 1.5, "#3a3530")
-    for face in g.sides(mag):
-        for row in range(1, face.h, 3):
-            face.hline(row, "#2a2622")
-    g.box(6, 9, -1, 1, -1, 1, "#c9a43a")
-    g.box(9, 10, -0.5, 0.5, -0.5, 0.5, "#b0703a")
+    mag = g.box(-8, 8, -3, 3, -2, 2, "#3a3530")
+    H.ribs(mag, ("right", "left"), 3, "#2a2622")
+    g.rod(8, 12, 1, 0, 1.2, "#c9a43a")
+    g.rod(12, 14, 1, 0, 0.8, "#b0703a")
 
 
 def _shotgun_shells(g):
-    for s in (-2.5, 1.5):
-        g.box(-4, 6, -1.5, 1.5, s - 1.5, s + 1.5, "#c8302c")
-        g.box(-6, -4, -1.5, 1.5, s - 1.5, s + 1.5, "#c9a43a")
+    for sx in (-3, 3):
+        g.rod(-4, 8, 0, sx, 2.2, "#c8302c")
+        g.rod(-7, -4, 0, sx, 2.4, "#c9a43a")
 
 
 def _sniper_rounds(g):
-    for s in (-3, 0, 3):
-        g.box(-6, 5, -1, 1, s - 1, s + 1, "#c9a43a")
-        g.box(5, 9, -0.5, 0.5, s - 0.5, s + 0.5, "#b0703a")
+    for sx in (-4, 0, 4):
+        g.rod(-8, 6, 0, sx, 1.5, "#c9a43a")
+        g.rod(6, 11, 0, sx, 0.9, "#b0703a")
 
 
 def _rocket(g):
-    g.cylinder(-8, 6, 0, 0, 2, "#5b6339")
-    g.cylinder(6, 10, 0, 0, 1.2, "#454b2b")
-    g.box(-9, -6, -3.5, 3.5, -0.5, 0.5, "#3d4148")
-    g.box(-9, -6, -0.5, 0.5, -3.5, 3.5, "#3d4148")
+    g.rod(-10, 8, 0, 0, 3, "#5b6339")
+    g.rod(8, 13, 0, 0, 2, "#454b2b")
+    g.rod(13, 15, 0, 0, 1, "#1d1f23")
+    g.box(-12, -8, -5, 5, -0.5, 0.5, "#3d4148")
+    g.box(-12, -8, -0.5, 0.5, -5, 5, "#3d4148")
 
 
 def _field_ration(g):
-    pouch = g.box(-5, 6, -1.5, 1.5, -4, 4, "#8a7550")
-    face = g.up(pouch)
-    face.fill("#e9e7df", 2, 3, face.w - 2, 6)
-    face.fill("#2a2a26", 3, 4, face.w - 3, 5)
-    g.box(6, 7, -1, 1, -4, 4, "#6a5838")
+    pouch = g.box(-7, 8, -2, 2, -6, 6, "#8a7550")
+    H.mark(pouch, "up", -2, 4, 0, 0, "#e9e7df", -4, 4)
+    H.mark(pouch, "up", -1, 3, 0, 0, "#2a2a26", -3, 3)
+    g.box(8, 9, -1.5, 1.5, -6, 6, "#6a5838")
 
 
 PROPS = {"pistol_ammo": _pistol_ammo, "rifle_ammo": _rifle_ammo, "shotgun_shells": _shotgun_shells,

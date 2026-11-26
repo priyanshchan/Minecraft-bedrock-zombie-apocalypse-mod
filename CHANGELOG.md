@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.1.0: the guns, rebuilt
+
+- **Every weapon remodelled** at quarter-pixel detail: about 30% larger in third person, and larger and closer in first person.
+  - The AR, SMG, LMG, shotgun, sniper rifle, pistol, rocket launcher, knife and grenades are all new.
+  - So are the Red Fang rifle, marksman rifle and RPG the AI soldiers carry.
+  - New detail: round barrels, chamfered receivers, rails with cross slots, M-LOK handguards, curved magazines, flip-up sights,
+    glass in scopes and sights, bipods, and lighting painted from above.
+- **Gun animations**, in first and third person:
+  - firing: recoil, and bolt, slide or pump cycling
+  - reloading: magazine out and in, then racking the gun; the shotgun loads shell by shell, the LMG swaps its box, the launcher loads a new rocket
+  - jam clearing and malfunction clearing
+  - other players see you reach for the magazine or rack the gun
+- **Jams and malfunctions:** a small chance per round, cleared by double-tapping crouch. A jam costs one round. A malfunction strips the
+  magazine, racks and reloads, and costs two rounds. Jams can be turned off in Settings.
+- **Ready for attachments:**
+  - every gun has optic, muzzle, underbarrel, side-rail, stock and magazine mounts, with its factory parts in separate bones
+  - guns render through their own controller with a slot for showing and hiding parts
+  - `scripts/attachments.js` stores fitted attachments on the gun and applies their effects
+  - `docs/attachments.md` lists every mount
+- Inventory icons rendered from the new models.
+
 ## 1.0.0
 
 The first release: **Frontline: NATO vs Red Fang** (the repository first held plans for a zombie add-on; that was dropped for this).

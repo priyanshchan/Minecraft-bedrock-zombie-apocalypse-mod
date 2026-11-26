@@ -202,7 +202,8 @@ async function record(player) {
 const MANUAL = {
   "Controls": [
     "§lGuns§r: use (right-click / hold-tap) to fire. Rifles fire short bursts.",
-    "§lReload§r: automatic when empty, or double-tap crouch.",
+    "§lReload§r: automatic when empty, or double-tap crouch. Your gun's own reload plays: magazine out, a fresh one in, the bolt or slide racked.",
+    "§lJams§r: now and then a gun stops. JAMMED: double-tap crouch to tap and rack it (one round lost). MALFUNCTION: double-tap crouch to strip the magazine, rack and reload (two rounds lost). Turn them off in Settings.",
     "§lAim§r: crouch to steady your aim (much tighter spread). Sprinting spreads it.",
     "§lHeadshots§r deal extra damage; sniper headshots kill almost anything.",
     "Spare ammo is an item in your inventory; each gun shows magazine | reserve on the HUD.",
@@ -252,13 +253,14 @@ async function settingsForm(player) {
     .toggle("AI patrols outside battles", { defaultValue: s.patrols })
     .slider("Minutes between patrols", 2, 10, { defaultValue: s.patrolMinutes, valueStep: 1 })
     .dropdown("AI damage", ["Low", "Normal", "High"], { defaultValueIndex: Math.max(0, damage.indexOf(s.botDamage)) })
-    .toggle("Status bar (HUD)", { defaultValue: s.hud });
+    .toggle("Status bar (HUD)", { defaultValue: s.hud })
+    .toggle("Weapon jams and malfunctions", { defaultValue: s.malfunctions });
   const res = await show(player, form);
   if (!res || res.canceled || !res.formValues) return;
   const v = res.formValues.filter((x) => x !== undefined);
   updateSettings({
     friendlyFire: Boolean(v[0]), destruction: Boolean(v[1]), patrols: Boolean(v[2]), patrolMinutes: Number(v[3]),
-    botDamage: damage[Number(v[4])] ?? 1, hud: Boolean(v[5]),
+    botDamage: damage[Number(v[4])] ?? 1, hud: Boolean(v[5]), malfunctions: Boolean(v[6]),
   });
   tell(player, "§aSettings saved.");
 }

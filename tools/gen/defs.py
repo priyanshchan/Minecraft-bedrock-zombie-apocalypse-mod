@@ -14,7 +14,7 @@ RP = ROOT / "resource_pack"
 
 NS = "frontline"
 TITLE = "Frontline: NATO vs Red Fang"
-VERSION = [1, 0, 0]
+VERSION = [1, 1, 0]
 MIN_ENGINE = [1, 21, 90]
 DESCRIPTION = (
     "Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, "

@@ -1,24 +1,41 @@
-"""Every item held in the hand as a detailed 3D model (attachables): the guns, the launcher, the knife,
-the grenades and the gear.
+"""Every item held in the hand as a detailed 3D model (attachables): the guns, the launcher, the knife, the
+grenades and the gear - and the Red Fang's own guns that the AI soldiers carry.
 
-Models are built at about three times the size they are drawn and the hold animations scale them by
-SCALE, so the parts can be a third of a pixel thin. Each item is built in a frame of its own:
+Units and frame
+---------------
+Guns are built in quarter pixels (one unit = 1/4 px) and the hold animations scale the bone `item` by
+SCALE (third person) or FP_SCALE (first person). Each item is built in a frame of its own:
 
     f  forward, along the barrel        (the model's +Y)
-    u  up, from the grip to the sights   (the model's -Z, so it ends up on top when held)
-    s  sideways, to the gun's left       (the model's +X)
+    u  up, from the grip to the sights   (the model's -Z)
+    s  sideways, to the gun's left       (the model's +X); the ejection port is on the right (-s)
 
-with the middle of the hand on the grip at the origin. The hold animations then put the frame in the
-player's hand; tools/gen/viewer.py draws every item held in first and third person to check them.
+with the middle of the hand on the grip at the origin.
+
+Bones (the same names on every gun, so animations and future attachments line up)
+-------------------------------------------------------------------------------
+    item                      hold transform (rotation, position, scale) per view
+      gun                     the whole weapon; reload/jam animations tilt it
+        frame                 the static parts (not "body": that name is the player's torso)
+        mag > def_mag         the magazine (drops out on reloads); extended mags will sit beside def_mag
+        bolt, charging_handle, slide, pump, cover, rocket, shell   moving parts (where the gun has them)
+        att_optic > def_optic         optic mount on the top rail; iron sights / the factory scope
+        att_muzzle > def_muzzle       muzzle thread; the factory flash hider or brake
+        att_underbarrel > def_underbarrel   under rail; bipods where the gun has one
+        att_side                      side rail (lasers, lights)
+        att_stock > def_stock         the stock
+A future attachment adds its boxes to the att_* bone and hides the def_* part beside it (see
+docs/attachments.md). Held.mounts records where each mount is, per gun.
 """
 from __future__ import annotations
 
 import math
 
-from modelkit import Model, shade, mix
+from modelkit import Model, shade
 
 GRIP = (-6.0, 13.5, 0.0)  # the middle of the right fist in the player's model space
-SCALE = 0.34
+SCALE = 0.25  # third person: quarter-pixel units
+FP_SCALE = 0.28  # first person: a little larger, as guns read better close to the eye
 SKELETON = [  # the player's bones (no cubes): the item hangs from rightItem
     ("root", None, (0, 0, 0)), ("waist", "root", (0, 12, 0)), ("body", "waist", (0, 24, 0)),
     ("head", "body", (0, 24, 0)), ("leftArm", "body", (5, 22, 0)), ("leftItem", "leftArm", (6, 15, 1)),
@@ -27,479 +44,828 @@ SKELETON = [  # the player's bones (no cubes): the item hangs from rightItem
 ]
 
 # ---------------------------------------------------------------- materials
-POLYMER = "#2b2c30"
-STEEL = "#3d4148"
-DARK = "#1d1f23"
-GUNMETAL = "#50555d"
-TAN = "#9c8462"
-OLIVE = "#5b6339"
-OD_DARK = "#454b2b"
-WOOD = "#7d5130"
-RUBBER = "#222326"
+BLACK = "#3b3e44"     # anodised receiver
+POLY = "#34363b"      # black polymer
+STEEL = "#4b5058"     # parkerised steel
+DARK = "#1b1c1f"      # bores, slots, shadows
+GUNMETAL = "#666d76"
+TAN = "#a48c68"       # coyote polymer
+TAN_D = "#7d6a4d"
+OD = "#5b6339"
+OD_D = "#434929"
+WOOD = "#82502c"
+WOOD_D = "#5c3618"
+RUBBER = "#1f2023"
 BRASS = "#c9a43a"
-GLASS = "#4fa7d8"
+COPPER = "#b5703c"
+SILVER = "#aab0b7"
+CHROME = "#d6dbdf"
+GLASS = "#4fb0e6"
 RED = "#c8302c"
 WHITE = "#e9e7df"
-SILVER = "#a9afb6"
-ORANGE = "#d9762a"
 
 
 class Held:
-    """An item model in the making: boxes placed in the item's own (f, u, s) frame."""
+    """An item model in the making: boxes placed in the item's own (f, u, s) frame, in named bones."""
 
     def __init__(self, key, hold):
         self.key, self.hold = key, hold
-        self.model = Model(f"held_{key}", bounds=(4.0, 4.0, 1.0))
+        self.model = Model(f"held_{key}", bounds=(5.0, 5.0, 1.0))
         for name, parent, pivot in SKELETON:
             self.model.bone(name, pivot, parent)
-        self.bone = self.model.bone("item", GRIP, "rightItem")
-        self.bone.scale = SCALE
-        self.muzzle = (0.0, 0.0)  # (f, u) of the muzzle, for the flash
+        self.bones = {}
+        item = self.model.bone("item", GRIP, "rightItem")
+        item.scale = SCALE
+        self.bones["item"] = item
+        self.bones["gun"] = self.model.bone("gun", GRIP, "item")
+        self.part("frame", 0, 0)
+        self.cur = self.bones["frame"]
+        self.muzzle = (0.0, 0.0)
+        self.mounts = {}
+        self.seed = sum(map(ord, key))
 
-    def _place(self, f0, f1, u0, u1, s0, s1):
-        """Model-space origin and size of a box spanning f0..f1, u0..u1, s0..s1."""
+    # ------------------------------------------------------------ bones
+    def at(self, f, u, s=0.0):
+        """Model-space point of an item-frame point."""
+        return (GRIP[0] + s, GRIP[1] + f, GRIP[2] - u)
+
+    def part(self, name, f, u, s=0.0, parent="gun"):
+        assert name not in {b[0] for b in SKELETON}, f"{name} is a player bone name"
+        if name not in self.bones:
+            self.bones[name] = self.model.bone(name, self.at(f, u, s), parent)
+        return self.bones[name]
+
+    def use(self, name):
+        """Boxes made from now on go into bone `name`."""
+        self.cur = self.bones[name]
+        return self
+
+    def mount(self, slot, f, u, s=0.0, length=0, default=True):
+        """An attachment mount: bone att_<slot> pivoting at (f, u, s), with an optional def_<slot> child."""
+        att = self.part(f"att_{slot}", f, u, s)
+        att.locators = {slot: [round(v, 3) for v in self.at(f, u, s)]}
+        self.mounts[slot] = {"f": f, "u": u, "s": s, "length": length}
+        if default:
+            self.part(f"def_{slot}", f, u, s, parent=f"att_{slot}")
+        return att
+
+    # ------------------------------------------------------------ boxes
+    def box(self, f0, f1, u0, u1, s0, s1, color, noise=3, inflate=0.0, tilt=0.0, pivot=None, roll=0.0, bone=None):
+        """A box spanning f0..f1, u0..u1, s0..s1. `tilt` turns it about the sideways axis (positive lifts its
+        front), `roll` about the barrel axis; `pivot` is (f, u) or (f, u, s), by default the box's centre."""
         size = (max(1, round(s1 - s0)), max(1, round(f1 - f0)), max(1, round(u1 - u0)))
-        origin = (GRIP[0] + s0, GRIP[1] + f0, GRIP[2] - u1)
-        return origin, size
-
-    def box(self, f0, f1, u0, u1, s0, s1, color, noise=4, inflate=0.0, tilt=0.0, pivot=None, roll=0.0):
-        """A box; `tilt` turns it about the sideways axis (positive lifts its front), `roll` about the barrel
-        axis. `pivot` is (f, u) (or (f, u, s)) for the turn; it defaults to the box's centre."""
-        origin, size = self._place(f0, f1, u0, u1, s0, s1)
+        origin = (GRIP[0] + s0, GRIP[1] + f0, GRIP[2] - (u0 + size[2]))
         rotation, piv = None, None
         if tilt or roll:
             pf, pu = pivot[:2] if pivot else ((f0 + f1) / 2, (u0 + u1) / 2)
             ps = pivot[2] if pivot and len(pivot) > 2 else (s0 + s1) / 2
-            piv = (GRIP[0] + ps, GRIP[1] + pf, GRIP[2] - pu)
-            rotation = (-tilt, roll, 0)
-        c = self.bone.cube(origin, size, inflate, rotation, piv)
-        c.fill(color, noise=noise, seed=len(self.bone.cubes) * 7 + len(self.key))
+            piv = self.at(pf, pu, ps)
+            rotation = (tilt, roll, 0)  # Bedrock: +x lifts the front of a forward-pointing box
+        target = self.bones[bone] if bone else self.cur
+        c = target.cube(origin, size, inflate, rotation, piv)
+        c.ext = (f0, f0 + size[1], u0, u0 + size[2], s0, s0 + size[0])
+        paint(c, color, noise, self.seed + len(target.cubes) * 7)
         return c
 
-    # The faces of a box, by what they face in the item frame.
-    @staticmethod
-    def up(c):
-        return c.front
-
-    @staticmethod
-    def down(c):
-        return c.back
-
-    @staticmethod
-    def fore(c):
-        return c.top
-
-    @staticmethod
-    def aft(c):
-        return c.bottom
-
-    @staticmethod
-    def sides(c):
-        return (c.right, c.left)
-
-    # ---------------------------------------------------------------- parts
-    def cylinder(self, f0, f1, cu, cs, r, color, noise=4):
-        """A round part along the barrel: a square box and the same box turned 45 degrees about its axis
-        (an octagon in section)."""
-        a = self.box(f0, f1, cu - r, cu + r, cs - r, cs + r, color, noise)
-        b = self.box(f0, f1, cu - r, cu + r, cs - r, cs + r, shade(color, 0.92), noise, roll=45,
-                     pivot=((f0 + f1) / 2, cu, cs), inflate=-0.12 * r)
-        return a, b
-
-    def grooves(self, c, every=2, color=None, along="f"):
-        """Dark grooves round a box (grips, pump handles): lines across the side and top faces."""
-        col = color or shade(c.front.get(0, 0), 0.6)
-        for face in (c.front, c.back, c.right, c.left):
-            if along == "f":
-                for row in range(1, face.h, every):
-                    face.hline(row, col)
+    def rod(self, f0, f1, cu, cs, r, color, noise=2, bone=None):
+        """A round bar along the barrel axis: its section drawn as a pixel circle of radius r (in units)."""
+        rows = []
+        n = int(math.ceil(r))
+        for y in range(-n, n):
+            yc = y + 0.5
+            if abs(yc) >= r:
+                continue
+            hw = round(math.sqrt(r * r - yc * yc))
+            if hw <= 0:
+                continue
+            if rows and rows[-1][2] == hw and rows[-1][1] == y:
+                rows[-1][1] = y + 1
             else:
-                for x in range(1, face.w, every):
-                    face.vline(x, col)
+                rows.append([y, y + 1, hw])
+        out = []
+        for y0, y1, hw in rows:
+            out.append(self.box(f0, f1, cu + y0, cu + y1, cs - hw, cs + hw, color, noise, bone=bone))
+        if out:  # light along the top, shadow underneath: a round look
+            out[-1].front.fill(shade(color, 1.18))
+            out[-1].front.noise(noise, self.seed)
+            out[0].back.fill(shade(color, 0.7))
+        return out
 
-    def rail(self, f0, f1, u, s0, s1, color=DARK):
-        """A picatinny rail: a strip with cross slots."""
-        c = self.box(f0, f1, u, u + 1, s0, s1, color, noise=2)
-        for row in range(0, c.front.h, 2):
-            c.front.hline(row, shade(color, 1.6))
-        return c
+    def rail(self, f0, f1, u, s0, s1, color=BLACK, bone=None):
+        """A picatinny rail: a base and a slotted top, cross slots every 3 units."""
+        self.box(f0, f1, u, u + 1, s0 + 1, s1 - 1, color, 2, bone=bone)
+        top = self.box(f0, f1, u + 1, u + 3, s0, s1, color, 2, bone=bone)
+        for row in range(1, top.front.h, 3):
+            top.front.hline(row, DARK)
+            for face in (top.right, top.left):
+                face.hline(row, DARK)
+        return top
 
-    def pistol_grip(self, f0, f1, u_top, length, width, color, angle=16):
+    def pistol_grip(self, f0, f1, u_top, length, width, color, angle=16, stipple=True):
         s = width / 2
-        c = self.box(f0, f1, u_top - length, u_top, -s, s, color, tilt=-angle, pivot=((f0 + f1) / 2, u_top))
-        for face in (c.right, c.left):
-            for y in range(0, face.h, 2):
-                for x in range(y % 4 // 2, face.w, 2):
-                    face.px(x, y, shade(color, 1.25))  # stippling
-        return c
+        g = self.box(f0, f1, u_top - length, u_top, -s, s, color, 3, tilt=-angle, pivot=((f0 + f1) / 2, u_top))
+        self.box(f0 - 1, f1, u_top - length - 1, u_top - length + 1, -s, s, shade(color, 0.85), 2,
+                 tilt=-angle, pivot=((f0 + f1) / 2, u_top))
+        if stipple:
+            for face in (g.right, g.left):
+                for y in range(1, face.h - 1):
+                    for x in range(2 + (y % 2), face.w - 2, 2):
+                        face.px(x, y, shade(color, 1.35))
+            for y in range(2, g.top.h, 3):  # finger grooves on the front strap
+                g.top.hline(y, shade(color, 0.6))
+        return g
 
-    def trigger(self, f0, u0):
-        self.box(f0 - 1, f0 + 5, u0 - 1, u0, -0.5, 0.5, DARK, noise=1)  # guard
-        self.box(f0 + 4, f0 + 5, u0 - 1, u0 + 1, -0.5, 0.5, DARK, noise=1)
-        self.box(f0 + 1, f0 + 2, u0 - 1, u0 + 1, -0.5, 0.5, SILVER, noise=1, inflate=-0.1)  # trigger
+    def trigger(self, f0, u0, width=2):
+        s = width / 2
+        self.box(f0, f0 + 10, u0 - 1, u0, -s, s, DARK, 1)  # guard bottom
+        self.box(f0 + 9, f0 + 10, u0 - 1, u0 + 3, -s, s, DARK, 1)  # guard front
+        return self.box(f0 + 3, f0 + 5, u0 - 1, u0 + 3, -0.5, 0.5, SILVER, 1)  # trigger blade
 
-    def lens(self, f, u0, u1, s0, s1, color=GLASS):
-        c = self.box(f, f + 1, u0, u1, s0, s1, color, noise=0, inflate=-0.05)
+    def lens(self, f, u0, u1, s0, s1, color=GLASS, depth=1, bone=None):
+        c = self.box(f, f + depth, u0, u1, s0, s1, color, 0, bone=bone)
         for face in c.faces:
             face.fill(color)
-            face.px(0, 0, shade(color, 1.6))
+            for i in range(min(face.h, face.w)):
+                face.px(i, i, shade(color, 1.5))  # a glint across the glass
+            face.px(0, 0, WHITE)
         return c
 
-    def stencil(self, face, rows, color):
-        """Paint tiny lettering / markings on a face (rows of '#' and '.')."""
-        for y, row in enumerate(rows):
-            for x, ch in enumerate(row):
-                if ch == "#":
-                    face.px(x, y, color)
+    def screw(self, c, side, f, u):
+        mark(c, side, f, f + 1, u, u + 1, shade(SILVER, 0.8))
 
     def finish(self):
         self.model.pack()
         f, u = self.muzzle
-        self.bone.locators = {"muzzle": [round(GRIP[0], 3), round(GRIP[1] + f, 3), round(GRIP[2] - u, 3)]}
+        self.bones["gun"].locators = {"muzzle": [round(v, 3) for v in self.at(f, u)]}
         return self
 
 
-# =========================================================================== firearms
+# ---------------------------------------------------------------- painting
+
+def paint(c, color, noise, seed):
+    """Fill a box with a material lit from above: the top face bright, the sides shading down from a
+    highlighted top edge to a dark bottom edge, the underside and the far end in shadow, fine grain."""
+    for i, face in enumerate(c.faces):
+        face.fill(color)
+        if noise:
+            face.noise(noise, seed + i)
+
+    def scale_face(face, fn):
+        for xx in range(face.w):
+            for yy in range(face.h):
+                face.px(xx, yy, shade(face.get(xx, yy), fn(xx, yy, face.w, face.h)))
+
+    # side faces: texture x runs bottom -> top on the right face and top -> bottom on the left face
+    def side(top_at_right):
+        def fn(x, y, w, h):
+            t = x / max(1, w - 1) if top_at_right else 1 - x / max(1, w - 1)
+            f = 0.86 + 0.2 * t
+            if w >= 3 and (x == (w - 1 if top_at_right else 0)):
+                f *= 1.18  # highlight along the top edge
+            if w >= 3 and (x == (0 if top_at_right else w - 1)):
+                f *= 0.82  # shadow along the bottom edge
+            return f
+        return fn
+    scale_face(c.right, side(True))
+    scale_face(c.left, side(False))
+    scale_face(c.front, lambda x, y, w, h: 1.12 * (0.9 if w >= 3 and x in (0, w - 1) else 1.0))
+    scale_face(c.back, lambda x, y, w, h: 0.7)
+    scale_face(c.bottom, lambda x, y, w, h: 0.8)
+    scale_face(c.top, lambda x, y, w, h: 0.96)
+
+
+def face_rect(c, side, f0, f1, u0, u1, s0=None, s1=None):
+    """Texel rectangle (x0, y0, x1, y1) on a face of box c for an item-frame area."""
+    bf0, bf1, bu0, bu1, bs0, bs1 = c.ext
+    if side == "right":
+        return round(u0 - bu0), round(bf1 - f1), round(u1 - bu0), round(bf1 - f0)
+    if side == "left":
+        return round(bu1 - u1), round(bf1 - f1), round(bu1 - u0), round(bf1 - f0)
+    s0 = bs0 if s0 is None else s0
+    s1 = bs1 if s1 is None else s1
+    if side == "up":
+        return round(s0 - bs0), round(bf1 - f1), round(s1 - bs0), round(bf1 - f0)
+    if side == "down":
+        return round(bs1 - s1), round(bf1 - f1), round(bs1 - s0), round(bf1 - f0)
+    raise ValueError(side)
+
+
+FACES = {"right": "right", "left": "left", "up": "front", "down": "back"}
+
+
+def mark(c, side, f0, f1, u0, u1, color, s0=None, s1=None):
+    """Paint a rectangle onto one side of a box, in item-frame coordinates."""
+    x0, y0, x1, y1 = face_rect(c, side, f0, f1, u0, u1, s0, s1)
+    getattr(c, FACES[side]).fill(color, max(0, x0), max(0, y0), x1, y1)
+
+
+def slots(c, sides, f0, f1, u0, u1, every, length, color=DARK):
+    """A row of slots along f (M-LOK cuts, vents) on the given sides."""
+    f = f0
+    while f + length <= f1:
+        for side in sides:
+            mark(c, side, f, f + length, u0, u1, color)
+        f += every
+
+
+def ribs(c, sides, every, color):
+    """Cross ribs along the length (magazine ribs, grooves)."""
+    for side in sides:
+        face = getattr(c, FACES[side])
+        for row in range(1, face.h, every):
+            face.hline(row, color)
+
+
+# =========================================================================== the NATO / player guns
 
 def assault_rifle():
     g = Held("assault_rifle", "rifle")
-    g.pistol_grip(-3, 1, 3, 9, 3, POLYMER)
-    lower = g.box(-4, 10, 2, 6, -2, 2, STEEL)
-    upper = g.box(-5, 11, 6, 10, -2, 2, STEEL)
-    for face in g.sides(upper):  # ejection port and its cover on the right
-        face.fill(DARK, 2, 4, 5, 9)
-    g.stencil(lower.left, ["#.#.##", "##..#.", "#.#.##"], shade(STEEL, 1.6))
+    lower = g.box(-6, 22, 2, 10, -4, 4, BLACK)
+    g.box(7, 19, -1, 4, -5, 5, BLACK)  # magwell flare
+    upper = g.box(-8, 25, 10, 17, -4, 4, BLACK)
+    g.box(-8, 25, 17, 18, -3, 3, BLACK)
+    mark(upper, "right", 4, 14, 11, 15, DARK)  # ejection port
+    mark(upper, "right", 4, 14, 15, 16, shade(BLACK, 1.4))  # dust cover hinge
+    mark(lower, "left", 8, 18, 3, 8, shade(BLACK, 1.35))  # stamped markings
+    for f in (0, 3, 6):
+        mark(lower, "left", f, f + 2, 7, 8, shade(BLACK, 1.5))
+    g.screw(lower, "left", -4, 5)
+    g.screw(lower, "left", 20, 5)
+    g.rod(-2, 4, 12.5, -5, 1.5, STEEL)  # forward assist
+    g.box(-3, -1, 11, 14, -6, -4, STEEL)
+    g.box(6, 9, 5, 9, 4, 5, STEEL)  # bolt catch
+    g.box(10, 13, 5, 7, -5, -4, SILVER, 1)  # magazine release
+    g.box(-4, 0, 7, 9, 4, 5, SILVER, 1)  # selector
     g.trigger(-1, 2)
-    g.box(3, 5, 7, 9, 2, 3, DARK)  # forward assist
-    g.box(-1, 2, 3, 5, -3, -2, SILVER, noise=1)  # magazine release
-    mag_top = g.box(4, 9, -3, 2, -1.5, 1.5, TAN)
-    mag = g.box(3, 8, -10, -3, -1.5, 1.5, TAN, tilt=14, pivot=(6.5, -3))
-    for face in g.sides(mag_top) + g.sides(mag):
-        for row in range(1, face.h, 3):
-            face.hline(row, shade(TAN, 0.78))
-    g.box(2, 9, -11, -9, -2, 2, DARK, tilt=14, pivot=(6.5, -3))  # base plate
-    hand = g.box(11, 27, 5, 11, -2.5, 2.5, TAN)
-    for face in g.sides(hand):  # cooling slots
-        for row in range(2, face.h - 1, 4):
-            face.fill(shade(TAN, 0.55), 2, row, 4, row + 2)
-    g.rail(-4, 27, 10, -1.5, 1.5)
-    g.rail(13, 25, 7, 2.5, 3.5)
-    g.rail(13, 25, 7, -3.5, -2.5)
-    g.cylinder(27, 35, 8, 0, 1, GUNMETAL)  # barrel
-    g.box(28, 30, 6, 12, -1, 1, DARK)  # gas block and front sight post
-    g.box(28, 30, 11, 13, -1.5, 1.5, DARK)
-    brake = g.box(35, 40, 6, 10, -2, 2, DARK)
-    for face in g.sides(brake):
-        for x in range(1, face.w, 2):
-            face.vline(x, "#0c0d0f")
-    g.cylinder(-13, -5, 7.5, 0, 1.5, POLYMER)  # buffer tube
-    stock = g.box(-20, -10, 1, 9, -2, 2, TAN)
-    g.box(-18, -11, 9, 10, -1.5, 1.5, TAN)  # cheek rest
-    g.box(-21, -20, 0, 9, -2, 2, RUBBER, noise=1)  # butt pad
-    g.box(-15, -13, 0, 1, -0.5, 0.5, SILVER, noise=1)  # sling loop
-    g.box(-6, -4, 9, 10, -3, 3, DARK)  # charging handle
-    # red dot sight on the rail
-    g.box(2, 8, 11, 12, -1.5, 1.5, DARK)
-    body = g.box(2, 8, 12, 16, -2, 2, POLYMER)
-    for face in g.sides(body):
-        face.fill(shade(POLYMER, 1.4), 2, 1, 4, 3)  # brightness knob
-    g.lens(8, 12.5, 15.5, -1.5, 1.5)
-    g.lens(1, 12.5, 15.5, -1.5, 1.5, "#6fc4ef")
-    g.box(4, 5, 13.5, 14.5, -0.5, 0.5, "#ff3a2a", noise=0, inflate=-0.2)  # the dot
-    for face in g.sides(stock):
-        face.hline(face.h // 2, shade(TAN, 0.8))
-    g.muzzle = (40.0, 8.0)
+    g.pistol_grip(-6, 2, 3, 15, 6, POLY, angle=18)
+    g.rail(-8, 25, 18, -3, 3)
+    g.part("bolt", 9, 13)  # bolt carrier, seen through the ejection port
+    g.box(5, 13, 11.5, 14.5, -4, -3, STEEL, 2, bone="bolt")
+    g.part("charging_handle", -10, 16)
+    g.box(-13, -8, 15, 17, -2, 2, BLACK, 2, bone="charging_handle")
+    g.box(-13, -11, 15, 17, -5, 5, BLACK, 2, bone="charging_handle")
+    hg = g.box(25, 58, 9, 18, -5, 5, TAN)  # octagonal handguard with M-LOK slots
+    g.box(25, 58, 18, 19, -4, 4, TAN)
+    g.box(25, 58, 8, 9, -4, 4, TAN)
+    slots(hg, ("right", "left"), 29, 56, 12, 15, 6, 4)
+    slots(hg, ("down",), 29, 56, 9, 10, 6, 4)
+    g.box(25, 27, 8, 19, -5, 5, shade(TAN, 0.8))  # barrel nut ring
+    g.rail(27, 58, 19, -3, 3)
+    g.rail(46, 56, 12, 5, 6)  # a short side rail
+    g.rod(58, 76, 13.5, 0, 2, STEEL)  # barrel
+    g.box(59, 62, 11, 16, -2, 2, BLACK)  # gas block
+    g.muzzle = (84.0, 13.5)
+    g.rod(-30, -8, 13.5, 0, 3, BLACK)  # buffer tube
+    g.box(-12, -8, 10, 17, -3, 3, BLACK)
+    g.mount("stock", -30, 13)
+    g.use("def_stock")
+    stock = g.box(-46, -28, 4, 18, -4, 4, TAN)
+    g.box(-44, -30, 18, 20, -3, 3, TAN)  # cheek weld
+    g.box(-48, -46, 2, 19, -4, 4, RUBBER, 2)  # butt pad
+    mark(stock, "right", -42, -34, 8, 13, shade(TAN, 0.75))
+    mark(stock, "left", -42, -34, 8, 13, shade(TAN, 0.75))
+    g.box(-32, -28, 2, 4, -1, 1, DARK)  # adjustment lever
+    g.box(-41, -38, 1, 3, -1, 1, SILVER, 1)  # sling loop
+    g.part("mag", 13, 2)
+    g.part("def_mag", 13, 2, parent="mag")
+    g.use("def_mag")
+    g.box(8, 18, -6, 2, -3, 3, TAN)
+    m2 = g.box(9, 19, -12, -6, -3, 3, TAN)
+    m3 = g.box(10, 20, -18, -12, -3, 3, TAN)
+    m4 = g.box(11, 21, -24, -18, -3, 3, TAN)
+    g.box(10, 22, -26, -24, -4, 4, TAN_D)
+    for c in (m2, m3, m4):
+        ribs(c, ("right", "left"), 2, shade(TAN, 0.8))
+    mark(m2, "left", 13, 16, -11, -7, DARK)  # witness window
+    g.mount("optic", 8, 21, length=33)
+    g.use("def_optic")
+    g.box(-2, 3, 21, 23, -3, 3, BLACK)  # rear flip sight
+    g.box(-1, 2, 23, 27, -2, 2, BLACK)
+    g.box(-1, 2, 25, 26, -1, 1, DARK)
+    g.box(52, 56, 22, 24, -3, 3, BLACK)  # front flip sight
+    g.box(53, 55, 24, 28, -2, -1, BLACK)
+    g.box(53, 55, 24, 28, 1, 2, BLACK)
+    g.box(53, 55, 24, 27, -0.5, 0.5, DARK)
+    g.mount("muzzle", 76, 13.5)
+    g.use("def_muzzle")
+    for c in g.rod(76, 84, 13.5, 0, 3, BLACK):
+        slots(c, ("right", "left"), 78, 83, c.ext[2], c.ext[3], 2, 1)
+    g.mount("underbarrel", 42, 8, length=24, default=False)
+    g.mount("side", 51, 13.5, 6, length=10, default=False)
+    g.use("frame")
     return g
 
 
 def smg():
     g = Held("smg", "rifle")
-    g.pistol_grip(-2, 2, 3, 9, 3, POLYMER)
-    recv = g.box(-5, 12, 2, 9, -2, 2, POLYMER)
-    for face in g.sides(recv):
-        face.fill(DARK, 4, 1, 6, 6)  # cocking slot
-    g.trigger(0, 2)
-    g.box(5, 9, -9, 2, -1.5, 1.5, DARK)  # magazine
-    g.box(4, 10, -10, -9, -2, 2, POLYMER)
-    g.rail(-3, 11, 9, -1, 1)
-    g.box(-3, -1, 10, 12, -1.5, 1.5, DARK)  # rear sight
-    g.box(9, 11, 10, 12, -0.5, 0.5, DARK)  # front sight
-    g.box(12, 18, 3, 8, -1.5, 1.5, STEEL)  # barrel shroud
-    fore = g.box(12, 15, -5, 3, -1, 1, POLYMER)  # vertical foregrip
-    g.grooves(fore, 2)
-    sup = g.cylinder(18, 30, 5.5, 0, 2.5, DARK)  # suppressor
-    for c in sup:
-        for face in (c.right, c.left):
-            face.hline(1, "#101114")
-            face.hline(face.h - 2, "#101114")
-    # folding wire stock
-    g.box(-15, -5, 7, 8, -2, -1, SILVER, noise=1)
-    g.box(-15, -5, 7, 8, 1, 2, SILVER, noise=1)
-    g.box(-15, -5, 2, 3, -0.5, 0.5, SILVER, noise=1)
-    g.box(-16, -15, 1, 9, -2, 2, RUBBER, noise=1)
-    g.box(-6, -5, 8, 9, -2.5, 2.5, DARK)  # cocking handle
-    g.muzzle = (30.0, 5.5)
+    upper = g.box(-8, 26, 9, 18, -4, 4, POLY)
+    g.box(-8, 26, 18, 19, -3, 3, POLY)
+    g.box(-4, 20, 2, 9, -4, 4, POLY)
+    mark(upper, "right", 6, 14, 12, 16, DARK)
+    for f in range(-6, 24, 4):
+        mark(upper, "left", f, f + 2, 10, 11, shade(POLY, 1.4))
+    g.box(9, 19, -2, 3, -4, 4, POLY)  # magwell
+    g.trigger(-2, 2)
+    g.pistol_grip(-7, 0, 3, 15, 6, POLY, angle=14)
+    g.box(-2, 1, 6, 8, 4, 5, SILVER, 1)  # selector
+    g.rail(-6, 26, 19, -3, 3)
+    shroud = g.box(26, 42, 9, 17, -4, 4, POLY)
+    for f in range(28, 40, 4):
+        mark(shroud, "right", f, f + 2, 11, 15, DARK)
+        mark(shroud, "left", f, f + 2, 11, 15, DARK)
+        mark(shroud, "up", f, f + 2, 0, 0, DARK, -2, 2)
+    g.rail(28, 40, 6, -3, 3)
+    g.rod(42, 46, 13, 0, 2, STEEL)
+    g.muzzle = (50.0, 13.0)
+    g.part("charging_handle", 30, 16, 5)
+    g.box(24, 34, 15, 17, 4, 5, STEEL, 2, bone="charging_handle")
+    g.box(31, 34, 14, 18, 5, 7, BLACK, 2, bone="charging_handle")
+    g.part("bolt", 10, 14)
+    g.box(6, 14, 12.5, 15.5, -4, -3, STEEL, 2, bone="bolt")
+    g.mount("stock", -8, 11)
+    g.use("def_stock")
+    g.box(-10, -6, 4, 17, -4, 4, POLY)  # hinge block
+    g.rod(-34, -10, 15.5, -3, 1, SILVER)
+    g.rod(-34, -10, 15.5, 3, 1, SILVER)
+    g.rod(-34, -10, 6, 0, 1, SILVER)
+    g.box(-37, -34, 3, 18, -4, 4, RUBBER, 2)
+    g.part("mag", 14, 2)
+    g.part("def_mag", 14, 2, parent="mag")
+    g.use("def_mag")
+    mg = g.box(11, 17, -26, 2, -3, 3, DARK)
+    ribs(mg, ("right", "left"), 3, shade(DARK, 1.5))
+    g.box(10, 18, -28, -26, -4, 4, POLY)
+    g.mount("optic", 10, 22, length=28)
+    g.use("def_optic")
+    g.box(-4, 0, 22, 26, -3, 3, POLY)
+    g.box(-3, -1, 24, 25, -1, 1, DARK)
+    g.box(20, 23, 22, 26, -1, 1, POLY)
+    g.mount("muzzle", 46, 13)
+    g.use("def_muzzle")
+    g.rod(46, 50, 13, 0, 2.5, BLACK)
+    g.mount("underbarrel", 34, 6, length=12, default=False)
+    g.mount("side", 34, 13, 5, length=10, default=False)
+    g.use("frame")
     return g
 
 
 def lmg():
     g = Held("lmg", "rifle")
-    g.pistol_grip(-4, 0, 3, 9, 3, POLYMER)
-    recv = g.box(-7, 14, 1, 11, -2.5, 2.5, STEEL)
-    g.box(-7, 10, 11, 12, -2, 2, GUNMETAL)  # top cover
-    g.rail(-5, 10, 12, -1, 1)
-    for face in g.sides(recv):
-        face.fill(DARK, 1, 6, 4, 14)
-    g.trigger(-2, 1)
-    box = g.box(1, 11, -9, 1, -3, 3, OLIVE)  # ammo box
-    for face in g.sides(box):
-        face.border(OD_DARK)
-        face.fill("#d9cf8a", 2, 3, 6, 4)  # stencil
-    g.box(4, 8, -10, -9, -1, 1, DARK)  # carry strap loop
-    belt = g.box(3, 8, 1, 2, 2.5, 4, BRASS, noise=1)
-    for x in range(0, belt.front.w):
-        belt.front.vline(x, BRASS if x % 2 else "#7a6420")
-    g.cylinder(14, 46, 6.5, 0, 1.5, GUNMETAL)  # barrel
-    jacket = g.box(14, 27, 3, 10, -2.5, 2.5, DARK)  # heat shield
-    for face in g.sides(jacket) + (jacket.front,):
-        for row in range(1, face.h - 1, 3):
-            face.fill("#0c0d0f", 1, row, face.w - 1, row + 1)
-    g.box(17, 18, 10, 13, -0.5, 0.5, DARK)  # carry handle posts
-    g.box(23, 24, 10, 13, -0.5, 0.5, DARK)
-    g.box(16, 25, 13, 14, -1, 1, POLYMER)
-    g.box(41, 43, 7, 12, -0.5, 0.5, DARK)  # front sight
-    g.box(46, 50, 4.5, 8.5, -2, 2, DARK)  # flash hider
-    # folded bipod under the barrel
-    g.box(26, 40, 3, 4, -2, -1, SILVER, noise=1)
-    g.box(26, 40, 3, 4, 1, 2, SILVER, noise=1)
-    g.box(38, 41, 3, 6, -2, 2, DARK)
-    g.cylinder(-14, -7, 7, 0, 1.5, POLYMER)
-    g.box(-22, -12, 1, 10, -2, 2, POLYMER)  # stock
-    g.box(-23, -22, 0, 10, -2, 2, RUBBER, noise=1)
-    g.box(-3, -1, 12, 14, -1, 1, DARK)  # rear sight
-    g.muzzle = (50.0, 6.5)
+    recv = g.box(-10, 32, 4, 22, -6, 6, STEEL)
+    g.box(-10, 32, 22, 23, -5, 5, STEEL)
+    mark(recv, "right", 6, 18, 10, 16, DARK)  # ejection port
+    for f in (-8, 30):
+        g.screw(recv, "left", f, 6)
+        g.screw(recv, "left", f, 20)
+    g.trigger(-6, 4)
+    g.pistol_grip(-10, -2, 5, 16, 6, POLY, angle=16)
+    g.part("charging_handle", 20, 13, -7)
+    g.box(16, 24, 12, 15, -8, -6, BLACK, 2, bone="charging_handle")
+    g.box(14, 17, 11, 16, -10, -8, BLACK, 2, bone="charging_handle")
+    g.part("cover", -10, 23)  # feed tray cover, hinged at the rear
+    cov = g.box(-10, 22, 23, 27, -5, 5, GUNMETAL, bone="cover")
+    g.rail(-6, 20, 27, -3, 3, bone="cover")
+    g.box(-8, -4, 29, 34, -2, 2, BLACK, bone="cover")  # rear sight
+    mark(cov, "left", 0, 20, 24, 25, shade(GUNMETAL, 0.7))
+    jacket = g.box(32, 58, 9, 20, -5, 5, DARK)
+    for f in range(34, 56, 4):
+        for side in ("right", "left"):
+            mark(jacket, side, f, f + 2, 11, 18, "#0b0c0e")
+    g.box(38, 40, 20, 24, -1, 1, DARK)  # carry handle
+    g.box(48, 50, 20, 24, -1, 1, DARK)
+    g.box(36, 52, 24, 26, -2, 2, POLY)
+    g.rod(58, 98, 14.5, 0, 2.5, STEEL)
+    g.rod(32, 72, 8.5, 0, 1.5, GUNMETAL)  # gas tube
+    g.box(70, 74, 7, 17, -2, 2, BLACK)  # gas block
+    g.box(90, 93, 16, 25, -1, 1, BLACK)  # front sight
+    g.muzzle = (106.0, 14.5)
+    g.mount("stock", -10, 14)
+    g.use("def_stock")
+    stock = g.box(-50, -12, 6, 22, -5, 5, POLY)
+    mark(stock, "right", -44, -20, 10, 18, shade(POLY, 0.6))
+    mark(stock, "left", -44, -20, 10, 18, shade(POLY, 0.6))
+    g.box(-52, -50, 4, 23, -5, 5, RUBBER, 2)
+    g.box(-46, -40, 2, 6, -1, 1, DARK)  # rear grip
+    g.part("mag", 14, 4)
+    g.part("def_mag", 14, 4, parent="mag")
+    g.use("def_mag")
+    box = g.box(4, 26, -16, 4, -7, 7, OD)
+    for side in ("right", "left"):
+        mark(box, side, 6, 24, -14, -13, OD_D)
+        mark(box, side, 6, 24, 2, 3, OD_D)
+        mark(box, side, 9, 21, -9, -6, "#d9cf8a")  # stencil
+    g.box(10, 20, -18, -16, -2, 2, DARK)  # handle
+    g.box(22, 26, -6, 0, -8, -7, SILVER, 1)  # latch
+    belt = g.box(6, 18, 4, 8, 6, 9, BRASS, 1)
+    for row in range(0, belt.front.h, 2):
+        belt.front.hline(row, COPPER)
+        belt.left.hline(row, COPPER)
+    g.mount("optic", 6, 31, length=26, default=False)
+    g.mount("muzzle", 98, 14.5)
+    g.use("def_muzzle")
+    for c in g.rod(98, 106, 14.5, 0, 3.5, BLACK):
+        slots(c, ("right", "left", "up"), 100, 105, c.ext[2], c.ext[3], 2, 1)
+    g.mount("underbarrel", 80, 7)  # the factory bipod, folded
+    g.use("def_underbarrel")
+    g.box(78, 84, 5, 10, -3, 3, BLACK)
+    g.rod(52, 80, 6, -3, 1, SILVER)
+    g.rod(52, 80, 6, 3, 1, SILVER)
+    g.box(52, 55, 4, 7, -4, -2, RUBBER, 1)
+    g.box(52, 55, 4, 7, 2, 4, RUBBER, 1)
+    g.mount("side", 46, 14.5, 6, length=10, default=False)
+    g.use("frame")
     return g
 
 
 def shotgun():
     g = Held("shotgun", "rifle")
-    g.pistol_grip(-3, 1, 3, 9, 3, POLYMER)
-    recv = g.box(-4, 10, 2, 9, -2, 2, STEEL)
-    for face in g.sides(recv):
-        face.fill(DARK, 2, 3, 5, 9)  # loading port
-    g.trigger(-1, 2)
-    g.cylinder(10, 36, 7.5, 0, 1.5, GUNMETAL)  # barrel
-    g.cylinder(10, 31, 4, 0, 1.5, DARK)  # tube magazine
-    g.box(31, 32, 2.5, 5.5, -1.5, 1.5, STEEL)  # magazine cap
-    pump = g.box(14, 24, 1.5, 6.5, -2.5, 2.5, POLYMER)
-    g.grooves(pump, 2)
-    g.box(35, 36, 9, 10, -0.5, 0.5, SILVER, noise=0)  # bead sight
-    saddle = g.box(0, 9, 3, 8, 2, 3, DARK)  # side saddle with spare shells
-    for x in range(1, saddle.left.w - 1, 2):
-        saddle.left.vline(x, RED, 1, saddle.left.h - 3)
-        saddle.left.vline(x, BRASS, saddle.left.h - 3, saddle.left.h - 1)
-    g.box(-19, -4, 1, 9, -2, 2, POLYMER)  # stock
-    g.box(-20, -19, 0, 9, -2, 2, RUBBER, noise=1)
-    g.box(-4, -2, 9, 10, -1, 1, DARK)
-    g.muzzle = (36.0, 7.5)
+    recv = g.box(-6, 20, 6, 18, -4, 4, STEEL)
+    g.box(-6, 20, 18, 19, -3, 3, STEEL)
+    mark(recv, "right", 2, 14, 11, 16, DARK)  # ejection port
+    mark(recv, "down", 0, 14, 0, 0, DARK, -2, 2)  # loading port
+    mark(recv, "left", -2, 16, 9, 10, shade(STEEL, 1.4))
+    g.trigger(-2, 6)
+    g.pistol_grip(-8, 0, 7, 15, 6, POLY, angle=20)
+    g.rail(-2, 16, 19, -3, 3)
+    g.rod(20, 82, 15, 0, 2.5, GUNMETAL)  # barrel
+    g.rod(20, 72, 9, 0, 2.5, DARK)  # magazine tube
+    g.rod(72, 76, 9, 0, 3, STEEL)  # cap
+    g.box(74, 78, 8, 17, -1, 1, STEEL)  # barrel clamp
+    g.muzzle = (84.0, 15.0)
+    g.part("pump", 39, 9)
+    pump = g.box(30, 48, 5, 13, -5, 5, POLY, bone="pump")
+    g.box(30, 48, 13, 14, -4, 4, POLY, bone="pump")
+    g.box(30, 48, 4, 5, -4, 4, POLY, bone="pump")
+    ribs(pump, ("right", "left", "down"), 2, shade(POLY, 0.5))
+    g.part("shell", 7, 4)  # a shell waiting inside the receiver; reloads bring it up from below
+    g.rod(3, 11, 7, 0, 1.5, RED, bone="shell")
+    g.rod(1, 3, 7, 0, 1.5, BRASS, bone="shell")
+    saddle = g.box(2, 16, 8, 16, 4, 6, DARK)  # side saddle with spare shells
+    for f in range(3, 15, 3):
+        mark(saddle, "left", f, f + 2, 9, 14, RED)
+        mark(saddle, "left", f, f + 2, 14, 15, BRASS)
+    g.mount("stock", -6, 12)
+    g.use("def_stock")
+    stock = g.box(-46, -6, 5, 18, -4, 4, POLY)
+    g.box(-44, -10, 18, 19, -3, 3, POLY)
+    mark(stock, "right", -40, -14, 8, 15, shade(POLY, 0.6))
+    mark(stock, "left", -40, -14, 8, 15, shade(POLY, 0.6))
+    g.box(-48, -46, 4, 19, -4, 4, RUBBER, 2)
+    g.box(-30, -27, 3, 5, -1, 1, SILVER, 1)
+    g.part("mag", 46, 9)  # loads into the tube: an empty magazine bone keeps animations uniform
+    g.part("def_mag", 46, 9, parent="mag")
+    g.mount("optic", 7, 21, length=18)
+    g.use("def_optic")
+    g.box(12, 16, 21, 25, -3, -2, STEEL)  # ghost ring
+    g.box(12, 16, 21, 25, 2, 3, STEEL)
+    g.box(12, 16, 25, 26, -3, 3, STEEL)
+    g.box(78, 80, 17, 19, -1, 1, CHROME, 0)  # bead
+    g.mount("muzzle", 82, 15)
+    g.use("def_muzzle")
+    g.rod(82, 84, 15, 0, 3, STEEL)
+    g.mount("underbarrel", 39, 4, length=12, default=False)
+    g.mount("side", 40, 9, 5, length=8, default=False)
+    g.use("frame")
     return g
 
 
 def sniper_rifle():
     g = Held("sniper_rifle", "rifle")
-    g.pistol_grip(-6, -2, 4, 9, 3, TAN, angle=22)
-    g.box(-8, 6, 4, 9, -1.5, 1.5, STEEL)  # action
-    fore = g.box(4, 20, 2, 8, -2, 2, TAN)  # forend
-    for face in g.sides(fore):
-        face.hline(face.h // 2, shade(TAN, 0.8))
-    g.trigger(-4, 3)
-    g.box(0, 4, 0, 4, -1, 1, DARK)  # magazine
-    g.cylinder(20, 50, 6, 0, 1, GUNMETAL)  # barrel
-    brake = g.box(50, 55, 4, 8, -1.5, 1.5, DARK)
-    for face in g.sides(brake):
-        for x in range(1, face.w, 2):
-            face.vline(x, "#0c0d0f")
-    # bolt handle with a ball knob on the right
-    g.box(-3, -2, 6, 7, -5, -1.5, SILVER, noise=1)
-    g.box(-4, -1, 5, 8, -6, -4, SILVER, noise=1)
-    g.box(-26, -8, 0, 8, -2, 2, TAN)  # buttstock
-    g.box(-22, -10, 8, 10, -1.5, 1.5, TAN)  # cheek riser
-    g.box(-27, -26, -1, 8, -2, 2, RUBBER, noise=1)
-    g.box(-19, -15, 0, 2, -2.5, 2.5, DARK)  # rear monopod
-    # scope
-    g.box(-1, 1, 9, 11, -1, 1, DARK)
-    g.box(9, 11, 9, 11, -1, 1, DARK)
-    g.cylinder(-5, 14, 12.5, 0, 1.5, POLYMER)
-    g.cylinder(14, 21, 12.5, 0, 2.5, POLYMER)  # objective bell
-    g.cylinder(-10, -5, 12.5, 0, 2, POLYMER)  # eyepiece
-    g.lens(21, 10.5, 14.5, -2, 2)
-    g.lens(-11, 11, 14, -1.5, 1.5, "#6fc4ef")
-    g.box(3, 6, 14, 16, -1, 1, DARK)  # elevation turret
-    g.box(3, 6, 11.5, 13.5, -3.5, -1.5, DARK)  # windage turret
-    # folded bipod
-    g.box(18, 32, 1, 2, -2, -1, DARK)
-    g.box(18, 32, 1, 2, 1, 2, DARK)
-    g.muzzle = (55.0, 6.0)
+    g.rod(-14, 12, 14, 0, 4, STEEL)  # round action
+    g.box(-14, 12, 8, 12, -4, 4, TAN)  # chassis under the action
+    fore = g.box(12, 46, 5, 14, -5, 5, TAN)
+    g.box(12, 46, 14, 15, -4, 4, TAN)
+    g.box(12, 46, 4, 5, -4, 4, TAN)
+    slots(fore, ("right", "left"), 16, 44, 8, 11, 6, 4, TAN_D)
+    g.trigger(-12, 6)
+    g.pistol_grip(-16, -8, 8, 17, 6, TAN, angle=12)
+    g.rod(46, 86, 14, 0, 2.5, DARK)
+    for c in g.rod(46, 76, 14, 0, 2.6, DARK):  # fluting
+        for side in ("right", "left"):
+            face = getattr(c, FACES[side])
+            for x in range(0, face.w, 2):
+                face.vline(x, GUNMETAL)
+    g.muzzle = (94.0, 14.0)
+    g.part("bolt", -6, 14, -4)  # bolt handle with a tactical knob, on the right
+    g.box(-7, -4, 13, 15, -9, -4, SILVER, 1, bone="bolt")
+    g.rod(-8, -2, 14, -10, 2, POLY, bone="bolt")
+    g.part("mag", 2, 6)
+    g.part("def_mag", 2, 6, parent="mag")
+    g.use("def_mag")
+    mg = g.box(-2, 8, 0, 8, -3, 3, DARK)
+    ribs(mg, ("right", "left"), 2, shade(DARK, 1.6))
+    g.mount("stock", -16, 12)
+    g.use("def_stock")
+    butt = g.box(-52, -16, 3, 15, -4, 4, TAN)
+    mark(butt, "right", -46, -24, 6, 11, TAN_D)
+    mark(butt, "left", -46, -24, 6, 11, TAN_D)
+    g.box(-46, -26, 15, 19, -3, 3, TAN)  # cheek riser
+    g.box(-50, -48, 15, 16, -2, 2, SILVER, 1)
+    g.box(-54, -52, 2, 16, -4, 4, RUBBER, 2)
+    g.box(-42, -38, -2, 3, -2, 2, DARK)  # monopod
+    g.mount("optic", 6, 19, length=36)
+    g.use("def_optic")
+    g.rail(-6, 26, 17, -3, 3)
+    g.box(-2, 2, 19, 25, -3, 3, BLACK)  # rings
+    g.box(20, 24, 19, 25, -3, 3, BLACK)
+    g.rod(-12, 28, 25, 0, 3.5, POLY)  # tube
+    g.rod(28, 32, 25, 0, 4.5, POLY)
+    g.rod(32, 42, 25, 0, 5.5, POLY)  # objective bell
+    g.rod(-22, -12, 25, 0, 4.5, POLY)  # eyepiece
+    g.lens(42, 21, 29, -3, 3)
+    g.lens(-23, 22, 28, -2, 2, "#7fd0f5")
+    g.box(8, 12, 28, 32, -2, 2, BLACK)  # elevation turret
+    g.box(8, 12, 22, 27, -8, -3, BLACK)  # windage turret
+    g.box(9, 11, 32, 33, -1, 1, SILVER, 1)
+    g.mount("muzzle", 86, 14)
+    g.use("def_muzzle")
+    brake = g.box(86, 94, 10, 18, -4, 4, DARK)
+    for side in ("right", "left"):
+        mark(brake, side, 88, 90, 12, 16, "#060607")
+        mark(brake, side, 91, 93, 12, 16, "#060607")
+    g.mount("underbarrel", 30, 4)
+    g.use("def_underbarrel")
+    g.box(36, 40, 2, 5, -3, 3, BLACK)
+    g.rod(16, 38, 3, -3, 1, SILVER)
+    g.rod(16, 38, 3, 3, 1, SILVER)
+    g.mount("side", 30, 10, 5, length=10, default=False)
+    g.use("frame")
     return g
 
 
 def service_pistol():
     g = Held("service_pistol", "pistol")
-    g.pistol_grip(-3, 2, 4, 11, 3, POLYMER, angle=18)
-    slide = g.box(-5, 12, 5, 10, -1.5, 1.5, STEEL)
-    for face in g.sides(slide):
-        for x in range(1, 4):
-            pass
-        for row in range(face.h - 5, face.h - 1):  # rear serrations
-            if row % 2 == 0:
-                face.hline(row, DARK)
-        face.fill(DARK, 1, 6, 3, 10)  # ejection port
-    g.box(-2, 11, 3, 5, -1.5, 1.5, POLYMER)  # frame
-    g.rail(5, 10, 2, -1, 1)
-    g.box(12, 13, 7, 9, -0.5, 0.5, "#0c0d0f", noise=0)  # muzzle
-    g.trigger(1, 3)
-    g.box(-4, -2, 10, 11, -1, 1, DARK)  # rear sight
-    g.box(10, 11, 10, 11, -0.5, 0.5, DARK)  # front sight
-    g.box(-6, -5, 7, 9, -0.5, 0.5, DARK)  # hammer
-    g.box(-6, 0, -8, -7, -1.5, 1.5, DARK, tilt=-18, pivot=(-0.5, 4))  # magazine base
-    g.muzzle = (13.0, 8.0)
+    frame = g.box(-4, 24, 4, 8, -3, 3, POLY)
+    mark(frame, "left", 2, 6, 5, 7, shade(POLY, 1.4))
+    g.rail(14, 24, 2, -2, 2)  # dust cover rail
+    g.box(-1, 9, 2, 3, -1, 1, POLY)  # trigger guard
+    g.box(8, 9, 2, 5, -1, 1, POLY)
+    g.box(2, 4, 2, 6, -0.5, 0.5, SILVER, 1)
+    g.pistol_grip(-6, 3, 5, 18, 6, POLY, angle=18)
+    g.box(-9, -5, 8, 10, -2, 2, POLY)  # beavertail
+    g.box(-1, 3, 6, 8, 3, 4, STEEL)  # slide stop
+    g.part("slide", 10, 11)
+    slide = g.box(-6, 28, 8, 15, -3, 3, STEEL, bone="slide")
+    g.box(-6, 28, 15, 16, -2, 2, STEEL, bone="slide")
+    for side in ("right", "left"):
+        for f in range(-5, 2, 2):
+            mark(slide, side, f, f + 1, 9, 15, DARK)  # rear serrations
+        for f in range(20, 26, 2):
+            mark(slide, side, f, f + 1, 10, 15, DARK)  # front serrations
+    mark(slide, "right", 6, 14, 12, 15, DARK)  # ejection port
+    g.box(-5, -2, 16, 18, -2, 2, DARK, bone="slide")  # rear sight
+    g.box(24, 26, 16, 18, -0.5, 0.5, DARK, bone="slide")  # front sight
+    g.box(25, 26, 17, 18, -0.5, 0.5, WHITE, 0, bone="slide")
+    g.box(28, 29, 10, 13, -1, 1, "#050505", 0, bone="slide")  # bore
+    g.muzzle = (29.0, 11.5)
+    g.part("mag", -2, -10)
+    g.part("def_mag", -2, -10, parent="mag")
+    g.use("def_mag")
+    g.box(-8, 2, -14, -12, -3, 3, POLY, tilt=-18, pivot=(-1.5, 5))
+    g.mount("optic", 4, 16, length=8, default=False)
+    g.mount("muzzle", 28, 11.5, default=False)
+    g.mount("side", 19, 2, length=8, default=False)
+    g.use("frame")
     return g
 
 
 def rocket_launcher():
     g = Held("rocket_launcher", "launcher")
-    tube = g.cylinder(-22, 18, 8, 0, 4, OLIVE)
-    for c in tube:
-        for face in (c.right, c.left, c.front, c.back):
-            face.hline(face.h - 12, OD_DARK)
-            face.hline(face.h - 30, OD_DARK)
-            face.fill("#d9cf8a", 1, 10, 3, 20)  # stencil band
-    g.cylinder(-27, -22, 8, 0, 5, DARK)  # rear blast cone
-    g.cylinder(18, 22, 8, 0, 3, OLIVE)  # warhead body
-    g.cylinder(22, 27, 8, 0, 2, OD_DARK)
-    g.cylinder(27, 30, 8, 0, 1, DARK)  # nose
-    g.pistol_grip(-2, 2, 4, 9, 3, POLYMER)
-    g.trigger(0, 3)
-    fg = g.box(6, 9, -3, 4, -1, 1, POLYMER)  # fore grip
-    g.grooves(fg, 2)
-    sight = g.box(-2, 7, 9, 14, 4, 6, DARK)
-    for face in (sight.top, sight.bottom):
-        face.fill(GLASS)
-    g.box(-12, -2, 2, 4, -3, 3, RUBBER, noise=1)  # shoulder pad
-    for f0 in (-15, 8):
-        g.box(f0, f0 + 1, 3.5, 12.5, -4.5, 4.5, DARK, noise=1)  # straps
-    g.muzzle = (30.0, 8.0)
+    for c in g.rod(-50, 50, 20, 0, 8, OD):  # tube with bands and a stencil
+        for side in ("right", "left", "up", "down"):
+            for f0 in (-36, 0, 36):
+                mark(c, side, f0, f0 + 2, c.ext[2], c.ext[3], OD_D)
+        if c.ext[3] - c.ext[2] >= 4:
+            mark(c, "left", -24, -6, c.ext[2], c.ext[3], "#d9cf8a")
+    g.rod(-58, -50, 20, 0, 10, DARK)  # blast cone
+    g.rod(-60, -58, 20, 0, 9, "#0d0e10")
+    g.rod(46, 50, 20, 0, 9, OD_D)  # muzzle ring
+    g.pistol_grip(-12, -4, 12, 14, 6, POLY, angle=10)
+    g.trigger(-10, 12)
+    g.box(6, 12, 2, 12, -2, 2, POLY, tilt=6)  # fore grip
+    g.box(-32, -12, 10, 12, -6, 6, RUBBER, 2)  # shoulder pad
+    g.mount("optic", 4, 28, 6, length=10)
+    g.use("def_optic")
+    g.box(-6, 14, 26, 34, 6, 12, DARK)
+    g.lens(14, 27, 33, 7, 11)
+    g.lens(-7, 28, 32, 8, 10, "#7fd0f5")
+    g.box(0, 4, 20, 26, 7, 9, DARK)
+    g.part("rocket", 52, 20)  # the warhead sticking out of the tube
+    g.rod(50, 58, 20, 0, 7, "#4f5733", bone="rocket")
+    g.rod(58, 62, 20, 0, 5, "#4f5733", bone="rocket")
+    g.rod(62, 66, 20, 0, 3.5, "#3b4126", bone="rocket")
+    g.rod(66, 69, 20, 0, 2, DARK, bone="rocket")
+    g.part("mag", 52, 20)
+    g.part("def_mag", 52, 20, parent="mag")
+    g.muzzle = (69.0, 20.0)
+    g.mount("side", 20, 20, -9, length=10, default=False)
+    g.use("frame")
     return g
 
 
-# =========================================================================== close quarters and gear
+# =========================================================================== close quarters
 
 def combat_knife():
     g = Held("combat_knife", "blade")
-    h = g.box(-5, 3, -1.5, 1.5, -1, 1, RUBBER)
-    g.grooves(h, 2)
-    g.box(-6, -5, -2, 2, -1.5, 1.5, STEEL)  # pommel
-    g.box(3, 4, -3, 3, -1.5, 1.5, STEEL)  # guard
-    blade = g.box(4, 15, -1.5, 2, -0.5, 0.5, SILVER, noise=1)
-    for face in g.sides(blade):
-        face.vline(0, "#e8ecef")  # edge
-        for row in range(face.h - 4, face.h):
-            if row % 2:
-                face.px(face.w - 1, row, DARK)  # serrations on the spine
-    g.box(15, 17, -1, 1.5, -0.5, 0.5, SILVER, noise=1)
-    g.box(17, 18, -0.5, 1, -0.5, 0.5, "#e8ecef", noise=0)
+    h = g.box(-14, 6, -3, 3, -2, 2, RUBBER)
+    ribs(h, ("right", "left", "up", "down"), 2, shade(RUBBER, 1.6))
+    g.box(-17, -14, -3.5, 3.5, -2.5, 2.5, STEEL)  # pommel
+    g.box(6, 8, -6, 6, -2.5, 2.5, STEEL)  # guard
+    blade = g.box(8, 34, -4, 4, -0.5, 0.5, SILVER, 1)
+    for side in ("right", "left"):
+        mark(blade, side, 8, 34, -4, -3, CHROME)  # edge
+        mark(blade, side, 12, 30, 0, 1, shade(SILVER, 0.75))  # fuller
+        for f in range(9, 18, 2):
+            mark(blade, side, f, f + 1, 3, 4, DARK)  # spine serrations
+    g.box(34, 38, -3, 3, -0.5, 0.5, SILVER, 1)
+    g.box(38, 41, -2, 2, -0.5, 0.5, SILVER, 1)
+    g.box(41, 43, -1, 1, -0.5, 0.5, CHROME, 0)
     return g
+
+
+def _ovoid(g, f0, f1, r, color):
+    """A body of revolution about the f axis: stacked rods following a rounded profile."""
+    n = f1 - f0
+    out = []
+    for i in range(n):
+        t = (i + 0.5) / n
+        rr = r * math.sqrt(max(0.0, 1 - (2 * t - 1) ** 2)) ** 0.7
+        out += g.rod(f0 + i, f0 + i + 1, 0, 0, max(1.0, rr), color, 2)
+    return out
 
 
 def frag_grenade():
     g = Held("frag_grenade", "grenade")
-    g.box(-3, 3, -3, 3, -2, 2, OLIVE)
-    g.box(-3, 3, -2, 2, -3, 3, OLIVE)
-    core = g.box(-2, 4, -2, 2, -2, 2, OD_DARK)
-    g.box(4, 6, -1, 1, -1, 1, SILVER, noise=1)  # fuse
-    g.box(3, 7, 2, 3, -0.5, 0.5, SILVER, noise=1)  # spoon
-    g.box(1, 4, 3, 4, -0.5, 0.5, SILVER, noise=1)
-    g.box(5, 6, 1, 3, 1, 3, "#d8d8d8", noise=0)  # pin ring
-    for face in g.sides(core):
-        face.hline(1, "#d9cf8a")
+    for c in _ovoid(g, -10, 12, 8, OD):
+        if c.ext[3] - c.ext[2] >= 6:
+            for side in ("right", "left"):
+                face = getattr(c, FACES[side])
+                for x in range(0, face.w, 3):
+                    face.vline(x, OD_D)  # segmented body
+    g.rod(12, 15, 0, 0, 3, SILVER)  # fuse
+    g.box(6, 18, 6, 7, -1.5, 1.5, SILVER, 1)  # spoon
+    g.box(-2, 7, 7, 8, -1.5, 1.5, SILVER, 1, tilt=-8)
+    g.box(14, 17, -6, -5, -3, 3, CHROME, 0)  # pin ring
+    g.box(14, 17, -2, -1, -3, 3, CHROME, 0)
+    g.box(14, 17, -6, -1, -3, -2, CHROME, 0)
+    g.box(14, 17, -6, -1, 2, 3, CHROME, 0)
     return g
 
 
 def smoke_grenade():
     g = Held("smoke_grenade", "grenade")
-    can = g.cylinder(-4, 5, 0, 0, 2.5, "#7d8288")
-    for c in can:
-        for face in (c.right, c.left, c.front, c.back):
-            face.fill("#e9e7df", 0, 3, face.w, 5)  # white band
-    g.box(5, 7, -1, 1, -1, 1, SILVER, noise=1)
-    g.box(3, 8, 2.5, 3.5, -0.5, 0.5, SILVER, noise=1)
-    g.box(6, 7, 1, 3, 1, 3, "#d8d8d8", noise=0)
+    for c in g.rod(-12, 12, 0, 0, 6, "#7d8288"):
+        for side in ("right", "left", "up", "down"):
+            mark(c, side, -2, 4, c.ext[2], c.ext[3], WHITE)
+            mark(c, side, 8, 10, c.ext[2], c.ext[3], "#5a5e64")
+    g.rod(12, 15, 0, 0, 3, SILVER)
+    g.box(4, 18, 6, 7, -1.5, 1.5, SILVER, 1)
+    g.box(14, 17, -6, -1, -3, -2, CHROME, 0)
+    g.box(14, 17, -6, -1, 2, 3, CHROME, 0)
+    g.box(14, 17, -6, -5, -3, 3, CHROME, 0)
     return g
 
 
+# =========================================================================== gear (carried, not aimed)
+
 def medkit():
     g = Held("medkit", "gear")
-    bag = g.box(-4, 6, -2, 7, -3, 3, "#b02a26")
-    for face in (bag.front, bag.back, bag.right, bag.left):
-        face.border("#7e1a17")
-    for face in g.sides(bag) + (g.up(bag),):
+    bag = g.box(-16, 24, -8, 20, -12, 12, "#b02a26")
+    for face in (bag.right, bag.left, bag.front):
         cx, cy = face.w // 2, face.h // 2
-        face.fill(WHITE, cx - 1, cy - 3, cx + 1, cy + 3)
-        face.fill(WHITE, cx - 3, cy - 1, cx + 3, cy + 1)
-    g.box(-2, 4, 7, 8, -0.5, 0.5, DARK)  # handle
-    g.box(-4, 6, 2, 3, -3.5, 3.5, "#2a2a2a", noise=1)  # zip
+        face.fill(WHITE, cx - 2, cy - 7, cx + 2, cy + 7)
+        face.fill(WHITE, cx - 7, cy - 2, cx + 7, cy + 2)
+        face.border("#7e1a17")
+    g.box(-8, 16, 20, 23, -2, 2, DARK)  # handle
+    g.box(-16, 24, 6, 8, -13, 13, "#2a2a2a", 1)  # zip
     return g
 
 
 def ammo_box():
     g = Held("ammo_box", "gear")
-    can = g.box(-5, 6, -3, 6, -3, 3, OLIVE)
-    for face in g.sides(can):
-        face.border(OD_DARK)
-        face.fill("#d9cf8a", 2, 3, face.w - 2, 4)
-        face.fill("#d9cf8a", 2, 5, face.w - 4, 6)
-    g.box(-5, 6, 6, 7, -3.5, 3.5, OD_DARK)  # lid
-    g.box(-1, 2, 7, 8, -0.5, 0.5, DARK)  # handle
-    g.box(5, 6, 3, 6, -3.5, 3.5, DARK)  # latch
+    can = g.box(-20, 24, -12, 24, -12, 12, OD)
+    for side in ("right", "left"):
+        mark(can, side, -16, 20, 8, 12, "#d9cf8a")
+        mark(can, side, -16, 8, 2, 5, "#d9cf8a")
+    g.box(-20, 24, 24, 28, -13, 13, OD_D)  # lid
+    g.box(-4, 8, 28, 31, -2, 2, DARK)  # handle
+    g.box(20, 24, 12, 24, -14, 14, DARK)  # latch
     return g
 
 
 def repair_tool():
     g = Held("repair_tool", "pistol")
-    g.pistol_grip(-2, 2, 3, 8, 3, "#3a3a3e")
-    tank = g.cylinder(-6, 6, 6, 0, 2.5, "#c8302c")
-    for c in tank:
-        c.top.fill(SILVER)
-    g.box(6, 9, 5, 7, -1, 1, BRASS, noise=1)  # valve
-    g.cylinder(9, 18, 6, 0, 0.7, SILVER)  # nozzle
-    g.box(17, 19, 5, 7, -1, 1, DARK)
-    g.box(-1, 1, 9, 10, -2.5, 2.5, BRASS, noise=1)  # knob
-    g.muzzle = (19.0, 6.0)
+    g.pistol_grip(-6, 2, 10, 14, 6, "#3a3a3e", angle=12)
+    g.rod(-24, 24, 22, 0, 9, RED)
+    g.rod(-26, -24, 22, 0, 8, SILVER)
+    g.rod(24, 34, 22, 0, 4, BRASS)
+    g.rod(34, 66, 22, 0, 2, SILVER)
+    g.rod(64, 72, 22, 0, 3, DARK)
+    g.box(-4, 4, 31, 35, -6, 6, BRASS, 1)
+    g.muzzle = (72.0, 22.0)
     return g
 
 
 def binoculars():
     g = Held("binoculars", "gear")
-    for s in (-3, 3):
-        g.cylinder(-2, 8, 4, s, 2, "#3b4030")
-        g.lens(8, 2.5, 5.5, s - 1.5, s + 1.5)
-        g.cylinder(-4, -2, 4, s, 1.5, RUBBER)
-    g.box(0, 6, 3, 5, -1, 1, DARK)  # bridge
-    g.box(2, 4, 5, 6, -0.5, 0.5, SILVER, noise=1)  # focus wheel
+    for s in (-10, 10):
+        g.rod(-8, 24, 14, s, 7, "#3b4030")
+        g.lens(24, 9, 19, s - 5, s + 5)
+        g.rod(-16, -8, 14, s, 5, RUBBER)
+    g.box(0, 18, 11, 17, -4, 4, DARK)
+    g.rod(6, 12, 19, 0, 2.5, SILVER)
     return g
 
 
 def field_radio():
     g = Held("field_radio", "gear")
-    body = g.box(-4, 8, -2, 2, -2.5, 2.5, "#3b4030")
-    face = g.up(body)
-    face.fill("#7fd08a", 1, 2, face.w - 1, 5)  # screen
-    for y in range(7, face.h - 1, 2):
-        for x in range(1, face.w - 1, 2):
-            face.px(x, y, DARK)  # keypad
-    g.box(8, 10, -1, 1, 1, 2, DARK)  # knob
-    g.cylinder(8, 22, 0, -1.5, 0.5, RUBBER)  # antenna
-    g.box(-5, -4, -2.5, 2.5, -3, 3, DARK)
+    body = g.box(-14, 30, -8, 8, -9, 9, "#3b4030")
+    mark(body, "up", 14, 26, 0, 0, "#7fd08a", -6, 6)
+    for f in range(-10, 10, 4):
+        for s in range(-6, 6, 4):
+            mark(body, "up", f, f + 2, 0, 0, DARK, s, s + 2)
+    g.rod(30, 36, 4, -5, 2, DARK)  # knob
+    g.rod(30, 80, 0, 5, 1.5, RUBBER)  # antenna
+    g.box(-18, -14, -9, 9, -11, 11, DARK)
+    return g
+
+
+# =========================================================================== the Red Fang's guns (AI soldiers)
+
+def fang_rifle():
+    """A stamped-steel rifle with wooden furniture and a curved magazine."""
+    g = Held("fang_rifle", "rifle")
+    recv = g.box(-8, 30, 4, 16, -4, 4, STEEL)
+    g.box(-8, 30, 16, 18, -3, 3, GUNMETAL)  # dust cover
+    mark(recv, "right", 6, 18, 10, 14, DARK)
+    g.box(4, 18, 11, 13, -7, -4, STEEL)  # safety lever
+    g.trigger(-2, 4)
+    g.pistol_grip(-8, 0, 5, 14, 6, WOOD_D, angle=18, stipple=False)
+    hg = g.box(30, 52, 7, 15, -5, 5, WOOD)
+    for side in ("right", "left"):
+        mark(hg, side, 30, 52, 8, 9, WOOD_D)
+        mark(hg, side, 30, 52, 13, 14, WOOD_D)
+    g.box(30, 48, 15, 19, -3, 3, WOOD)  # upper guard
+    g.rod(48, 64, 17, 0, 1.5, STEEL)  # gas tube
+    g.rod(52, 76, 11, 0, 2, GUNMETAL)
+    g.box(64, 68, 9, 24, -2, 2, DARK)  # front sight block
+    g.rod(76, 82, 11, 0, 2.5, DARK)  # slant brake
+    g.box(-2, 4, 18, 22, -2, 2, DARK)  # rear sight
+    g.part("charging_handle", 22, 14, -5)
+    g.box(18, 24, 13, 15, -7, -4, SILVER, 1, bone="charging_handle")
+    g.part("mag", 14, 4)
+    g.part("def_mag", 14, 4, parent="mag")
+    g.use("def_mag")
+    for i, (f0, u0) in enumerate(((10, -4), (12, -10), (15, -16), (18, -22))):
+        c = g.box(f0, f0 + 10, u0, u0 + 6 + (2 if i == 0 else 0), -3, 3, "#4a3a2e" if i % 2 else "#55432f")
+        ribs(c, ("right", "left"), 2, shade("#4a3a2e", 0.75))
+    g.use("frame")
+    stock = g.box(-44, -8, 3, 16, -4, 4, WOOD, tilt=5, pivot=(-8, 12))
+    for side in ("right", "left"):
+        mark(stock, side, -40, -12, 9, 10, WOOD_D)
+    g.box(-46, -44, 2, 16, -4, 4, STEEL, tilt=5, pivot=(-8, 12))
+    g.muzzle = (82.0, 11.0)
+    return g
+
+
+def fang_dmr():
+    g = Held("fang_dmr", "rifle")
+    g.box(-10, 30, 4, 16, -4, 4, STEEL)
+    g.trigger(-4, 4)
+    g.pistol_grip(-10, -2, 5, 14, 6, WOOD_D, angle=18, stipple=False)
+    g.box(30, 62, 6, 16, -5, 5, WOOD)
+    g.rod(62, 100, 11, 0, 2, GUNMETAL)
+    g.rod(100, 106, 11, 0, 3, DARK)
+    stock = g.box(-52, -10, 2, 16, -4, 4, WOOD)
+    for side in ("right", "left"):
+        mark(stock, side, -44, -22, 6, 11, WOOD_D)
+    g.box(-54, -52, 1, 16, -4, 4, DARK)
+    g.box(-2, 26, 16, 18, -3, 3, DARK)  # side mount
+    g.rod(-6, 22, 23, 0, 3, POLY)
+    g.rod(22, 30, 23, 0, 4.5, POLY)
+    g.lens(30, 19, 27, -3, 3)
+    g.part("mag", 12, 4)
+    g.part("def_mag", 12, 4, parent="mag")
+    g.box(6, 16, -10, 4, -3, 3, "#2e2a26", bone="def_mag")
+    g.muzzle = (106.0, 11.0)
+    return g
+
+
+def fang_rpg():
+    g = Held("fang_rpg", "launcher")
+    g.rod(-52, 30, 20, 0, 4, GUNMETAL)  # tube
+    g.rod(-14, 14, 20, 0, 6, WOOD)  # heat shield
+    g.rod(-64, -52, 20, 0, 7, DARK)  # rear flare
+    g.pistol_grip(-6, 2, 14, 14, 6, DARK, angle=10, stipple=False)
+    g.pistol_grip(14, 20, 14, 12, 6, DARK, angle=10, stipple=False)
+    g.box(0, 10, 26, 32, 5, 9, DARK)  # optic
+    g.part("rocket", 34, 20)
+    g.rod(30, 38, 20, 0, 3, "#4a5530", bone="rocket")
+    g.rod(38, 48, 20, 0, 8, "#4a5530", bone="rocket")
+    g.rod(48, 56, 20, 0, 6, "#4a5530", bone="rocket")
+    g.rod(56, 62, 20, 0, 3.5, "#3a4228", bone="rocket")
+    g.rod(62, 66, 20, 0, 1.5, DARK, bone="rocket")
+    g.muzzle = (66.0, 20.0)
     return g
 
 
@@ -509,6 +875,9 @@ ALL = {
     "frag_grenade": frag_grenade, "smoke_grenade": smoke_grenade, "medkit": medkit, "ammo_box": ammo_box,
     "repair_tool": repair_tool, "binoculars": binoculars, "field_radio": field_radio,
 }
+FANG = {"fang_rifle": fang_rifle, "fang_dmr": fang_dmr, "fang_rpg": fang_rpg}
+GUNS = ["service_pistol", "smg", "assault_rifle", "lmg", "shotgun", "sniper_rifle", "rocket_launcher"]
+
 
 def build_all():
     return {key: fn().finish() for key, fn in ALL.items()}

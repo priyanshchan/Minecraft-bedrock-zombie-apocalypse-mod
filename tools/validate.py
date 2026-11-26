@@ -277,7 +277,7 @@ for f in sorted((BP / "scripts").glob("*.js")):
             err(f"{f.name}: sound {NS}.{ref} is not defined")
     for ref in set(re.findall(r'animation\.\$\{NS\}\.([a-z_.]+)', text)):
         full = f"animation.{NS}.{ref}"
-        if not ref.endswith("_") and full not in animations:
+        if not ref.endswith(("_", ".")) and full not in animations:  # names built at run time end in _ or .
             err(f"{f.name}: animation {full} is not defined")
     for ref in set(re.findall(r'\$\{NS\}:capture_\$\{team\}', text)):
         pass

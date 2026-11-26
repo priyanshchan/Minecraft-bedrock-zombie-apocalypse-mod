@@ -63,7 +63,7 @@ def compute():
         third = solve(third_person_arms(kind), (0.0, -0.05, -1.0), (0.0, 1.0, 0.0))
         # In first person the gun sits in front of the arm the game draws at the lower right (whose fist is
         # about 11, 18, 17 from the model origin) and points a little inwards, at the crosshair far ahead.
-        grip = {"rifle": (7.0, 16.5, 12.0), "pistol": (6.5, 17.0, 11.5), "launcher": (7.5, 18.0, 12.5)}[kind]
+        grip = {"rifle": (8.0, 15.0, 20.0), "pistol": (6.5, 16.0, 16.0), "launcher": (8.0, 13.5, 22.0)}[kind]
         aim = np.array([0.0, 23.0, 120.0]) - np.array(grip)
         first = solve(dict(FIRST_PERSON_ARM), aim, (-0.08, 1.0, 0.0), grip_at=grip)
         holds[kind] = (third, first)

@@ -16,7 +16,11 @@
       },
       "animations": {
         "first": "animation.frontline.hold.pistol.first_person",
-        "third": "animation.frontline.hold.pistol.third_person"
+        "third": "animation.frontline.hold.pistol.third_person",
+        "fire": "animation.frontline.gun.service_pistol.fire",
+        "reload": "animation.frontline.gun.service_pistol.reload",
+        "jam": "animation.frontline.gun.service_pistol.jam",
+        "malfunction": "animation.frontline.gun.service_pistol.malfunction"
       },
       "scripts": {
         "animate": [
@@ -25,11 +29,23 @@
           },
           {
             "third": "!c.is_first_person"
+          },
+          {
+            "fire": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 0.15) < 0.026"
+          },
+          {
+            "reload": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 1.60) < 0.026"
+          },
+          {
+            "jam": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 1.10) < 0.026"
+          },
+          {
+            "malfunction": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 2.50) < 0.026"
           }
         ]
       },
       "render_controllers": [
-        "controller.render.item_default"
+        "controller.render.frontline.gun"
       ]
     }
   }

@@ -52,6 +52,22 @@ Everyone also gets a combat knife, an iron helmet and chestplate if they have no
 Every gun, the launcher, knife, grenades and gear are **3D models in your hand**, in both first and third person. Players holding a gun are shown
 **aiming it with both hands** to everyone else.
 
+The guns are built from many small parts at quarter-pixel detail:
+- receivers with ejection ports, bolt catches and markings
+- rails with cross slots, and handguards with M-LOK slots
+- round barrels, flash hiders and muzzle brakes
+- curved magazines, flip-up iron sights, scopes with glass, and a folded bipod on the LMG and sniper
+
+Their moving parts are animated:
+- **Firing:** recoil, with the bolt or slide cycling. The shotgun pumps and the sniper works its bolt.
+- **Reloading:** the gun rolls towards you, the magazine drops out, a fresh one goes in, and the charging handle, slide or bolt is racked.
+  The shotgun loads shell by shell, the LMG opens its top cover and swaps the ammo box, and the launcher loads a new rocket.
+- **Jams and malfunctions:** clearing them plays its own animation (see below).
+
+![Reload and jam animations, first person](docs/images/animations.png)
+
+![The weapon models](docs/images/gun_sides.png)
+
 | Gun | Magazine | Notes |
 | --- | --- | --- |
 | Service Pistol | 12 | Quick sidearm |
@@ -65,6 +81,10 @@ Every gun, the launcher, knife, grenades and gear are **3D models in your hand**
 - **Fire:** use the gun (right-click, or hold-tap on mobile). Rifles fire short bursts.
 - **Aim:** crouch to steady your aim. Sprinting spreads your shots.
 - **Reload:** automatic when the magazine is empty, or **double-tap crouch**.
+- **Jams:** now and then a gun stops. Clear it by double-tapping crouch.
+  - **JAMMED:** tap and rack the gun; one round is lost.
+  - **MALFUNCTION** (rarer): strip the magazine, rack it and reload; two rounds are lost.
+  - The LMG and shotgun stop most often, the sniper least. You can turn jams off in Settings.
 - **Headshots** deal extra damage. Hits show a hit marker, and kills are announced in a kill feed.
 - Spare ammo is an inventory item. The status bar shows `magazine/size | reserve`.
 - Teammates are never shot (friendly fire is a setting).
@@ -111,7 +131,19 @@ next to your side: Recruit, Private, Corporal, Sergeant, Lieutenant, Captain, Ma
 
 ## Settings (Field Radio, then Settings)
 
-Friendly fire · explosions break blocks (off by default) · AI patrols and how often · AI damage (low/normal/high) · status bar on/off.
+Friendly fire · explosions break blocks (off by default) · AI patrols and how often · AI damage (low/normal/high) · status bar on/off ·
+weapon jams and malfunctions.
+
+## Attachments (coming in a future update)
+
+Every gun is already built for attachments: optic, muzzle, underbarrel, side rail, stock and magazine.
+- **The models:** each has named mount points (`att_optic`, `att_muzzle`, ...) at its rails and muzzle, with the factory parts
+  (iron sights, flash hider, stock, magazine) in their own bones, so an attachment can replace them.
+- **The guns' render controller:** guns already render through their own controller with a slot for showing and hiding parts.
+- **The scripts:** they already store fitted attachments on the gun and apply their effect on spread, recoil, damage, range,
+  magazine size, reload time and loudness.
+
+[docs/attachments.md](docs/attachments.md) lists every gun's mount positions and how to add an attachment.
 
 ## Recipes
 
@@ -124,21 +156,32 @@ with copper or iron nuggets. Vehicle kits use iron blocks, coal blocks, TNT and 
 python3 tools/gen/generate.py --preview   # pack JSON + 3D models, icons, sounds (+ preview images in docs/images)
 python3 tools/validate.py                 # every reference between files resolves
 npm install && npm run check              # type-check the scripts against @minecraft/server 2.0.0
-node tools/sim/test.js                    # play the scripts in a simulated world (46 checks)
+node tools/sim/test.js                    # play the scripts in a simulated world (62 checks)
 python3 tools/build.py                    # validate and package dist/*.mcaddon
 ```
 
 - `tools/gen/defs.py`: the list of everything (items, blocks, soldiers, vehicles, sounds).
-- `tools/gen/held.py`: the 3D guns and gear. `tools/gen/holds.py` works out how they sit in the hand. `tools/gen/viewer.py` draws them held.
+- `tools/gen/held.py`: the 3D guns and gear, with their attachment mounts.
+- `tools/gen/gunanims.py`: the guns' fire, reload, jam and malfunction animations.
+- `tools/gen/holds.py`: works out how each item sits in the hand.
+- `tools/gen/viewer.py`: draws items held, in first and third person, at any moment of an animation.
+- `tools/gen/gunsheet.py`: side views of every weapon.
 - `tools/gen/models.py`: soldiers, vehicles, projectiles, the capture flag and block models (built with `modelkit.py`, adapted from the Overlord add-on).
 - `behavior_pack/scripts/`: `weapons.js` (guns), `battle.js` (conquest and AI director), `vehicles.js`, `explosives.js`, `gear.js`,
-  `teams.js` (sides, ranks, kill feed), `patrols.js`, `ui.js` (Field Radio), `main.js`.
+  `teams.js` (sides, ranks, kill feed), `patrols.js`, `ui.js` (Field Radio), `main.js`, `attachments.js` (attachment slots and effects),
+  `gundata.js` (generated: animation timings and mounts).
 
 ### Status
 
 The packs pass the validator, the scripts pass a strict type check against the official 2.0.0 API definitions, and the gameplay runs through
-the simulated-world test. **It has not been play-tested inside Minecraft yet.** The likeliest things to need tuning are gun positions in the
-hand, vehicle seat heights, jeep and tank speeds, and AI accuracy. Please report what looks or feels off.
+the simulated-world test. **It has not been play-tested inside Minecraft yet.** The likeliest things to need tuning are:
+- gun positions in the hand
+- vehicle seat heights
+- jeep and tank speeds
+- AI accuracy
+
+The guns' own animations rely on Minecraft letting the held model read the item's cooldown (`q.cooldown_time`). If they don't play in your
+version, firing, reloading and jams still work normally; only the 3D parts stay still. Please report what looks or feels off.
 
 ## License
 

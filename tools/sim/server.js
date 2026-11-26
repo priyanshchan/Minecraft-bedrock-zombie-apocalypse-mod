@@ -44,7 +44,10 @@ export class ItemStack {
     const single = ["service_pistol", "smg", "assault_rifle", "lmg", "shotgun", "sniper_rifle", "rocket_launcher", "combat_knife",
       "field_radio", "binoculars", "repair_tool", "jeep_kit", "tank_kit"].map((n) => `frontline:${n}`);
     this.maxAmount = single.includes(typeId) || /helmet|chestplate/.test(typeId) ? 1 : typeId.endsWith("grenade") ? 4 : 64;
+    this.props = new Map();
   }
+  getDynamicProperty(k) { return this.props.get(k); }
+  setDynamicProperty(k, v) { if (v === undefined) this.props.delete(k); else this.props.set(k, v); }
 }
 
 // ------------------------------------------------------------------ blocks
@@ -210,6 +213,8 @@ export function makePlayer(name) {
   p.selectedSlotIndex = 0;
   p.mode = GameMode.Survival;
   p.getGameMode = () => p.mode;
+  p.cooldowns = [];
+  p.startItemCooldown = (category, ticks) => p.cooldowns.push({ category, ticks, at: tick });
   p.sendMessage = (m) => p.messages.push(m);
   p.playSound = (s) => p.heard.push(s);
   p.onScreenDisplay = { setActionBar: (t) => (p.bar = Array.isArray(t) ? t.join("") : t), setTitle: (t, o) => p.titles.push({ t, o }) };

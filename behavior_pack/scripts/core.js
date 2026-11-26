@@ -54,6 +54,7 @@ export const DEFAULT_SETTINGS = {
   patrolMinutes: 4,
   botDamage: 1,
   hud: true,
+  malfunctions: true,
 };
 
 /** @type {typeof DEFAULT_SETTINGS | undefined} */

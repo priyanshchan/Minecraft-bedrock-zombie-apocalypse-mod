@@ -155,14 +155,14 @@ def draw(canvas, project, model: Model, anim, show=("body", "head", "rightArm", 
 
 
 def hold_anim(hold, view):
-    from held import SCALE
+    from held import FP_SCALE, SCALE
     from holds import compute
     third, first = compute()[hold]
     rot, pos = third if view == "third" else first
-    return {"item": (rot, pos, SCALE)}
+    return {"item": (rot, pos, SCALE if view == "third" else FP_SCALE)}
 
 
-def third_person(model, hold, pose, size=(360, 420), yaw=-60.0, pitch=12.0, scale=7.0):
+def third_person(model, hold, pose, size=(360, 420), yaw=-60.0, pitch=12.0, scale=7.0, extra=None):
     canvas = Canvas(*size)
     cy, sy = math.cos(math.radians(yaw)), math.sin(math.radians(yaw))
     cp, sp = math.cos(math.radians(pitch)), math.sin(math.radians(pitch))
@@ -174,11 +174,12 @@ def third_person(model, hold, pose, size=(360, 420), yaw=-60.0, pitch=12.0, scal
         return scr, q[:, 2]
     anim = third_person_arms(pose)
     anim.update(hold_anim(hold, "third"))
+    anim.update(extra or {})
     draw(canvas, project, model, anim)
     return canvas.image()
 
 
-def first_person(model, hold, size=(480, 300), fov=70.0):
+def first_person(model, hold, size=(480, 300), fov=70.0, extra=None):
     canvas = Canvas(*size, bg=(118, 168, 220))
     eye = np.array([0.0, 24.0, 0.0])
     f = (size[1] / 2) / math.tan(math.radians(fov / 2))
@@ -192,6 +193,7 @@ def first_person(model, hold, size=(480, 300), fov=70.0):
         return scr, depth
     anim = dict(FIRST_PERSON_ARM)
     anim.update(hold_anim(hold, "first"))
+    anim.update(extra or {})
     draw(canvas, project, model, anim, show=("rightArm",))
     img = canvas.image()
     d = ImageDraw.Draw(img)
@@ -208,7 +210,7 @@ def main(keys):
     for key, item in items.items():
         if keys and key not in keys:
             continue
-        side = item.model.render(yaw=-90, pitch=0, scale=6, size=(420, 220))
+        side = item.model.render(yaw=-90, pitch=0, scale=13, size=(420, 220))
         a = third_person(item.model, item.hold, item.hold)
         b = third_person(item.model, item.hold, item.hold, yaw=30)
         c = first_person(item.model, item.hold)
@@ -258,3 +260,41 @@ def icon_render(model, anim, yaw=90.0, pitch=20.0, size=32, margin=1, light_dir=
     rgb = canvas.color.astype(np.uint8)
     alpha = (canvas.depth < 1e8).astype(np.uint8) * 255
     return Image.fromarray(np.dstack([rgb, alpha]), "RGBA")
+
+
+def sample(anim, t):
+    """Bone transforms {bone: (rotation, position, scale)} of an animation (gunanims JSON) at time t."""
+    out = {}
+
+    def at(keys):
+        times = sorted((float(k), v) for k, v in keys.items())
+        if t <= times[0][0]:
+            return times[0][1]
+        for (t0, v0), (t1, v1) in zip(times, times[1:]):
+            if t0 <= t <= t1:
+                k = 0 if t1 == t0 else (t - t0) / (t1 - t0)
+                return [a + (b - a) * k for a, b in zip(v0, v1)]
+        return times[-1][1]
+    for bone, channels in anim["bones"].items():
+        rot = at(channels["rotation"]) if "rotation" in channels else (0, 0, 0)
+        pos = at(channels["position"]) if "position" in channels else (0, 0, 0)
+        sc = at(channels["scale"])[0] if "scale" in channels else 1.0
+        out[bone] = (tuple(rot), tuple(pos), sc)
+    return out
+
+
+def frames(key, action, times, view="first"):
+    """Renders a held gun at several moments of one of its animations (first or third person)."""
+    import gunanims
+    from held import ALL
+    g = ALL[key]().finish()
+    a = gunanims.build(key)[action].json()
+    imgs = []
+    for t in times:
+        extra = sample(a, t)
+        if view == "first":
+            img = first_person(g.model, g.hold, extra=extra)
+        else:
+            img = third_person(g.model, g.hold, g.hold, extra=extra)
+        imgs.append(img)
+    return imgs

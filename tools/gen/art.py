@@ -40,7 +40,7 @@ def outline(img):
 def icon_for(key, g):
     """Guns and blades lie diagonally with the muzzle to the upper right; gear is shown from above."""
     if g.hold in ("rifle", "pistol", "launcher", "blade"):
-        rot, yaw, pitch = (45.0, 0.0, 0.0), 90.0, 0.0
+        rot, yaw, pitch = (-55.0, 0.0, 0.0), -90.0, 0.0  # left side, muzzle up and to the right
     elif key in ("frag_grenade", "smoke_grenade"):
         rot, yaw, pitch = (0.0, 0.0, 0.0), 60.0, 20.0
     else:

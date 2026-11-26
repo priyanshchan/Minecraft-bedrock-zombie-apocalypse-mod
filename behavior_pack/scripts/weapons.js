@@ -3,9 +3,11 @@
 import { EntityDamageCause, system, world } from "@minecraft/server";
 import {
   add, countItem, cue, distance, dot, getNumber, id, isCreative, isSoldier, isVehicle, normalize, NS, particle, players,
-  safe, sameTeam, scale, settings, shake, sound, spread, sub, takeItem, notify, onUse,
+  safe, sameTeam, scale, settings, shake, sound, spread, sub, takeItem, notify, onUse, heldItem,
 } from "./core.js";
 import { noteHit } from "./teams.js";
+import { modifiers } from "./attachments.js";
+import { GUN_DATA } from "./gundata.js";
 
 /**
  * @typedef {object} Gun
@@ -24,32 +26,68 @@ import { noteHit } from "./teams.js";
  * @property {number} [headshot]   damage multiplier
  * @property {string} [projectile] fires an entity instead of a hitscan round
  * @property {number} [kick]       camera shake
+ * @property {string} key          short name (animations, cooldown category)
+ * @property {number} jam          chance per round of a stoppage (a quarter of them are malfunctions)
  */
 
-/** @type {Record<string, Gun>} */
-export const GUNS = {
-  [id("service_pistol")]: { name: "Service Pistol", ammo: id("pistol_ammo"), mag: 12, damage: 6, rate: 5, spread: 1.6, range: 48, reload: 30, sound: `${NS}.pistol`, pose: "pistol", headshot: 1.8, kick: 0.04 },
-  [id("smg")]: { name: "Talon SMG", ammo: id("pistol_ammo"), mag: 30, damage: 4, rate: 6, burst: 3, spread: 3.0, range: 40, reload: 40, sound: `${NS}.smg`, pose: "rifle", headshot: 1.6, kick: 0.03 },
-  [id("assault_rifle")]: { name: "Vanguard AR", ammo: id("rifle_ammo"), mag: 30, damage: 6, rate: 8, burst: 3, spread: 1.6, range: 90, reload: 45, sound: `${NS}.assault_rifle`, pose: "rifle", headshot: 1.8, kick: 0.05 },
-  [id("lmg")]: { name: "Bulwark LMG", ammo: id("rifle_ammo"), mag: 100, damage: 5, rate: 10, burst: 5, spread: 2.8, range: 90, reload: 80, sound: `${NS}.lmg`, pose: "rifle", headshot: 1.6, kick: 0.06 },
-  [id("shotgun")]: { name: "Breacher Shotgun", ammo: id("shotgun_shells"), mag: 6, damage: 3.5, pellets: 8, rate: 16, spread: 7, range: 22, reload: 60, sound: `${NS}.shotgun`, pose: "rifle", headshot: 1.3, kick: 0.12 },
-  [id("sniper_rifle")]: { name: "Longshot Sniper", ammo: id("sniper_rounds"), mag: 5, damage: 22, rate: 30, spread: 0.3, range: 220, reload: 60, sound: `${NS}.sniper`, pose: "rifle", headshot: 2.5, kick: 0.15 },
-  [id("rocket_launcher")]: { name: "Hornet Launcher", ammo: id("rocket"), mag: 1, damage: 0, rate: 20, spread: 0.4, range: 0, reload: 70, sound: `${NS}.rocket_launch`, pose: "launcher", projectile: id("rocket"), kick: 0.2 },
+/** @type {Record<string, Omit<Gun, "key" | "reload"> & {reload?: number}>} */
+const STATS = {
+  [id("service_pistol")]: { name: "Service Pistol", ammo: id("pistol_ammo"), mag: 12, damage: 6, rate: 5, spread: 1.6, range: 48, sound: `${NS}.pistol`, pose: "pistol", headshot: 1.8, kick: 0.04, jam: 0.0025 },
+  [id("smg")]: { name: "Talon SMG", ammo: id("pistol_ammo"), mag: 30, damage: 4, rate: 6, burst: 3, spread: 3.0, range: 40, sound: `${NS}.smg`, pose: "rifle", headshot: 1.6, kick: 0.03, jam: 0.004 },
+  [id("assault_rifle")]: { name: "Vanguard AR", ammo: id("rifle_ammo"), mag: 30, damage: 6, rate: 8, burst: 3, spread: 1.6, range: 90, sound: `${NS}.assault_rifle`, pose: "rifle", headshot: 1.8, kick: 0.05, jam: 0.0035 },
+  [id("lmg")]: { name: "Bulwark LMG", ammo: id("rifle_ammo"), mag: 100, damage: 5, rate: 10, burst: 5, spread: 2.8, range: 90, sound: `${NS}.lmg`, pose: "rifle", headshot: 1.6, kick: 0.06, jam: 0.005 },
+  [id("shotgun")]: { name: "Breacher Shotgun", ammo: id("shotgun_shells"), mag: 6, damage: 3.5, pellets: 8, rate: 16, spread: 7, range: 22, sound: `${NS}.shotgun`, pose: "rifle", headshot: 1.3, kick: 0.12, jam: 0.006 },
+  [id("sniper_rifle")]: { name: "Longshot Sniper", ammo: id("sniper_rounds"), mag: 5, damage: 22, rate: 30, spread: 0.3, range: 220, sound: `${NS}.sniper`, pose: "rifle", headshot: 2.5, kick: 0.15, jam: 0.002 },
+  [id("rocket_launcher")]: { name: "Hornet Launcher", ammo: id("rocket"), mag: 1, damage: 0, rate: 20, spread: 0.4, range: 0, sound: `${NS}.rocket_launch`, pose: "launcher", projectile: id("rocket"), kick: 0.2, jam: 0.01 },
 };
+
+/** Ticks of each animated action of a gun, from the generated gun data (the 3D model's animations match). */
+const TIMING = /** @type {Record<string, Record<"fire" | "reload" | "jam" | "malfunction", number>>} */ (GUN_DATA.timing);
+
+/** @type {Record<string, Gun>} */
+export const GUNS = Object.fromEntries(Object.entries(STATS).map(([gid, st]) => {
+  const key = gid.replace(`${NS}:`, "");
+  return [gid, { ...st, key, reload: TIMING[key].reload }];
+}));
+
+/**
+ * Tells the gun's 3D model which animation to play: a cooldown of the action's length on the gun's own
+ * category (the model reads q.cooldown_time). Also the hotbar shows the action's progress.
+ * @param {import("@minecraft/server").Player} player @param {string} gunId @param {"fire" | "reload" | "jam" | "malfunction"} action
+ */
+export function animate(player, gunId, action) {
+  const g = GUNS[gunId];
+  safe(() => player.startItemCooldown(`${NS}_${g.key}`, TIMING[g.key][action]));
+}
 
 export const GUN_IDS = Object.keys(GUNS);
 /** @type {Record<string, string[]>} */
 const POSE_IDS = { rifle: [], pistol: [], launcher: [] };
 for (const [key, g] of Object.entries(GUNS)) POSE_IDS[g.pose].push(key);
 
-/** Ticks until which each player cannot fire, and active reloads. */
+/** Ticks until which each player cannot fire, and actions under way (reloads and clearing stoppages). */
 const nextShot = new Map();
-/** @type {Map<string, {gun: string, done: number}>} */
+/** @typedef {"reload" | "jam" | "malfunction"} Action */
+/** @type {Map<string, {gun: string, done: number, kind: Action}>} */
 const reloading = new Map();
+/** Guns that have stopped: player -> the gun and what went wrong. @type {Map<string, {gun: string, kind: "jam" | "malfunction"}>} */
+const stopped = new Map();
+
+/** The magazine size of the gun a player holds, with attachments (extended magazines). @param {import("@minecraft/server").Player} player @param {string} gun */
+export function magSize(player, gun) {
+  const item = heldItem(player);
+  return GUNS[gun].mag + (item?.typeId === gun ? modifiers(item).magazine : 0);
+}
 
 /** Rounds in the magazine of a gun (stored per player and gun type; a new gun comes loaded). @param {import("@minecraft/server").Player} player @param {string} gun */
 export function magOf(player, gun) {
   return getNumber(player, `fl:mag:${gun}`, GUNS[gun].mag);
+}
+
+/** What stopped a player's gun, if it has. @param {import("@minecraft/server").Player} player @param {string} gun */
+export function stoppage(player, gun) {
+  const s = stopped.get(player.id);
+  return s && s.gun === gun ? s.kind : undefined;
 }
 /** @param {import("@minecraft/server").Player} player @param {string} gun @param {number} n */
 function setMag(player, gun, n) {
@@ -69,14 +107,40 @@ export function isReloading(player) {
 /** @param {import("@minecraft/server").Player} player @param {string} gun */
 export function startReload(player, gun) {
   const g = GUNS[gun];
-  if (reloading.has(player.id) || magOf(player, gun) >= g.mag) return;
+  if (reloading.has(player.id)) return;
+  if (stoppage(player, gun)) {
+    clearStoppage(player, gun);
+    return;
+  }
+  if (magOf(player, gun) >= magSize(player, gun)) return;
   if (reserveOf(player, gun) <= 0) {
     cue(player, `${NS}.dry_fire`);
     notify(player, `§cNo ${g.ammo.replace(`${NS}:`, "").replace(/_/g, " ")} left`);
     return;
   }
-  reloading.set(player.id, { gun, done: system.currentTick + g.reload });
+  const ticks = Math.round(g.reload * modifiers(heldItem(player)).reload);
+  reloading.set(player.id, { gun, done: system.currentTick + ticks, kind: "reload" });
+  animate(player, gun, "reload");
+  playerMotion(player, "reload");
   sound(player.dimension, `${NS}.reload`, player.location, 0.9, 30 / g.reload + 0.4);
+}
+
+/** Clears a jam (tap and rack) or a malfunction (strip the magazine, rack, reload): the action the stoppage needs.
+ * @param {import("@minecraft/server").Player} player @param {string} gun */
+export function clearStoppage(player, gun) {
+  const kind = stoppage(player, gun);
+  if (!kind || reloading.has(player.id)) return;
+  const g = GUNS[gun];
+  reloading.set(player.id, { gun, done: system.currentTick + TIMING[g.key][kind], kind });
+  animate(player, gun, kind);
+  playerMotion(player, kind === "jam" ? "rack" : "reload");
+  sound(player.dimension, `${NS}.reload`, player.location, 0.8, kind === "jam" ? 1.4 : 0.9);
+  notify(player, kind === "jam" ? "§eClearing the jam..." : "§eClearing the malfunction...", TIMING[g.key][kind]);
+}
+
+/** The arm motion seen by others (third person) while reloading or racking. @param {import("@minecraft/server").Player} player @param {"reload" | "rack"} motion */
+function playerMotion(player, motion) {
+  safe(() => player.playAnimation(`animation.${NS}.player.${motion}`, { controller: `${NS}_action`, blendOutTime: 0.2 }));
 }
 
 function finishReloads() {
@@ -86,10 +150,22 @@ function finishReloads() {
     if (!r || r.done > now) continue;
     reloading.delete(p.id);
     const g = GUNS[r.gun];
-    const need = g.mag - magOf(p, r.gun);
+    if (r.kind === "jam") {
+      stopped.delete(p.id);
+      setMag(p, r.gun, Math.max(0, magOf(p, r.gun) - 1)); // the stuck round is thrown out
+      cue(p, `${NS}.click`, 0.8, 1.2);
+      notify(p, "§aCleared");
+      continue;
+    }
+    if (r.kind === "malfunction") {
+      stopped.delete(p.id);
+      setMag(p, r.gun, Math.max(0, magOf(p, r.gun) - 2)); // two rounds lost in the double feed
+    }
+    const need = magSize(p, r.gun) - magOf(p, r.gun);
     const got = isCreative(p) ? need : takeItem(p, g.ammo, need);
     setMag(p, r.gun, magOf(p, r.gun) + got);
     cue(p, `${NS}.click`, 0.8, 1.2);
+    if (r.kind === "malfunction") notify(p, "§aCleared and reloaded");
   }
 }
 
@@ -120,12 +196,15 @@ function fireRound(player, gunId, g) {
   const dim = player.dimension;
   const eye = player.getHeadLocation();
   const look = player.getViewDirection();
-  const steady = player.isSneaking ? 0.45 : player.isSprinting ? 1.8 : 1;
+  const mods = modifiers(heldItem(player));
+  const steady = (player.isSneaking ? 0.45 : player.isSprinting ? 1.8 : 1) * mods.spread;
+  const range = g.range * mods.range;
   const muzzle = add(eye, add(scale(look, 0.9), { x: -look.z * 0.25, y: -0.18, z: look.x * 0.25 }));
   particle(dim, `${NS}:muzzle_flash`, muzzle);
   particle(dim, `${NS}:gun_smoke`, muzzle);
-  sound(dim, g.sound, eye, 1, 0.95 + Math.random() * 0.1);
-  shake(player, g.kick ?? 0.05, 0.08);
+  sound(dim, g.sound, eye, Math.max(0.15, mods.noise), 0.95 + Math.random() * 0.1);
+  shake(player, (g.kick ?? 0.05) * mods.recoil, 0.08);
+  animate(player, gunId, "fire");
 
   if (g.projectile) {
     const proj = safe(() => dim.spawnEntity(g.projectile ?? "", add(eye, scale(look, 1.4))));
@@ -140,8 +219,8 @@ function fireRound(player, gunId, g) {
   let hitAny = false;
   for (let p = 0; p < (g.pellets ?? 1); p++) {
     const dir = normalize(spread(look, g.spread * steady));
-    const block = safe(() => dim.getBlockFromRay(eye, dir, { maxDistance: g.range, includeLiquidBlocks: false, includePassableBlocks: false }));
-    const wall = block ? distance(eye, add(block.block.location, block.faceLocation)) : g.range;
+    const block = safe(() => dim.getBlockFromRay(eye, dir, { maxDistance: range, includeLiquidBlocks: false, includePassableBlocks: false }));
+    const wall = block ? distance(eye, add(block.block.location, block.faceLocation)) : range;
     const hits = safe(() => dim.getEntitiesFromRay(eye, dir, { maxDistance: wall, excludeTypes: SKIP_TYPES })) ?? [];
     let target;
     let at = wall;
@@ -165,7 +244,7 @@ function fireRound(player, gunId, g) {
       continue;
     }
     const head = throughHead(eye, dir, target);
-    let dmg = g.damage * (at > g.range * 0.6 ? 0.75 : 1) * (head ? g.headshot ?? 1.5 : 1);
+    let dmg = g.damage * mods.damage * (at > range * 0.6 ? 0.75 : 1) * (head ? g.headshot ?? 1.5 : 1);
     if (safe(() => target.hasTag("fl_spotted"))) dmg *= 1.15;
     noteHit(target, g.name, head);
     safe(() => target.applyDamage(dmg, { cause: EntityDamageCause.projectile, damagingEntity: player }));
@@ -181,13 +260,20 @@ export function pullTrigger(player, gunId) {
   const now = system.currentTick;
   if ((nextShot.get(player.id) ?? 0) > now) return;
   if (reloading.has(player.id)) return;
+  const stuck = stoppage(player, gunId);
+  if (stuck) {
+    nextShot.set(player.id, now + 6);
+    cue(player, `${NS}.dry_fire`);
+    notify(player, stuck === "jam" ? "§cJAMMED §7- double-tap crouch to clear it" : "§cMALFUNCTION §7- double-tap crouch to clear it");
+    return;
+  }
   const rounds = g.burst ?? 1;
   nextShot.set(player.id, now + g.rate + (rounds - 1) * 2);
   for (let i = 0; i < rounds; i++) {
     const fire = () => {
       if (!safe(() => player.isValid)) return;
       const held = safe(() => player.getComponent("minecraft:inventory")?.container?.getItem(player.selectedSlotIndex)?.typeId);
-      if (held !== gunId || reloading.has(player.id)) return;
+      if (held !== gunId || reloading.has(player.id) || stoppage(player, gunId)) return;
       const mag = magOf(player, gunId);
       if (mag <= 0) {
         cue(player, `${NS}.dry_fire`);
@@ -196,6 +282,16 @@ export function pullTrigger(player, gunId) {
       }
       setMag(player, gunId, mag - 1);
       safe(() => fireRound(player, gunId, g));
+      // A stoppage now and then: a jam (tap, rack) or, a quarter of the time, a malfunction (strip, rack, reload).
+      if (settings().malfunctions && mag - 1 > 0 && Math.random() < g.jam) {
+        const kind = Math.random() < 0.25 ? "malfunction" : "jam";
+        stopped.set(player.id, { gun: gunId, kind });
+        system.runTimeout(() => {
+          cue(player, `${NS}.dry_fire`, 1, 0.8);
+          notify(player, kind === "jam" ? "§cJAMMED §7- double-tap crouch to clear it" : "§cMALFUNCTION §7- double-tap crouch to clear it", 60);
+        }, 2);
+        return;
+      }
       if (mag - 1 <= 0) system.runTimeout(() => startReload(player, gunId), 6);
     };
     if (i === 0) fire();
@@ -237,14 +333,19 @@ export function ammoText(player, held) {
   if (!g) return "";
   const r = reloading.get(player.id);
   if (r) {
-    const pct = 1 - (r.done - system.currentTick) / g.reload;
+    const total = r.kind === "reload" ? g.reload : TIMING[g.key][r.kind];
+    const pct = 1 - (r.done - system.currentTick) / total;
     const bars = Math.round(Math.max(0, Math.min(1, pct)) * 10);
-    return `§f${g.name} §6RELOADING §a${"|".repeat(bars)}§8${"|".repeat(10 - bars)}`;
+    const what = r.kind === "reload" ? "RELOADING" : r.kind === "jam" ? "CLEARING JAM" : "CLEARING MALFUNCTION";
+    return `§f${g.name} §6${what} §a${"|".repeat(bars)}§8${"|".repeat(10 - bars)}`;
   }
+  const stuck = stoppage(player, held);
+  if (stuck) return `§f${g.name} §c${stuck === "jam" ? "JAMMED" : "MALFUNCTION"} §7- double-tap crouch`;
   const mag = magOf(player, held);
+  const size = magSize(player, held);
   const reserve = reserveOf(player, held);
-  const magColor = mag === 0 ? "§c" : mag <= g.mag / 4 ? "§6" : "§f";
-  return `§f${g.name} ${magColor}${mag}§7/${g.mag} §8| §7${isCreative(player) ? "∞" : reserve}`;
+  const magColor = mag === 0 ? "§c" : mag <= size / 4 ? "§6" : "§f";
+  return `§f${g.name} ${magColor}${mag}§7/${size} §8| §7${isCreative(player) ? "∞" : reserve}`;
 }
 
 // ------------------------------------------------------------------ AI soldiers' shots
