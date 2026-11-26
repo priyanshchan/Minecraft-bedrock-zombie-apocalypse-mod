@@ -182,7 +182,7 @@ def attachables():
     ANIMATIONS.update(gun_anims)
     ANIMATIONS.update(gunanims.player_animations(NS))
     for key, g in built.items():
-        save_model(g.model, "attachables", f"held/{key}")
+        save_model(g.model, "entity/held", f"held/{key}")  # the game reads models from models/entity
         animations = {"first": f"animation.{NS}.hold.{g.hold}.first_person",
                       "third": f"animation.{NS}.hold.{g.hold}.third_person"}
         animate = [{"first": "c.is_first_person"}, {"third": "!c.is_first_person"}]
@@ -561,7 +561,6 @@ def corpse():
     # Near the end of its time the body sinks into the ground before it is gone.
     ANIMATIONS[f"animation.{NS}.corpse.sink"] = {"loop": True, "bones": {
         "root": {"position": [0, "math.max(0.0, q.life_time - 10.5) * -10.0", 0]}}}
-    SOUND_ENTITIES[nid("corpse")] = {"volume": 0.0, "events": {}}
 
 
 def soldier_animations():
@@ -630,8 +629,7 @@ def projectiles(models):
                 "materials": {"default": "entity_emissive_alpha" if name in ("bullet", "sniper_bullet") else "entity_alphatest"},
                 "textures": {"default": f"textures/models/projectiles/{name}"},
                 "geometry": {"default": f"geometry.{NS}.projectile_{name}"},
-                "animations": anims,
-                "scripts": {"animate": animate} if animate else {},
+                **({"animations": anims, "scripts": {"animate": animate}} if animate else {}),
                 "render_controllers": [f"controller.render.{NS}.single"],
             }},
         })
@@ -881,19 +879,19 @@ def recipes():
     shaped("m1911", ["II", " W"], {"I": I, "W": W}, "m1911")
     shaped("mp5", ["III", " PI"], {"I": I, "P": P}, "mp5")
     shaped("ump45", ["III", "PPI"], {"I": I, "P": P}, "ump45")
-    shaped("m4a1", ["IIII", " PI ", "  C "], {"I": I, "P": P, "C": C}, "m4a1")
-    shaped("ak47", ["IIII", "WPI ", "  C "], {"I": I, "P": P, "C": C, "W": W}, "ak47")
-    shaped("m249", ["IIII", "BPI ", "B C "], {"I": I, "P": P, "C": C, "B": B}, "m249")
+    shaped("m4a1", ["III", "CPI", " C "], {"I": I, "P": P, "C": C}, "m4a1")
+    shaped("ak47", ["III", "WPI", " C "], {"I": I, "P": P, "C": C, "W": W}, "ak47")
+    shaped("m249", ["III", "BPI", "BC "], {"I": I, "P": P, "C": C, "B": B}, "m249")
     shaped("rem870", ["III", "WPI"], {"I": I, "P": P, "W": W}, "rem870")
-    shaped("awm", ["GIII", " PI ", " P  "], {"I": I, "P": P, "G": "minecraft:spyglass"}, "awm")
-    shaped("svd", ["GIII", " PI ", " W  "], {"I": I, "P": P, "G": "minecraft:spyglass", "W": W}, "svd")
+    shaped("awm", ["GII", "IPI", " P "], {"I": I, "P": P, "G": "minecraft:spyglass"}, "awm")
+    shaped("svd", ["GII", "IPI", " W "], {"I": I, "P": P, "G": "minecraft:spyglass", "W": W}, "svd")
     shaped("carl_gustaf", ["III", "TPT", "CCC"], {"I": I, "P": P, "T": "minecraft:tnt", "C": C}, "carl_gustaf")
     shaped("rpg7", ["III", "TPT", "WWW"], {"I": I, "P": P, "T": "minecraft:tnt", "W": W}, "rpg7")
     shaped("deagle", ["IIC", " P"], {"I": I, "P": P, "C": C}, "deagle")
     shaped("p90", ["PPP", "IPI"], {"I": I, "P": P}, "p90")
-    shaped("scar_h", ["IIII", "CPI ", "  C "], {"I": I, "P": P, "C": C}, "scar_h")
-    shaped("barrett", ["GIII", "BPI ", " P  "], {"I": I, "P": P, "B": B, "G": "minecraft:spyglass"}, "barrett")
-    shaped("pkm", ["IIII", "BPI ", "W C "], {"I": I, "P": P, "C": C, "B": B, "W": W}, "pkm")
+    shaped("scar_h", ["III", "CPC", " C "], {"I": I, "P": P, "C": C}, "scar_h")
+    shaped("barrett", ["GII", "BPB", " P "], {"I": I, "P": P, "B": B, "G": "minecraft:spyglass"}, "barrett")
+    shaped("pkm", ["III", "BPI", "WC "], {"I": I, "P": P, "C": C, "B": B, "W": W}, "pkm")
     shapeless("ammo_50ae", [G, G, C, N, N], "ammo_50ae", 7)
     shapeless("ammo_57", [G, C, C, N], "ammo_57", 50)
     shapeless("ammo_762x51", [G, G, C, C, I], "ammo_762x51", 20)

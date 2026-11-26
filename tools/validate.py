@@ -282,6 +282,29 @@ for f in sorted((BP / "scripts").glob("*.js")):
     for ref in set(re.findall(r'\$\{NS\}:capture_\$\{team\}', text)):
         pass
 
+# ---- rules the game enforces that the cross-references above do not catch (found in the content log)
+for f in sorted((RP / "models").rglob("*.json")):
+    rel = f.relative_to(RP / "models").parts[0]
+    if rel not in ("entity", "blocks"):
+        err(f"{f}: models are only read from models/entity or models/blocks")
+    for g in load(f).get("minecraft:geometry", []):
+        names = [k for b in g.get("bones", []) for k in (b.get("locators") or {})]
+        for n in set(names):
+            if names.count(n) > 1:
+                err(f"{f.name}: locator {n} appears {names.count(n)} times")
+for f in sorted((BP / "recipes").glob("*.json")):
+    pat = load(f).get("minecraft:recipe_shaped", {}).get("pattern", [])
+    if len(pat) > 3 or any(len(r) > 3 for r in pat):
+        err(f"{f.name}: a shaped recipe can be at most 3x3")
+for f in sorted((RP / "entity").glob("*.json")):
+    desc = load(f)["minecraft:client_entity"]["description"]
+    for key in ("animations", "geometry", "textures", "materials"):
+        if key in desc and not desc[key]:
+            err(f"{f.name}: '{key}' is empty")
+for name, v in load(RP / "sounds.json").get("entity_sounds", {}).get("entities", {}).items():
+    if not v.get("events"):
+        err(f"sounds.json: {name} has no sound events")
+
 if errors:
     print(f"validate: {len(errors)} problem(s)")
     print("\n".join(sorted(set(errors))))

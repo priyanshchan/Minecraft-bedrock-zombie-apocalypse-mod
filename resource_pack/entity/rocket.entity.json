@@ -12,8 +12,6 @@
       "geometry": {
         "default": "geometry.frontline.projectile_rocket"
       },
-      "animations": {},
-      "scripts": {},
       "render_controllers": [
         "controller.render.frontline.single"
       ]
