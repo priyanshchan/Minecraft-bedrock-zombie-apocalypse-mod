@@ -446,10 +446,17 @@ class Model:
             self.pack()
         num = lambda v: int(v) if float(v).is_integer() else round(float(v), 4)
         bones = []
+        skip = getattr(self, "export_skip", set())  # helper bones kept for previews, not written
+        bound = False
         for b in self.bones:
+            if b.name in skip:
+                continue
             jb = {"name": b.name}
-            if b.parent:
+            if b.parent and b.parent not in skip:
                 jb["parent"] = b.parent
+            if getattr(b, "binding", None):
+                jb["binding"] = b.binding
+                bound = True
             jb["pivot"] = [num(v) for v in b.pivot]
             if b.rotation:
                 jb["rotation"] = [num(v) for v in b.rotation]
@@ -468,7 +475,7 @@ class Model:
                 jb["locators"] = {k: [num(v) for v in p] for k, p in b.locators.items()}
             bones.append(jb)
         return {
-            "format_version": "1.12.0",
+            "format_version": "1.16.0" if bound else "1.12.0",
             "minecraft:geometry": [{
                 "description": {
                     "identifier": f"geometry.{NAMESPACE}.{self.name}",

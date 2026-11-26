@@ -78,6 +78,10 @@ class Held:
         self.bones = {}
         item = self.model.bone("item", GRIP, "rightItem")
         item.scale = SCALE
+        # In the game the item bone is bound to the hand holding it; the player skeleton above it is only for the
+        # previews (viewer.py, holds.py) and is not written out.
+        item.binding = "q.item_slot_to_bone_name(c.item_slot)"
+        self.model.export_skip = {name for name, _p, _v in SKELETON}
         self.bones["item"] = item
         self.bones["gun"] = self.model.bone("gun", GRIP, "item")
         self.part("frame", 0, 0)
