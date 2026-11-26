@@ -1,0 +1,29 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:pistol_suppressor"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IWI"
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "W": {
+        "tag": "minecraft:wool"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:pistol_suppressor",
+      "count": 1
+    }
+  }
+}

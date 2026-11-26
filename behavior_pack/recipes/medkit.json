@@ -1,0 +1,32 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "frontline:medkit"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:paper"
+      },
+      {
+        "item": "minecraft:string"
+      },
+      {
+        "item": "minecraft:glistering_melon_slice"
+      },
+      {
+        "item": "minecraft:red_dye"
+      }
+    ],
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:medkit",
+      "count": 2
+    }
+  }
+}

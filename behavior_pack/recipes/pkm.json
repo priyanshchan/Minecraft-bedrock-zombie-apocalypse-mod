@@ -1,0 +1,40 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:pkm"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IIII",
+      "BPI ",
+      "W C "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "P": {
+        "item": "minecraft:blackstone"
+      },
+      "C": {
+        "item": "minecraft:copper_ingot"
+      },
+      "B": {
+        "item": "minecraft:iron_block"
+      },
+      "W": {
+        "tag": "minecraft:planks"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:pkm",
+      "count": 1
+    }
+  }
+}

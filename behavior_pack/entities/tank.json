@@ -1,0 +1,150 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "frontline:tank",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "frontline:team": {
+          "type": "int",
+          "range": [
+            0,
+            1
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "frontline:turret": {
+          "type": "float",
+          "range": [
+            -180.0,
+            180.0
+          ],
+          "default": 0.0,
+          "client_sync": true
+        },
+        "frontline:pitch": {
+          "type": "float",
+          "range": [
+            -25.0,
+            25.0
+          ],
+          "default": 0.0,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {},
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "frontline_vehicle",
+          "tank",
+          "inanimate"
+        ]
+      },
+      "minecraft:health": {
+        "value": 400,
+        "max": 400
+      },
+      "minecraft:collision_box": {
+        "width": 2.6,
+        "height": 1.7
+      },
+      "minecraft:movement": {
+        "value": 0.17
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:input_ground_controlled": {},
+      "minecraft:rideable": {
+        "seat_count": 2,
+        "family_types": [
+          "player"
+        ],
+        "interact_text": "action.interact.ride.horse",
+        "pull_in_entities": false,
+        "crouching_skip_interact": true,
+        "seats": [
+          {
+            "position": [
+              0.0,
+              1.25,
+              -0.1
+            ]
+          },
+          {
+            "position": [
+              -0.5,
+              1.05,
+              0.95
+            ]
+          }
+        ]
+      },
+      "minecraft:variable_max_auto_step": {
+        "base_value": 1.0625,
+        "controlled_value": 1.0625,
+        "jump_prevented_value": 1.0625
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1.0
+      },
+      "minecraft:persistent": {},
+      "minecraft:nameable": {},
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0,
+        "breathes_water": true
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "fall",
+            "deals_damage": false
+          },
+          {
+            "cause": "suffocation",
+            "deals_damage": false
+          },
+          {
+            "cause": "projectile",
+            "damage_multiplier": 0.04
+          },
+          {
+            "cause": "entity_attack",
+            "damage_multiplier": 0.05
+          },
+          {
+            "cause": "fire",
+            "damage_multiplier": 0.1
+          },
+          {
+            "cause": "fire_tick",
+            "damage_multiplier": 0.1
+          }
+        ]
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:fire_immune": {}
+    },
+    "events": {
+      "frontline:paint_nato": {
+        "set_property": {
+          "frontline:team": 0
+        }
+      },
+      "frontline:paint_redfang": {
+        "set_property": {
+          "frontline:team": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:redfang_rpg",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "skin_0": "textures/models/soldiers/redfang_rpg"
+      },
+      "geometry": {
+        "skin_0": "geometry.frontline.soldier_redfang_rpg"
+      },
+      "animations": {
+        "look": "animation.frontline.soldier.look",
+        "walk": "animation.frontline.soldier.walk",
+        "aim": "animation.frontline.soldier.aim",
+        "gun": "animation.frontline.soldier.gun"
+      },
+      "scripts": {
+        "animate": [
+          "look",
+          "walk",
+          "aim",
+          "gun"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.redfang_rpg"
+      ],
+      "spawn_egg": {
+        "base_color": "#2a2a2e",
+        "overlay_color": "#7e1a17"
+      }
+    }
+  }
+}

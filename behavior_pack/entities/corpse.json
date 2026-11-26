@@ -1,0 +1,86 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "frontline:corpse",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "frontline:skin": {
+          "type": "int",
+          "range": [
+            0,
+            9
+          ],
+          "default": 0,
+          "client_sync": true
+        },
+        "frontline:fall": {
+          "type": "int",
+          "range": [
+            0,
+            1
+          ],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "frontline:gone": {
+        "minecraft:instant_despawn": {}
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "frontline_corpse",
+          "inanimate"
+        ]
+      },
+      "minecraft:health": {
+        "value": 20,
+        "max": 20
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": false
+          }
+        ]
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 0.3
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1.0
+      },
+      "minecraft:fire_immune": true,
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:timer": {
+        "looping": false,
+        "time": 12.0,
+        "time_down_event": {
+          "event": "frontline:despawn"
+        }
+      }
+    },
+    "events": {
+      "frontline:despawn": {
+        "add": {
+          "component_groups": [
+            "frontline:gone"
+          ]
+        }
+      }
+    }
+  }
+}

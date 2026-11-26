@@ -1,0 +1,389 @@
+{
+  "format_version": "1.20.20",
+  "sound_definitions": {
+    "frontline.pistol": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 80.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/pistol",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.smg": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 80.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/smg",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.assault_rifle": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 112.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/assault_rifle",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.lmg": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 112.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/lmg",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.shotgun": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 96.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/shotgun",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.sniper": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 160.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/sniper",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.rocket_launch": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 112.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/rocket_launch",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.explosion": {
+      "category": "weather",
+      "min_distance": 1.0,
+      "max_distance": 160.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/explosion",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.tank_fire": {
+      "category": "hostile",
+      "min_distance": 1.0,
+      "max_distance": 160.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/tank_fire",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.dry_fire": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/dry_fire",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.reload": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/reload",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.grenade_pin": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/grenade_pin",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.hitmarker": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/hitmarker",
+          "volume": 0.8,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.kill": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/kill",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.capture": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/capture",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.capture_lost": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/capture_lost",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.alarm": {
+      "category": "ambient",
+      "min_distance": 1.0,
+      "max_distance": 160.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/alarm",
+          "volume": 0.6,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.battle_start": {
+      "category": "ambient",
+      "min_distance": 1.0,
+      "max_distance": 200.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/battle_start",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.victory": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/victory",
+          "volume": 0.9,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.defeat": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/defeat",
+          "volume": 0.9,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.radio": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/radio",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.heal": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/heal",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.resupply": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/resupply",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.repair": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/repair",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.click": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/click",
+          "volume": 0.6,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.engine": {
+      "category": "neutral",
+      "min_distance": 1.0,
+      "max_distance": 24.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/engine",
+          "volume": 0.5,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.heavy_pistol": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 80.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/heavy_pistol",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.ak47": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 112.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/ak47",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.dmr": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 140.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/dmr",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.suppressed": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 24.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/suppressed",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.attach": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 32.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/attach",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "frontline.bullet_crack": {
+      "category": "player",
+      "min_distance": 1.0,
+      "max_distance": 6.0,
+      "sounds": [
+        {
+          "name": "sounds/frontline/bullet_crack",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    }
+  }
+}

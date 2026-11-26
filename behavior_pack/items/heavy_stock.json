@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:heavy_stock",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_heavy_stock"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.heavy_stock.name"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:cooldown": {
+        "category": "frontline_att_heavy_stock",
+        "duration": 0.05
+      },
+      "minecraft:can_destroy_in_creative": false
+    }
+  }
+}

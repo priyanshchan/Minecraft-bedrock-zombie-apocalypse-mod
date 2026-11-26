@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:precision_stock",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_precision_stock"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.precision_stock.name"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:cooldown": {
+        "category": "frontline_att_precision_stock",
+        "duration": 0.05
+      },
+      "minecraft:can_destroy_in_creative": false
+    }
+  }
+}

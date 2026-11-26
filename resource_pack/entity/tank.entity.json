@@ -1,0 +1,33 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:tank",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "nato": "textures/models/vehicles/tank_nato",
+        "redfang": "textures/models/vehicles/tank_redfang"
+      },
+      "geometry": {
+        "default": "geometry.frontline.vehicle_tank"
+      },
+      "animations": {
+        "turret": "animation.frontline.tank.turret"
+      },
+      "scripts": {
+        "animate": [
+          "turret"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.tank"
+      ],
+      "spawn_egg": {
+        "base_color": "#4f5d34",
+        "overlay_color": "#1e1e22"
+      }
+    }
+  }
+}

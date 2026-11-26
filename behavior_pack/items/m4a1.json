@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:m4a1",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_m4a1"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.m4a1.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "uncommon",
+      "minecraft:hand_equipped": true,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:cooldown": {
+        "category": "frontline_m4a1",
+        "duration": 0.05
+      }
+    }
+  }
+}

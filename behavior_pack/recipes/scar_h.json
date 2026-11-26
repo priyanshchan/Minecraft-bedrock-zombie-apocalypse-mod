@@ -1,0 +1,34 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:scar_h"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IIII",
+      "CPI ",
+      "  C "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "P": {
+        "item": "minecraft:blackstone"
+      },
+      "C": {
+        "item": "minecraft:copper_ingot"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:scar_h",
+      "count": 1
+    }
+  }
+}

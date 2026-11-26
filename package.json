@@ -1,0 +1,14 @@
+{
+  "name": "frontline-nato-vs-red-fang",
+  "private": true,
+  "description": "Minecraft Bedrock add-on: type definitions and checks for the behavior pack scripts",
+  "scripts": {
+    "check": "tsc -p tsconfig.json",
+    "test": "node tools/sim/test.js"
+  },
+  "devDependencies": {
+    "@minecraft/server": "2.0.0",
+    "@minecraft/server-ui": "2.0.0",
+    "typescript": "5.6.3"
+  }
+}

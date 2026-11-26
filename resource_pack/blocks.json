@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.40",
+  "frontline:sandbags": {
+    "sound": "sand"
+  },
+  "frontline:barbed_wire": {
+    "sound": "metal"
+  },
+  "frontline:ammo_crate": {
+    "sound": "wood"
+  },
+  "frontline:spawn_beacon": {
+    "sound": "metal"
+  },
+  "frontline:flag_neutral": {
+    "sound": "stone"
+  },
+  "frontline:flag_nato": {
+    "sound": "stone"
+  },
+  "frontline:flag_redfang": {
+    "sound": "stone"
+  }
+}

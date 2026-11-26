@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:marksman_8x"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "ISS",
+      " C "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "S": {
+        "item": "minecraft:spyglass"
+      },
+      "C": {
+        "item": "minecraft:copper_ingot"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:marksman_8x",
+      "count": 1
+    }
+  }
+}

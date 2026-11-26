@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:nato_heavy",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "skin_0": "textures/models/soldiers/nato_heavy"
+      },
+      "geometry": {
+        "skin_0": "geometry.frontline.soldier_nato_heavy"
+      },
+      "animations": {
+        "look": "animation.frontline.soldier.look",
+        "walk": "animation.frontline.soldier.walk",
+        "aim": "animation.frontline.soldier.aim",
+        "gun": "animation.frontline.soldier.gun"
+      },
+      "scripts": {
+        "animate": [
+          "look",
+          "walk",
+          "aim",
+          "gun"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.nato_heavy"
+      ],
+      "spawn_egg": {
+        "base_color": "#3a4424",
+        "overlay_color": "#25507e"
+      }
+    }
+  }
+}

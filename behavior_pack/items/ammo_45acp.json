@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:ammo_45acp",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_ammo_45acp"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.ammo_45acp.name"
+      },
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "resource_pack_name": "frontline",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "frontline_ak47": {
+      "textures": "textures/items/frontline/ak47"
+    },
+    "frontline_ammo_12g": {
+      "textures": "textures/items/frontline/ammo_12g"
+    },
+    "frontline_ammo_338": {
+      "textures": "textures/items/frontline/ammo_338"
+    },
+    "frontline_ammo_45acp": {
+      "textures": "textures/items/frontline/ammo_45acp"
+    },
+    "frontline_ammo_50ae": {
+      "textures": "textures/items/frontline/ammo_50ae"
+    },
+    "frontline_ammo_50bmg": {
+      "textures": "textures/items/frontline/ammo_50bmg"
+    },
+    "frontline_ammo_556": {
+      "textures": "textures/items/frontline/ammo_556"
+    },
+    "frontline_ammo_57": {
+      "textures": "textures/items/frontline/ammo_57"
+    },
+    "frontline_ammo_762x39": {
+      "textures": "textures/items/frontline/ammo_762x39"
+    },
+    "frontline_ammo_762x51": {
+      "textures": "textures/items/frontline/ammo_762x51"
+    },
+    "frontline_ammo_762x54r": {
+      "textures": "textures/items/frontline/ammo_762x54r"
+    },
+    "frontline_ammo_84mm": {
+      "textures": "textures/items/frontline/ammo_84mm"
+    },
+    "frontline_ammo_9mm": {
+      "textures": "textures/items/frontline/ammo_9mm"
+    },
+    "frontline_ammo_box": {
+      "textures": "textures/items/frontline/ammo_box"
+    },
+    "frontline_ammo_pg7v": {
+      "textures": "textures/items/frontline/ammo_pg7v"
+    },
+    "frontline_angled_grip": {
+      "textures": "textures/items/frontline/angled_grip"
+    },
+    "frontline_awm": {
+      "textures": "textures/items/frontline/awm"
+    },
+    "frontline_barrett": {
+      "textures": "textures/items/frontline/barrett"
+    },
+    "frontline_big_box": {
+      "textures": "textures/items/frontline/big_box"
+    },
+    "frontline_binoculars": {
+      "textures": "textures/items/frontline/binoculars"
+    },
+    "frontline_bipod": {
+      "textures": "textures/items/frontline/bipod"
+    },
+    "frontline_carl_gustaf": {
+      "textures": "textures/items/frontline/carl_gustaf"
+    },
+    "frontline_combat_4x": {
+      "textures": "textures/items/frontline/combat_4x"
+    },
+    "frontline_combat_knife": {
+      "textures": "textures/items/frontline/combat_knife"
+    },
+    "frontline_compensator": {
+      "textures": "textures/items/frontline/compensator"
+    },
+    "frontline_cylinder_choke": {
+      "textures": "textures/items/frontline/cylinder_choke"
+    },
+    "frontline_deagle": {
+      "textures": "textures/items/frontline/deagle"
+    },
+    "frontline_drum_mag": {
+      "textures": "textures/items/frontline/drum_mag"
+    },
+    "frontline_extended_mag": {
+      "textures": "textures/items/frontline/extended_mag"
+    },
+    "frontline_extended_tube": {
+      "textures": "textures/items/frontline/extended_tube"
+    },
+    "frontline_field_radio": {
+      "textures": "textures/items/frontline/field_radio"
+    },
+    "frontline_field_ration": {
+      "textures": "textures/items/frontline/field_ration"
+    },
+    "frontline_flash_hider": {
+      "textures": "textures/items/frontline/flash_hider"
+    },
+    "frontline_flashlight": {
+      "textures": "textures/items/frontline/flashlight"
+    },
+    "frontline_frag_grenade": {
+      "textures": "textures/items/frontline/frag_grenade"
+    },
+    "frontline_full_choke": {
+      "textures": "textures/items/frontline/full_choke"
+    },
+    "frontline_glock17": {
+      "textures": "textures/items/frontline/glock17"
+    },
+    "frontline_handstop": {
+      "textures": "textures/items/frontline/handstop"
+    },
+    "frontline_heavy_stock": {
+      "textures": "textures/items/frontline/heavy_stock"
+    },
+    "frontline_holo_magnifier": {
+      "textures": "textures/items/frontline/holo_magnifier"
+    },
+    "frontline_holo_sight": {
+      "textures": "textures/items/frontline/holo_sight"
+    },
+    "frontline_jeep_kit": {
+      "textures": "textures/items/frontline/jeep_kit"
+    },
+    "frontline_laser_light": {
+      "textures": "textures/items/frontline/laser_light"
+    },
+    "frontline_laser_sight": {
+      "textures": "textures/items/frontline/laser_sight"
+    },
+    "frontline_light_stock": {
+      "textures": "textures/items/frontline/light_stock"
+    },
+    "frontline_m1911": {
+      "textures": "textures/items/frontline/m1911"
+    },
+    "frontline_m249": {
+      "textures": "textures/items/frontline/m249"
+    },
+    "frontline_m4a1": {
+      "textures": "textures/items/frontline/m4a1"
+    },
+    "frontline_marksman_8x": {
+      "textures": "textures/items/frontline/marksman_8x"
+    },
+    "frontline_medkit": {
+      "textures": "textures/items/frontline/medkit"
+    },
+    "frontline_mp5": {
+      "textures": "textures/items/frontline/mp5"
+    },
+    "frontline_muzzle_brake": {
+      "textures": "textures/items/frontline/muzzle_brake"
+    },
+    "frontline_night_vision_4x": {
+      "textures": "textures/items/frontline/night_vision_4x"
+    },
+    "frontline_p90": {
+      "textures": "textures/items/frontline/p90"
+    },
+    "frontline_pistol_suppressor": {
+      "textures": "textures/items/frontline/pistol_suppressor"
+    },
+    "frontline_pkm": {
+      "textures": "textures/items/frontline/pkm"
+    },
+    "frontline_precision_stock": {
+      "textures": "textures/items/frontline/precision_stock"
+    },
+    "frontline_prism_2x": {
+      "textures": "textures/items/frontline/prism_2x"
+    },
+    "frontline_quick_mag": {
+      "textures": "textures/items/frontline/quick_mag"
+    },
+    "frontline_red_dot": {
+      "textures": "textures/items/frontline/red_dot"
+    },
+    "frontline_reflex_sight": {
+      "textures": "textures/items/frontline/reflex_sight"
+    },
+    "frontline_rem870": {
+      "textures": "textures/items/frontline/rem870"
+    },
+    "frontline_repair_tool": {
+      "textures": "textures/items/frontline/repair_tool"
+    },
+    "frontline_rifle_suppressor": {
+      "textures": "textures/items/frontline/rifle_suppressor"
+    },
+    "frontline_rpg7": {
+      "textures": "textures/items/frontline/rpg7"
+    },
+    "frontline_scar_h": {
+      "textures": "textures/items/frontline/scar_h"
+    },
+    "frontline_smoke_grenade": {
+      "textures": "textures/items/frontline/smoke_grenade"
+    },
+    "frontline_sniper_12x": {
+      "textures": "textures/items/frontline/sniper_12x"
+    },
+    "frontline_stubby_grip": {
+      "textures": "textures/items/frontline/stubby_grip"
+    },
+    "frontline_svd": {
+      "textures": "textures/items/frontline/svd"
+    },
+    "frontline_tank_kit": {
+      "textures": "textures/items/frontline/tank_kit"
+    },
+    "frontline_ump45": {
+      "textures": "textures/items/frontline/ump45"
+    },
+    "frontline_variable_6x": {
+      "textures": "textures/items/frontline/variable_6x"
+    },
+    "frontline_vertical_grip": {
+      "textures": "textures/items/frontline/vertical_grip"
+    }
+  }
+}

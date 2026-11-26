@@ -1,0 +1,52 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "frontline:pkm",
+      "materials": {
+        "default": "entity_alphatest",
+        "enchanted": "entity_alphatest_glint"
+      },
+      "textures": {
+        "default": "textures/models/held/pkm",
+        "enchanted": "textures/misc/enchanted_item_glint"
+      },
+      "geometry": {
+        "default": "geometry.frontline.held_pkm"
+      },
+      "animations": {
+        "first": "animation.frontline.hold.rifle.first_person",
+        "third": "animation.frontline.hold.rifle.third_person",
+        "fire": "animation.frontline.gun.pkm.fire",
+        "reload": "animation.frontline.gun.pkm.reload",
+        "jam": "animation.frontline.gun.pkm.jam",
+        "malfunction": "animation.frontline.gun.pkm.malfunction"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "first": "c.is_first_person"
+          },
+          {
+            "third": "!c.is_first_person"
+          },
+          {
+            "fire": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 0.10) < 0.026"
+          },
+          {
+            "reload": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 5.50) < 0.026"
+          },
+          {
+            "jam": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 1.55) < 0.026"
+          },
+          {
+            "malfunction": "q.cooldown_time_remaining('slot.weapon.mainhand', 0) > 0.0 && math.abs(q.cooldown_time('slot.weapon.mainhand', 0) - 3.70) < 0.026"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.gun_pkm"
+      ]
+    }
+  }
+}

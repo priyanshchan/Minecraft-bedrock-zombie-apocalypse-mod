@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:glock17",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_glock17"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.glock17.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:cooldown": {
+        "category": "frontline_glock17",
+        "duration": 0.05
+      }
+    }
+  }
+}

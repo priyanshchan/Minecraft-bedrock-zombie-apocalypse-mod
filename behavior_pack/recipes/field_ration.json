@@ -1,0 +1,29 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "frontline:field_ration"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:bread"
+      },
+      {
+        "item": "minecraft:cooked_beef"
+      },
+      {
+        "item": "minecraft:paper"
+      }
+    ],
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:field_ration",
+      "count": 2
+    }
+  }
+}

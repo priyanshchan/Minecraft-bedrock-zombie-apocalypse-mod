@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:rpg7",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_rpg7"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.rpg7.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "rare",
+      "minecraft:hand_equipped": true,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:cooldown": {
+        "category": "frontline_rpg7",
+        "duration": 0.05
+      }
+    }
+  }
+}

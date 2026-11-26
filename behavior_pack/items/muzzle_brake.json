@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.50",
+  "minecraft:item": {
+    "description": {
+      "identifier": "frontline:muzzle_brake",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "frontline_muzzle_brake"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "item.frontline.muzzle_brake.name"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:cooldown": {
+        "category": "frontline_att_muzzle_brake",
+        "duration": 0.05
+      },
+      "minecraft:can_destroy_in_creative": false
+    }
+  }
+}

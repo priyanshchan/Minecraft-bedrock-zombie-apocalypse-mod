@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:holo_sight"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "IGI",
+      "NRN"
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "G": {
+        "item": "minecraft:glass_pane"
+      },
+      "N": {
+        "item": "minecraft:iron_nugget"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:holo_sight",
+      "count": 1
+    }
+  }
+}

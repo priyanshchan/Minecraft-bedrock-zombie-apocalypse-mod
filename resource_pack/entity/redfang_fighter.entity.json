@@ -1,0 +1,42 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:redfang_fighter",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "skin_0": "textures/models/soldiers/redfang_black",
+        "skin_1": "textures/models/soldiers/redfang_olive",
+        "skin_2": "textures/models/soldiers/redfang_hoodie"
+      },
+      "geometry": {
+        "skin_0": "geometry.frontline.soldier_redfang_black",
+        "skin_1": "geometry.frontline.soldier_redfang_olive",
+        "skin_2": "geometry.frontline.soldier_redfang_hoodie"
+      },
+      "animations": {
+        "look": "animation.frontline.soldier.look",
+        "walk": "animation.frontline.soldier.walk",
+        "aim": "animation.frontline.soldier.aim",
+        "gun": "animation.frontline.soldier.gun"
+      },
+      "scripts": {
+        "animate": [
+          "look",
+          "walk",
+          "aim",
+          "gun"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.redfang_fighter"
+      ],
+      "spawn_egg": {
+        "base_color": "#1e1e22",
+        "overlay_color": "#c8302c"
+      }
+    }
+  }
+}
