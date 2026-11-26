@@ -798,50 +798,139 @@ def m249():
 
 
 def svd():
+    """SVD Dragunov (7.62x54mmR): milled receiver with the left dovetail scope rail, wooden upper handguard over
+    the gas tube, slotted lower handguard, tangent rear sight, hooded front sight, long slotted flash hider,
+    skeleton thumbhole stock, 10-round curved magazine and the PSO-1 scope on the left of the rail."""
     g = gun("svd", "rifle", "ar")
-    rec = g.box(-10, 30, 6, 17, -4, 4, BLUED)
-    g.bevel(-10, 30, 17, 20, -3, 3, BLUED, 1)
+    B = 12.0
+    # ------------------------------------------------ receiver
+    rec = g.bevel(-10, 30, 6, 17, -4, 4, BLUED, 1)
+    for c in rec[:2]:
+        mark(c, "right", 6, 20, 11, 15, DARK)  # ejection port
+        mark(c, "right", 2, 26, 8, 9, shade(BLUED, 0.7))  # milling line
+        mark(c, "left", 2, 26, 8, 9, shade(BLUED, 0.7))
+        roll_mark(c, "left", -6, 4, 9.5, shade(BLUED, 1.6))
+    cov = g.bevel(-10, 30, 17, 20, -3, 3, BLUED, 1)  # dust cover
+    mark(cov[1], "up", -10, 30, 0, 0, shade(BLUED, 0.7), -0.5, 0.5)
+    g.box(-12, -10, 10, 17, -2, 2, GUNMETAL, 2)  # recoil spring cap
     g.box(0, 20, 10, 16, 4, 6, BLUED)  # side scope rail (dovetail)
-    g.box(2, 22, 12, 14, -4.6, -4, BLUED)  # safety
+    for f in range(1, 20, 4):
+        g.box(f, f + 1.5, 10.5, 15.5, 5.6, 6.3, shade(BLUED, 1.3), 1)  # clamp serrations
+    for f, u in ((-8, 7.5), (26, 7.5), (-8, 15.5), (26, 15.5)):
+        pins(g, f, u, 4, size=0.9)
+    g.box(2, 22, 12, 14, -4.6, -4, BLUED)  # safety lever
     g.box(4, 14, 13, 16, -4.3, -2, DARK)
+    g.box(18, 21, 11, 15, -5.4, -4.4, BLUED, 1)  # safety tab
     g.part("charging_handle", 22, 14, -5)
     g.box(18, 26, 13, 15, -8, -4, GUNMETAL, 1, bone="charging_handle")
     g.box(24, 26, 12, 16, -9, -7, GUNMETAL, 1, bone="charging_handle")
-    g.trigger(0, 5)
-    hg = g.slotted_panel(34, 60, 7, 16, -5, 5, WOOD, (9, 14), 3, 6)
-    uhg = g.bevel(34, 56, 16, 20, -3, 3, WOOD, 1)
-    g.rod(30, 66, 18, 0, 1.8, BLUED)
-    g.box(62, 66, 9, 20, -2.5, 2.5, BLUED)
-    g.rod(56, 112, 12, 0, 2, BLUED)
-    g.box(102, 106, 8, 16, -2, 2, BLUED)
-    g.box(102, 106, 16, 21, -2, -1, BLUED)
-    g.box(102, 106, 16, 21, 1, 2, BLUED)
-    g.box(103, 105, 16, 20, -0.5, 0.5, DARK)
+    # magazine well, trigger group, pistol grip
+    mw = g.bevel(10, 24, 2, 7, -4, 4, BLUED, 0.8)
+    g.box(9, 11, 1, 4, -1.5, 1.5, STEEL, 1)  # magazine catch
+    g.box(-6, 10, 3, 6, -2.8, 2.8, BLUED)
+    g.trigger(-1, 3)
+    g.pistol_grip(-10, -3, 6, 15, 6, WOOD, angle=14)
+    g.box(-11, -9, -8, -2, -3.2, 3.2, shade(WOOD, 0.8), 2, tilt=-14, pivot=(-6, 6))
+    # ------------------------------------------------ handguards, gas tube, barrel
+    g.rod(30, 112, B, 0, 2, BLUED)
+    g.rod(58, 96, 16.6, 0, 1.6, BLUED)  # gas tube
+    g.rod(94, 100, 16.6, 0, 2.2, GUNMETAL)  # gas piston cap
+    low = slotted(g, 34, 60, 6, 15.5, -4.6, 4.6, WOOD,
+                  [(8.5, 13, [(37, 40), (43, 46), (49, 52), (55, 58)])], inner=DARK)
+    for c in low:
+        lines(c, "left", 34, 60, 6, 8.5, 2, shade(WOOD, 0.8))
+    uhg = g.bevel(34, 58, 15, 21, -3.6, 3.6, WOOD, 1.2)  # upper handguard over the gas tube
+    for c in uhg[:2]:
+        for side in ("right", "left"):
+            lines(c, side, 34, 58, 16, 21, 2, shade(WOOD, 0.75))
+    g.box(58, 62, 6, 21, -4.8, 4.8, BLUED)  # ferrule where the handguard ends
+    g.box(58, 62, 9, 19, 4.8, 5.4, shade(BLUED, 1.3), 1)
+    pins(g, 60, 8, 4.8, size=0.9)
+    # tangent rear sight on the front of the receiver cover
+    g.box(26, 36, 19.5, 22, -2.5, 2.5, BLUED)
+    g.box(27, 35, 22, 23, -1.2, 1.2, GUNMETAL, 1)
+    leaf = g.box(28, 30, 22, 26.5, -1.5, 1.5, BLUED, 1, tilt=-18, pivot=(29, 22))
+    g.box(28, 30, 25, 26.4, -0.4, 0.4, DARK, 1, tilt=-18, pivot=(29, 22))  # the notch
+    for f in range(30, 36, 2):
+        g.box(f, f + 1, 22, 22.6, -1.8, 1.8, shade(BLUED, 1.4), 1)
+    # gas block and hooded front sight
+    g.box(86, 92, 8, 20, -2.8, 2.8, BLUED)
+    g.rod(86, 92, B, 0, 3.0, BLUED)
+    g.box(100, 108, 9, 16, -2.6, 2.6, BLUED)
+    g.rod(100, 108, B, 0, 3.0, BLUED)
+    g.box(101, 107, 16, 19, -2, 2, BLUED)
+    for s0 in (-3.2, 2.2):  # wings of the hood
+        g.box(100.5, 108, 16, 21.5, s0, s0 + 1, BLUED, 2)
+    g.box(103.5, 104.5, 19, 24, -0.5, 0.5, DARK, 1)  # the post
+    g.box(103, 105, 23.5, 24.8, -0.8, 0.8, GUNMETAL, 1)
+    pins(g, 104, 11, 2.6, size=0.8)
     g.muzzle = (122.0, 12.0)
+    # ------------------------------------------------ 10-round magazine
     mag_bones(g, 17, 6)
-    curved_mag(g, 12, 6, 6, [(0, 8), (1, 5), (3, 4)], BLUED)
+    segs = [(0, 8), (1, 5), (3, 4)]
+    cm = curve_mag(g, 12, 6, 6, segs, BLUED, overlap=0.4)
+    for seg in cm:
+        _c, df, ut, h, _a, _p = seg
+        for u in (ut - h + 1.5, ut - h + 3.5):
+            if u + 1 <= ut:
+                on_seg(g, seg, 12 + df + 1, 12 + df + 9, u, u + 1, -3.3, 3.3, shade(BLUED, 1.25), 1)
+    seg = cm[-1]
+    _c, df, ut, h, _a, _p = seg
+    on_seg(g, seg, 12 + df - 1, 12 + df + 11, ut - h - 1, ut - h + 1, -3.8, 3.8, STEEL)
+    on_seg(g, cm[0], 12 + 8, 12 + 10.4, ut - 8 + 0, 6 - 1, -3.3, 3.3, DARK, 1)  # the front rib of the box
     g.mag_profile = dict(f0=12, top=6, width=6, segs=[(0, 8), (1, 5), (3, 4)], color=BLUED, kind="dmr")
+    # ------------------------------------------------ PSO-1 scope
+    g.use("frame")
     g.mount("optic", 8, 22, 4, length=12)
     g.use("def_optic")
-    g.box(0, 20, 16, 22, 4, 10, BLUED)  # PSO-1 bracket
-    g.rod(-12, 26, 26, 6, 3, POLY)
-    g.rod(26, 32, 26, 6, 4, POLY)
-    g.rod(-20, -12, 26, 6, 3.5, RUBBER)  # eyecup
-    g.lens(32, 23, 29, 3, 9)
-    g.box(6, 10, 29, 32, 4, 8, POLY)
-    g.box(6, 10, 24, 28, 9, 12, POLY)
-    g.mount("muzzle", 112, 12, bore=2)
-    g.use("def_muzzle")
-    for c in g.rod(112, 122, 12, 0, 2.6, BLUED):
-        slots(c, ("right", "left", "up"), 113, 121, c.ext[2], c.ext[3], 4, 2)
+    g.box(-2, 20, 16, 20, 3.5, 7.5, BLUED)  # base on the side rail
+    g.box(-2, 20, 19.5, 23, 3.5, 6.5, BLUED)
+    g.box(0, 16, 17, 22.6, 6.5, 8, BLUED, 2)  # clamp lever side
+    g.box(14, 17, 17, 21, 7.5, 9.5, GUNMETAL, 1)  # clamp lever
+    g.rod(-6, 24, 26, 5, 3, POLY)  # main tube
+    g.rod(24, 33, 26, 5, 4.1, POLY)  # objective bell
+    g.rod(33, 38, 26, 5, 4.4, shade(POLY, 0.8))  # sun-shade ring
+    g.rod(-6, -2, 26, 5, 3.3, shade(POLY, 1.2))
+    g.rod(-12, -6, 26, 5, 3.5, RUBBER)  # eyecup
+    g.rod(-12.5, -11.5, 26, 5, 2.0, DARK, 0)  # the eyepiece lens
+    g.rod(17, 19, 26, 5, 3.4, GUNMETAL)  # focus ring
+    lc = g.rod(37.8, 38.6, 26, 5, 3.6, GLASS, 0)
+    for c in lc:
+        c.front.fill(GLASS)
+        c.front.px(0, 0, WHITE)
+    g.box(8, 12, 28.5, 30.5, 3.2, 6.8, POLY, 1)  # elevation drum
+    knob(g, 10, 5, 29.5, 32, 1.8, GUNMETAL)
+    disc(g, 10, 26, 8.5, 10.5, 1.8, GUNMETAL)  # windage drum on the left
+    g.box(-2, 3, 28.5, 30, 4, 6, BLACK, 1)  # illumination battery housing / reticle lamp
+    g.box(26, 30, 22.5, 24, 3, 7, BLUED, 1)
+    # ------------------------------------------------ muzzle
+    g.use("frame")
+    g.mount("muzzle", 112, B, bore=2)
+    g.use("def_muzzle")  # long slotted flash hider
+    g.rod(112, 114, B, 0, 2.9, BLUED)
+    for c in g.rod(114, 121, B, 0, 2.6, BLUED):
+        slots(c, ("right", "left", "up"), 115, 121, c.ext[2], c.ext[3], 3, 1.5)
+        slots(c, ("down",), 115, 121, c.ext[2], c.ext[3], 3, 1.5)
+    g.rod(121, 122, B, 0, 2.8, BLUED)
+    bore(g, 122, B, 1.4)
+    g.use("frame")
     g.mount("underbarrel", 48, 6, length=10, default=False)
+    # ------------------------------------------------ skeleton thumbhole stock
     g.mount("stock", -10, 10)
     g.use("def_stock")
-    g.box(-60, -14, 14, 18, -3.5, 3.5, WOOD)  # skeleton thumbhole stock
-    g.box(-60, -22, 0, 4, -3.5, 3.5, WOOD)
-    g.box(-24, -12, 0, 14, -3.5, 3.5, WOOD, tilt=-10, pivot=(-18, 7))  # grip post
-    g.bevel(-62, -54, 0, 18, -4, 4, WOOD, 1.5)
-    g.box(-48, -28, 18, 21, -3, 3, WOOD)  # cheek rest
-    g.box(-64, -62, 0, 18, -4, 4, BLUED)
+    top = g.bevel(-58, -10, 12, 19, -3.4, 3.4, WOOD, 1.2)
+    for c in top[:2]:
+        lines(c, "left", -58, -10, 13, 18, 2, shade(WOOD, 0.8))
+        lines(c, "right", -58, -10, 13, 18, 2, shade(WOOD, 0.8))
+    g.box(-52, -28, 19, 21.5, -3, 3, WOOD, 2)  # cheek rest
+    low = g.box(-58, -8, -3, 2, -3.2, 3.2, WOOD)  # lower strut to the grip
+    g.box(-22, -14, 2, 12, -3.4, 3.4, WOOD, 2)  # the thumbhole post
+    for f in (-52, -36):
+        g.box(f, f + 3, 2, 12, -3.4, 3.4, WOOD, 2)
+    butt = g.bevel(-62, -58, -6, 19, -4, 4, WOOD, 1.2)
+    g.box(-65, -62, -7, 20, -4.2, 4.2, BLUED)  # steel butt plate
+    for u in (-4, 1, 6, 11, 16):
+        g.box(-65.5, -65, u, u + 1, -3, 3, shade(BLUED, 1.35), 1)
+    sling_swivel(g, -52, -3, 0, down=True)
     g.use("frame")
     return g

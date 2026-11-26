@@ -565,67 +565,148 @@ def awm():
 # =========================================================================== launchers
 
 def carl_gustaf():
+    """Carl Gustaf M4 84mm recoilless rifle: a banded smooth tube open at both ends, the hinged venturi with its
+    locking lever, shoulder rest, cheek pad, carry handle, trigger group with safety, fore grip, side sight."""
     g = gun("carl_gustaf", "launcher", "launcher_rear")
-    for c in g.rod(-40, 50, 22, 0, 9, CARBON):
-        for side in ("right", "left", "up", "down"):
-            for f0 in (-30, 10, 40):
-                mark(c, side, f0, f0 + 2, c.ext[2], c.ext[3], shade(CARBON, 0.7))
-    g.rod(48, 52, 22, 0, 10, BLACK)  # muzzle ring
+    U = 22
+    TUBE = CARBON
+    pipe(g, -40, 50, U, 0, 9, 2, TUBE, n=16)
+    if hi():
+        for f0 in (-22, 14, 38):  # reinforcing bands
+            pipe(g, f0, f0 + 2, U, 0, 9.4, 1, shade(TUBE, 1.3), n=16)
+    pipe(g, 46, 52, U, 0, 10, 2, BLACK, n=16)  # muzzle ring
+    pipe(g, -42, -38, U, 0, 9.8, 2, STEEL, n=16)  # breech collar
+    # ---- grips, trigger group
     g.pistol_grip(-12, -6, 13, 14, 6, POLY, angle=8)
     g.trigger(-12, 13)
-    g.box(6, 12, 0, 13, -2, 2, POLY, tilt=4)  # front grip
-    g.box(-30, -14, 11, 13, -6, 6, RUBBER, 2)  # shoulder rest
-    g.box(-6, 14, 31, 34, -1, 1, BLACK)  # carry handle
-    g.box(-6, -4, 30, 31, -1, 1, BLACK)
-    g.box(12, 14, 30, 31, -1, 1, BLACK)
-    g.part("breech", -40, 22, 9)  # the venturi swings open to load
-    g.rod(-56, -40, 22, 0, 10, DARK, bone="breech")
-    g.rod(-60, -56, 22, 0, 11, "#0b0c0e", bone="breech")
-    g.part("rocket", -24, 22)
-    g.rod(-38, -10, 22, 0, 7.5, "#6a7040", bone="rocket")  # the round, inside the tube
-    g.rod(-40, -38, 22, 0, 8, BRASS, bone="rocket")
-    mag_bones(g, -24, 22)
-    g.muzzle = (52.0, 22.0)
+    g.bevel(-16, 4, 9, 14, -3, 3, BLACK, 1)  # firing mechanism housing under the tube
+    if hi():
+        g.box(-9, -5, 11, 13, 2.5, 4.5, STEEL, 1, tilt=-12)  # safety lever on the left
+        g.box(-4, 0, 10, 12, 2.5, 3.5, DARK, 1)
+        g.pin(-1, 11, 3, "left")
+    g.bevel(8, 14, 0, 11, -2.5, 2.5, POLY, 1)  # fore grip
+    g.box(7, 15, 8, 12, -3, 3, BLACK)  # its clamp
+    g.box(7.5, 14.5, -1.5, 0, -3, 3, RUBBER, 1)  # grip base
+    # ---- shoulder rest and cheek pad
+    pc = g.bevel(-34, -14, 8, 13, -5, 5, RUBBER, 1.5)
+    g.box(-26, -22, 12, 15, -1.5, 1.5, BLACK, 1)  # rest bracket
+    g.box(-18, -16, 11, 14, -1.5, 1.5, BLACK, 1)
+    if hi():
+        for c in pc[:2]:
+            ribs(c, ("right", "left"), 3, shade(RUBBER, 1.5))
+    g.bevel(-34, -16, 31, 34, -3.5, 3.5, RUBBER, 1)  # cheek pad
+    g.box(-30, -20, 30, 31, -2, 2, BLACK, 1)
+    # ---- carry handle
+    g.box(-6, -3, 30, 32, -1.5, 1.5, BLACK)
+    g.box(11, 14, 30, 32, -1.5, 1.5, BLACK)
+    hb = g.bevel(-6, 14, 32, 35, -2, 2, BLACK, 1)
+    if hi():
+        for c in hb[:2]:
+            ribs(c, ("up",), 2, shade(BLACK, 0.7))
+        g.box(-4, 12, 31, 32, -1, 1, DARK, 1)
+        sling_swivel(g, 30, 13, 0, True)
+        sling_swivel(g, -36, 31, 0, False)
+    # ---- the venturi: a hollow hourglass that swings open on a hinge on the left
+    g.part("breech", -40, U, 9)
+    cone(g, -48, -40, U, 0, 6.0, 9.4, 1, TUBE, n=12, bone="breech")
+    cone(g, -60, -48, U, 0, 10.5, 6.0, 1, TUBE, n=12, bone="breech")
+    g.rod(-47, -46, U, 0, 7.0, STEEL, bone="breech")  # throat ring
+    g.rod(-61, -59.5, U, 0, 10.8, BLACK, bone="breech")  # nozzle lip
+    g.box(-44, -36, 20, 24, -10.5, -8.5, STEEL, 1, bone="breech")  # locking lever on the right
+    g.box(-37, -34, 17, 24, -11, -9, BLACK, 1, bone="breech", tilt=0)
+    g.box(-44, -40, 19, 25, 8.5, 11.5, STEEL, 1, bone="breech")  # hinge knuckle on the left
+    g.pin(-42, 22, 9, "left")
+    # ---- the round, loaded in the tube
+    g.part("rocket", -24, U)
+    g.rod(-38, -37, U, 0, 5.6, BRASS, bone="rocket")  # case base
+    g.rod(-37, -24, U, 0, 5.4, "#8a7a3a", bone="rocket")  # cartridge case
+    g.rod(-24, -22, U, 0, 6.2, COPPER, bone="rocket")  # driving band
+    g.rod(-22, -10, U, 0, 6.0, "#6a7040", bone="rocket")  # HEAT warhead
+    g.ring(-18, -17, U, 0, 6.2, "#d8c040", bone="rocket")
+    mag_bones(g, -24, U)
+    g.muzzle = (52.0, float(U))
+    # ---- the sight: a bracket and a short telescope on the left
     g.mount("optic", 4, 30, 12, length=8)
     g.use("def_optic")
-    g.box(-4, 12, 26, 34, 9, 15, DARK)
-    g.lens(12, 27, 33, 10, 14)
-    g.lens(-5, 28, 32, 11, 13, "#7fd0f5")
+    g.box(-4, 10, 28, 30, 6, 10, DARK)
+    g.box(-1, 8, 26, 28, 8, 12, BLACK)
+    g.rod(-6, 14, 32, 12, 2.6, BLACK)
+    g.rod(10, 16, 32, 12, 3.4, BLACK)  # objective bell
+    g.rod(-10, -6, 32, 12, 3.2, RUBBER)  # eye cup
+    g.lens(16, 29, 35, 9, 15)
+    g.lens(-11, 30, 34, 10, 14, "#7fd0f5")
+    g.box(0, 4, 33, 36, 11, 13, STEEL, 1)  # elevation turret
     g.use("frame")
     return g
 
 
 def rpg7():
+    """RPG-7 with a PG-7V: tube with the flared nozzle and the muzzle flange, wooden heat shield in its two halves
+    clamped by bands, trigger group with hammer and safety, pistol and fore grip, folding sights, the PGO-7
+    optic on its side bracket, and the PG-7V round (sustainer, tapered shoulder, warhead, ogive, fuse probe)."""
     g = gun("rpg7", "launcher", "launcher_front")
-    g.rod(-40, 36, 20, 0, 4, BLUED)  # tube
-    g.rod(-14, 14, 20, 0, 6, WOOD)  # heat shield
-    for f0 in (-14, -2, 10):
-        g.ring(f0, f0 + 1, 20, 0, 6.3, BLUED)
-    g.rod(-44, -40, 20, 0, 4.6, BLUED)  # flare
-    g.rod(-50, -44, 20, 0, 5.6, BLUED)
-    g.rod(-56, -50, 20, 0, 7, DARK)
-    g.rod(34, 36, 20, 0, 5, BLUED)
-    g.pistol_grip(-4, 2, 15, 14, 6, BLUED, angle=10, stipple=False)
-    g.pistol_grip(14, 20, 15, 12, 6, BLUED, angle=10, stipple=False)
+    U = 20
+    pipe(g, -40, 36, U, 0, 4, 1, BLUED, n=12)  # tube
+    cone(g, -56, -40, U, 0, 7.0, 4.2, 1, BLUED, n=12)  # rear nozzle
+    g.rod(-57, -55.5, U, 0, 7.3, STEEL)
+    g.rod(-42, -40, U, 0, 4.7, STEEL)
+    g.rod(30, 34, U, 0, 4.6, BLUED)  # muzzle flange
+    pipe(g, 34, 36, U, 0, 5, 1, BLUED, n=12)
+    # heat shield: two wooden halves with a split and three steel bands
+    for i, c in enumerate(g.rod(-14, 14, U, 0, 6, WOOD)):
+        grain(c, WOOD, i + 3, flat=False)
+    for f0 in (-14, -2, 12):
+        g.ring(f0, f0 + 2, U, 0, 6.3, STEEL)
+    g.box(-12, 12, U - 0.5, U + 0.5, -6.2, 6.2, WOOD_D, 1)  # the seam between the halves
+    for f in (-8, 6):
+        g.pin(f, U + 1, 6, "left")
+        g.pin(f, U + 1, -6, "right")
+    # ---- trigger group
+    g.pistol_grip(-4, 2, 15, 14, 6, WOOD, angle=10, stipple=False)
+    g.bevel(-9, 6, 13, 19, -3, 3, BLUED, 1)  # mechanism housing
     g.trigger(-4, 15)
-    g.box(26, 28, 24, 30, -1, 1, BLUED)  # folding iron sights
+    g.box(-2, 1, 12, 14, 2.5, 4.5, DARK, 1)  # safety on the left
+    g.box(-8, -5, 17, 19, 3, 5.5, STEEL, 1, tilt=20)  # cocking lever
+    g.pin(2, 16, 3, "left")
+    g.pistol_grip(14, 20, 15, 12, 6, WOOD, angle=10, stipple=False)
+    g.box(11, 21, 14, 16, -3, 3, BLUED, 1)  # fore grip clamp
+    # ---- iron sights, folded forward
+    g.box(26, 28, 24, 30, -1, 1, BLUED)
+    g.box(25, 29, 29, 30.5, -1.6, 1.6, BLUED)
+    g.box(25.5, 26, 24, 30, -1.6, -1, BLUED)
+    g.box(25.5, 26, 24, 30, 1, 1.6, BLUED)
     g.box(2, 4, 24, 29, -1.5, 1.5, BLUED)
-    g.part("rocket", 40, 20)
-    g.rod(36, 44, 20, 0, 2.5, "#3a4228", bone="rocket")
-    g.rod(44, 48, 20, 0, 5.5, "#4a5530", bone="rocket")
-    g.rod(48, 56, 20, 0, 7, "#4a5530", bone="rocket")
-    g.ring(52, 53, 20, 0, 7.2, "#c9a43a", bone="rocket")
-    g.rod(56, 62, 20, 0, 5.5, "#4a5530", bone="rocket")
-    g.rod(62, 67, 20, 0, 3.5, "#3a4228", bone="rocket")
-    g.rod(67, 71, 20, 0, 2, DARK, bone="rocket")
-    g.rod(71, 74, 20, 0, 1, DARK, bone="rocket")
-    mag_bones(g, 40, 20)
-    g.muzzle = (74.0, 20.0)
+    g.box(2, 4, 27, 28, -0.5, 0.5, DARK)
+    sling_swivel(g, 30, 14, 0, True)
+    sling_swivel(g, -30, 14, 0, True)
+    # ---- the PG-7V rocket
+    g.part("rocket", 40, U)
+    G1, G2 = "#3a4228", "#4a5530"
+    g.rod(36, 44, U, 0, 2.5, G1, bone="rocket")  # sustainer neck
+    g.rod(44, 46, U, 0, 4.2, G1, bone="rocket")  # tapering shoulder
+    g.rod(46, 48, U, 0, 5.2, G2, bone="rocket")
+    g.rod(48, 50, U, 0, 6.0, G2, bone="rocket")
+    g.rod(50, 52, U, 0, 6.8, G2, bone="rocket")
+    g.rod(52, 60, U, 0, 7.0, G2, bone="rocket")  # warhead body
+    g.ring(52, 53, U, 0, 7.2, BRASS, bone="rocket")
+    g.ring(57, 58, U, 0, 7.2, "#d8c040", bone="rocket")
+    g.rod(60, 63, U, 0, 6.2, G2, bone="rocket")  # ogive
+    g.rod(63, 66, U, 0, 5.0, G2, bone="rocket")
+    g.rod(66, 69, U, 0, 3.8, G2, bone="rocket")
+    g.rod(69, 71, U, 0, 2.6, G1, bone="rocket")
+    g.rod(71, 74, U, 0, 1.2, DARK, bone="rocket")  # fuse probe
+    mag_bones(g, 40, U)
+    g.muzzle = (74.0, float(U))
+    # ---- the PGO-7 optic on its bracket on the left
     g.mount("optic", 2, 28, 8, length=8)
     g.use("def_optic")
-    g.box(-4, 8, 22, 26, 4, 8, BLUED)  # PGO-7 bracket
-    g.box(-8, 10, 25, 31, 8, 13, DARK)
-    g.rod(-16, -8, 28, 10.5, 2.5, RUBBER)
-    g.lens(10, 26, 30, 9, 12)
+    g.box(-4, 8, 22, 26, 4, 8, BLUED)
+    g.box(-2, 6, 26, 28, 6, 10, DARK)
+    g.rod(-8, 10, 29, 10.5, 2.6, BLACK)
+    g.rod(10, 14, 29, 10.5, 3.3, BLACK)
+    g.rod(-16, -8, 29, 10.5, 2.5, RUBBER)
+    g.box(0, 3, 31.5, 34, 9.5, 11.5, STEEL, 1)
+    g.lens(14, 26, 32, 7, 14)
+    g.lens(-17, 27, 31, 9, 12, "#7fd0f5")
     g.use("frame")
     return g
