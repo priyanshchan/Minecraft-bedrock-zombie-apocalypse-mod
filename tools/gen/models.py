@@ -379,7 +379,6 @@ def soldier(key, outfit_key, res=2):
         c.res = res
         c.bone = "gun"
         gun.cubes.append(c)
-    gun.locators = {"muzzle": [round(H.GRIP[0], 3), round(H.GRIP[1] + g.muzzle[0], 3), round(H.GRIP[2] - g.muzzle[1], 3)]}
     m.gun_scale = H.SCALE
     return m
 

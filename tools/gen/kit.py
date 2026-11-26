@@ -111,7 +111,6 @@ class Held:
         moving part such as a pistol's slide), with an optional def_<slot> child for the factory part.
         `bore` is the barrel radius at a muzzle mount; `length` the usable rail length."""
         att = self.part(f"att_{slot}", f, u, s, parent=parent)
-        att.locators = {slot: [round(v, 3) for v in self.at(f, u, s)]}
         self.mounts[slot] = {"f": f, "u": u, "s": s, "length": length, "bore": bore, "parent": parent}
         if default:
             self.part(f"def_{slot}", f, u, s, parent=f"att_{slot}")
@@ -284,7 +283,8 @@ class Held:
     def finish(self):
         self.model.pack()
         f, u = self.muzzle
-        self.bones["gun"].locators = {"muzzle": [round(v, 3) for v in self.at(f, u)]}
+        # No locators: the game rejects a model whose locator names repeat, and the scripts place muzzle effects
+        # themselves.
         return self
 
 
