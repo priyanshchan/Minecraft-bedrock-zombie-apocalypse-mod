@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.0: money, the Armory, fallen soldiers
+
+- **Money:**
+  - start with $1,000
+  - funding every 2 minutes: $300 from the government (NATO) or the cell's backers (Red Fang); the interval is a setting
+  - bounties: $150 a soldier (+$75 for a headshot), $300 a player, $500 a vehicle, $250 a flag capture, $1,000 a victory
+  - the balance shows in the Field Radio and on the status bar
+- **The Armory** (Field Radio): buy weapons, ammunition, attachments, equipment and vehicles.
+- **Death animations:**
+  - fallen soldiers crumple and fall backwards or forwards, lie a few seconds and sink into the ground
+  - the body is a separate entity in the soldier's uniform; bullets pass through it
+- **Soldiers drop their gear** when a player kills them: their gun (sometimes with attachments fitted), ammunition for it, and sometimes
+  a spare attachment, medkit or ration.
+- **No vanilla mobs by default:**
+  - animals, monsters and villagers are removed as they spawn and load
+  - kept: tamed pets, name-tagged mobs, armor stands and the ender dragon
+  - "Vanilla mobs" in Settings brings them back
+
 ## 1.2.0: real guns, real ballistics, attachments
 
 - **Five more guns** (seventeen in all): IWI Desert Eagle (.50 AE), FN P90 (5.7x28mm, its magazine on top), FN SCAR-H

@@ -128,6 +128,7 @@ export function familiesOf(e) {
   if (/frontline:redfang_/.test(e.typeId)) return ["frontline_soldier", "redfang", "human", "mob"];
   if (e.typeId === "minecraft:player") return ["player"];
   if (e.typeId === "frontline:jeep" || e.typeId === "frontline:tank") return ["frontline_vehicle"];
+  if (e.typeId.startsWith("minecraft:") && e.typeId !== "minecraft:item") return ["mob"];
   return [];
 }
 
@@ -208,7 +209,7 @@ function makeDimension(id) {
     playSound: (s, l, o) => sounds.push({ s, l, o }),
     createExplosion: (l, r, o) => (explosions.push({ l, r, o }), true),
     runCommand: (c) => (commands.push(c), { successCount: 1 }),
-    spawnItem: (stack, l) => entities.push(makeEntity("minecraft:item", l, dim)),
+    spawnItem: (stack, l) => { const e = makeEntity("minecraft:item", l, dim); e.stack = stack; entities.push(e); return e; },
   };
   return dim;
 }
@@ -259,7 +260,7 @@ export const world = {
   getDimension: () => overworld,
   sendMessage() {},
   afterEvents: {
-    worldLoad: signal(), itemUse: signal(), entitySpawn: signal(), entityDie: signal(), entityHurt: signal(), playerSpawn: signal(),
+    worldLoad: signal(), itemUse: signal(), entitySpawn: signal(), entityLoad: signal(), entityDie: signal(), entityHurt: signal(), playerSpawn: signal(),
     projectileHitEntity: signal(), projectileHitBlock: signal(), playerPlaceBlock: signal(), playerBreakBlock: signal(),
     playerInteractWithBlock: signal(),
   },

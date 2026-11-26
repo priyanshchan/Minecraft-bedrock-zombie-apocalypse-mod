@@ -5,6 +5,9 @@ import {
   container, countItem, cue, getNumber, giveItem, id, NS, safe, settings, TEAMS, teamOf, tell, updateSettings,
 } from "./core.js";
 import { gunsmith, gunWith } from "./gunsmith.js";
+import { armory } from "./shop.js";
+import { fmt, money } from "./economy.js";
+import { sweepVanilla } from "./soldiers.js";
 import { current, deployPoints, endBattle, groundAt, startBattle } from "./battle.js";
 import { beacons } from "./gear.js";
 import { joinTeam, rankFor, RANKS } from "./teams.js";
@@ -149,12 +152,14 @@ export async function radio(player) {
     options.push(["§lStart a conquest battle\n§r§8Flags, tickets, AI soldiers", () => setupBattle(player)]);
   }
   options.push([team ? `§lChange side\n§r§8Now ${TEAMS[team].color}${TEAMS[team].name}` : "§lChoose a side\n§r§8NATO or Red Fang", () => chooseTeam(player)]);
+  options.push([`§lArmory\n§r§8Buy gear · ${fmt(money(player))}`, () => armory(player)]);
   options.push(["§lGunsmith\n§r§8Fit scopes, muzzles, grips...", () => gunsmith(player)]);
   options.push(["§lService record\n§r§8Rank, score, kills", () => record(player)]);
   options.push(["§lField manual\n§r§8How everything works", () => manual(player)]);
   options.push(["§lSettings\n§r§8World rules", () => settingsForm(player)]);
   if (b) options.push(["§c§lEnd the battle", () => confirmEnd(player)]);
-  const form = new ActionFormData().title("§lField Radio").body(b ? "§6A battle is on." : "§7No battle is on. Patrols roam the land.");
+  const form = new ActionFormData().title("§lField Radio")
+    .body(`${b ? "§6A battle is on." : "§7No battle is on. Patrols roam the land."}\n§7Balance: §a${fmt(money(player))}`);
   for (const [label] of options) form.button(label);
   const res = await show(player, form);
   if (!res || res.canceled || res.selection === undefined) return;
@@ -243,6 +248,12 @@ const MANUAL = {
     "§lSide rail§r: laser sight (tighter hip fire, a red dot where you aim), flashlight (lights up where you aim), laser-light module.",
     "§lStocks§r and §lmagazines§r: heavy, lightweight and precision stocks; extended, drum and quick-pull magazines, extended shotgun tube, 300-round box.",
   ],
+  "Money and the Armory": [
+    "Everyone starts with $1,000. Funding arrives every few minutes: NATO's from the government, the Red Fang's from the cell's backers ($300 a time; the interval is a setting).",
+    "Kills pay a bounty: $150 a soldier (+$75 for a headshot), $300 a player, $500 a vehicle. Capturing a flag pays $250 and winning a battle $1,000.",
+    "Spend it at the §lArmory§r (Field Radio): weapons, ammunition, attachments, equipment and vehicles. Creative players buy for free.",
+    "Soldiers you kill drop the gun they carried (sometimes with attachments fitted), ammunition for it and now and then a spare attachment: take them and use them.",
+  ],
   "Classes": Object.values(CLASSES).map((c) => `§l${c.name}§r: ${c.desc}`),
   "Conquest": [
     "Stand at a flag (8 blocks) with more of your side than the enemy's to raise your colours.",
@@ -292,7 +303,9 @@ async function settingsForm(player) {
     .toggle("Weapon jams and malfunctions", { defaultValue: s.malfunctions })
     .toggle("Recoil moves the view", { defaultValue: s.cameraRecoil })
     .dropdown("Bullet drop", ["Off", "Realistic", "Heavy (x3)"], { defaultValueIndex: s.bulletDrop <= 0 ? 0 : s.bulletDrop > 1 ? 2 : 1 })
-    .toggle("Tracers", { defaultValue: s.tracers });
+    .toggle("Tracers", { defaultValue: s.tracers })
+    .slider("Minutes between funding payments", 1, 10, { defaultValue: s.salaryMinutes, valueStep: 1 })
+    .toggle("Vanilla mobs (animals, monsters, villagers)", { defaultValue: s.vanillaMobs });
   const res = await show(player, form);
   if (!res || res.canceled || !res.formValues) return;
   const v = res.formValues.filter((x) => x !== undefined);
@@ -300,6 +313,8 @@ async function settingsForm(player) {
     friendlyFire: Boolean(v[0]), destruction: Boolean(v[1]), patrols: Boolean(v[2]), patrolMinutes: Number(v[3]),
     botDamage: damage[Number(v[4])] ?? 1, hud: Boolean(v[5]), malfunctions: Boolean(v[6]),
     cameraRecoil: Boolean(v[7]), bulletDrop: [0, 1, 3][Number(v[8])] ?? 1, tracers: Boolean(v[9]),
+    salaryMinutes: Number(v[10]) || 2, vanillaMobs: Boolean(v[11]),
   });
+  sweepVanilla();
   tell(player, "§aSettings saved.");
 }

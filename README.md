@@ -165,6 +165,25 @@ Every attachment's exact effects and the guns it fits are listed in [docs/attach
 Fitted attachments are drawn on the gun in **your own** hands, in first and third person. They are shown through cooldowns of the item in
 hand, which only the holder's game knows, so other players see the gun in its factory form.
 
+## Money and the Armory
+
+- Everyone starts with **$1,000**.
+- **Funding** arrives every 2 minutes (a setting, 1 to 10): **$300** from the government for NATO, or from the cell's backers for
+  the Red Fang.
+- **Bounties:**
+  - $150 for each enemy soldier, plus $75 for a headshot
+  - $300 for an enemy player
+  - $500 for a vehicle
+  - $250 for capturing a flag
+  - $1,000 for winning a battle
+- The **Armory** (Field Radio, then Armory) sells everything:
+  - **Weapons:** all 17 guns, from $300 for a Glock to $4,500 for a Barrett
+  - **Ammunition:** packs of every cartridge
+  - **Attachments:** all 33, by slot
+  - **Equipment:** grenades, medkits, ammo boxes, a repair tool, sandbags, barbed wire, spawn beacons
+  - **Vehicles:** a jeep for $1,500 and a tank for $5,000 (deployment kits)
+- Your balance shows in the Field Radio and on the status bar next to your ammo. Creative players buy for free.
+
 ## Vehicles
 
 ![Jeeps and tanks](docs/images/models/vehicles.png)
@@ -183,7 +202,16 @@ hand, which only the holder's game knows, so other players see the gun in its fa
 | **NATO** | Rifleman (woodland and desert camo), Marksman (ghillie hood, sniper rifle), Anti-Tank Gunner (rocket launcher) |
 | **Red Fang** | Fighter (three outfits), Sniper, RPG Gunner |
 
-Soldiers fire visible tracer rounds, never hurt their own side, and attack the other side's soldiers and players. Outside battles, **patrols**
+Soldiers fire visible tracer rounds, never hurt their own side, and attack the other side's soldiers and players.
+
+- **Death animation:** a soldier who dies crumples and falls, backwards onto its back or forwards onto its face. The body lies there
+  for a few seconds, then sinks into the ground.
+- **Loot:** a soldier you kill drops its gear:
+  - the gun it carried, sometimes with attachments fitted
+  - ammunition for that gun
+  - sometimes a spare attachment, a medkit or a ration
+
+  Pick them up and use them. Outside battles, **patrols**
 of either side roam the land and fight whoever they meet. The Field Radio reports where they are.
 
 ## Gear and blocks
@@ -208,7 +236,12 @@ next to your side: Recruit, Private, Corporal, Sergeant, Lieutenant, Captain, Ma
 ## Settings (Field Radio, then Settings)
 
 Friendly fire · explosions break blocks (off by default) · AI patrols and how often · AI damage (low/normal/high) · status bar on/off ·
-weapon jams and malfunctions · recoil moves the view · bullet drop (off/realistic/heavy) · tracers.
+weapon jams and malfunctions · recoil moves the view · bullet drop (off/realistic/heavy) · tracers · minutes between funding payments ·
+vanilla mobs.
+
+**Vanilla mobs are off by default.** Animals, monsters and villagers are removed as they spawn, and when loaded, so only the soldiers fight
+over the land. Pets you have tamed, mobs with a name tag, armor stands and the ender dragon are kept. Turn "Vanilla mobs" on in Settings
+to bring the others back.
 
 ## Recipes
 
@@ -222,7 +255,7 @@ coal blocks, TNT and obsidian. Recipes show in the crafting book.
 python3 tools/gen/generate.py --preview   # pack JSON + 3D models, icons, sounds (+ preview images in docs/images)
 python3 tools/validate.py                 # every reference between files resolves
 npm install && npm run check              # type-check the scripts against @minecraft/server 2.0.0
-node tools/sim/test.js                    # play the scripts in a simulated world (87 checks)
+node tools/sim/test.js                    # play the scripts in a simulated world (98 checks)
 python3 tools/build.py                    # validate and package dist/*.mcaddon
 ```
 
@@ -239,6 +272,8 @@ python3 tools/build.py                    # validate and package dist/*.mcaddon
   - `weapons.js`: triggers, recoil and spread, magazines, jams, scopes, lasers and flashlights
   - `ballistics.js`: bullets in flight
   - `attachments.js`, `gunsmith.js`: attachments and the Gunsmith
+  - `economy.js`, `shop.js`: money, funding and the Armory
+  - `soldiers.js`: death animations (bodies), the gear soldiers drop, keeping vanilla mobs away
   - `battle.js` (conquest and AI director), `vehicles.js`, `explosives.js`, `gear.js`, `teams.js` (sides, ranks, kill feed),
     `patrols.js`, `ui.js` (Field Radio), `main.js`
   - `gundata.js` (generated): gun stats, animation timings, mounts and the attachment catalogue

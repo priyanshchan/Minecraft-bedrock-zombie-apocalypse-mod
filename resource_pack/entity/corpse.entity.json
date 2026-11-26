@@ -1,0 +1,54 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "frontline:corpse",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "skin_0": "textures/models/soldiers/nato_woodland",
+        "skin_1": "textures/models/soldiers/nato_woodland_b",
+        "skin_2": "textures/models/soldiers/nato_desert",
+        "skin_3": "textures/models/soldiers/nato_marksman",
+        "skin_4": "textures/models/soldiers/nato_heavy",
+        "skin_5": "textures/models/soldiers/redfang_black",
+        "skin_6": "textures/models/soldiers/redfang_olive",
+        "skin_7": "textures/models/soldiers/redfang_hoodie",
+        "skin_8": "textures/models/soldiers/redfang_sniper",
+        "skin_9": "textures/models/soldiers/redfang_rpg"
+      },
+      "geometry": {
+        "skin_0": "geometry.frontline.soldier_nato_woodland",
+        "skin_1": "geometry.frontline.soldier_nato_woodland_b",
+        "skin_2": "geometry.frontline.soldier_nato_desert",
+        "skin_3": "geometry.frontline.soldier_nato_marksman",
+        "skin_4": "geometry.frontline.soldier_nato_heavy",
+        "skin_5": "geometry.frontline.soldier_redfang_black",
+        "skin_6": "geometry.frontline.soldier_redfang_olive",
+        "skin_7": "geometry.frontline.soldier_redfang_hoodie",
+        "skin_8": "geometry.frontline.soldier_redfang_sniper",
+        "skin_9": "geometry.frontline.soldier_redfang_rpg"
+      },
+      "animations": {
+        "back": "animation.frontline.corpse.fall_back",
+        "front": "animation.frontline.corpse.fall_forward",
+        "sink": "animation.frontline.corpse.sink"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "back": "q.property('frontline:fall') == 0"
+          },
+          {
+            "front": "q.property('frontline:fall') == 1"
+          },
+          "sink"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.frontline.corpse"
+      ]
+    }
+  }
+}

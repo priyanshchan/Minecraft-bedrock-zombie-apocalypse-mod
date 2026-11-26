@@ -2,6 +2,7 @@ pack.name=Frontline: NATO vs Red Fang
 pack.description=Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, pick a class, drive jeeps and tanks and fight beside AI soldiers.
 action.interact.mount=Get in
 entity.frontline:capture_flag.name=Capture Point
+entity.frontline:corpse.name=Fallen Soldier
 entity.frontline:jeep.name=Jeep
 entity.frontline:nato_heavy.name=NATO Anti-Tank Gunner
 entity.frontline:nato_marksman.name=NATO Marksman

@@ -271,7 +271,7 @@ export function endBattle(winner) {
         subtitle: `${t.color}${t.name} §7wins the battle`, fadeInDuration: 10, stayDuration: 80, fadeOutDuration: 20,
       }));
       cue(p, mine ? `${NS}.victory` : `${NS}.defeat`);
-      if (mine) award(p, 500, "Victory");
+      if (mine) award(p, 500, "Victory", 1000);
     }
     broadcast(`§6[Battle] ${t.color}${t.name} §fwins! §7(NATO ${b.tickets.nato} · Red Fang ${b.tickets.redfang} tickets left)`);
   } else {
@@ -352,7 +352,7 @@ function setOwner(b, p, owner) {
     for (const pl of players()) {
       if (teamOf(pl) === team) {
         cue(pl, `${NS}.capture`);
-        if (flatDistance(pl.location, at) <= RADIUS + 1) award(pl, 150, `Captured ${p.key}`);
+        if (flatDistance(pl.location, at) <= RADIUS + 1) award(pl, 150, `Captured ${p.key}`, 250);
       } else if (teamOf(pl)) cue(pl, `${NS}.capture_lost`);
     }
   }

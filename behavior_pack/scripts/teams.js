@@ -3,6 +3,7 @@ import { DisplaySlotId, ObjectiveSortOrder, system, world } from "@minecraft/ser
 import {
   addNumber, broadcast, cue, getNumber, id, isSoldier, isVehicle, NS, players, safe, sameTeam, settings, TEAMS, teamOf, tell, notify,
 } from "./core.js";
+import { addMoney, fmt } from "./economy.js";
 
 export const RANKS = [
   { score: 0, name: "Recruit", short: "Rct" },
@@ -49,12 +50,13 @@ export function refreshName(player) {
   });
 }
 
-/** @param {import("@minecraft/server").Player} player @param {number} points @param {string} [why] */
-export function award(player, points, why) {
+/** Score (and money) for something a player did. @param {import("@minecraft/server").Player} player @param {number} points @param {string} [why] @param {number} [cash] */
+export function award(player, points, why, cash = 0) {
   const before = rankFor(getNumber(player, "fl:score"));
   const score = addNumber(player, "fl:score", points);
   const after = rankFor(score);
-  if (why) notify(player, `§e+${points} §7${why}`);
+  if (cash) addMoney(player, cash);
+  if (why) notify(player, `§e${points >= 0 ? "+" : ""}${points}${cash > 0 ? ` §a+${fmt(cash)}` : ""} §7${why}`);
   safe(() => world.scoreboard.getObjective("fl_score")?.setScore(player, score));
   if (after !== before) {
     safe(() => player.onScreenDisplay.setTitle("§6Promoted", { subtitle: `§f${after.name}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 15 }));
@@ -81,8 +83,12 @@ export function noteHit(target, weapon, headshot) {
   lastHits.set(target.id, { weapon, headshot, tick: system.currentTick });
 }
 
-/** @type {Array<(dead: import("@minecraft/server").Entity, killer: import("@minecraft/server").Entity | undefined) => void>} */
+/** Called for every death of a player, soldier or vehicle; `headshot` when a headshot finished it.
+ * @type {Array<(dead: import("@minecraft/server").Entity, killer: import("@minecraft/server").Entity | undefined, headshot: boolean) => void>} */
 export const onKill = [];
+
+/** Money for a kill: soldiers, players (a bigger bounty) and vehicles; headshots pay extra. */
+export const BOUNTY = { soldier: 150, player: 300, vehicle: 500, headshot: 75 };
 
 export function init() {
   safe(() => {
@@ -124,7 +130,8 @@ export function init() {
       if (!sameTeam(p, dead)) {
         addNumber(p, "fl:kills", 1);
         const vehicle = isVehicle(dead);
-        award(p, vehicle ? 300 : 100 + (head ? 25 : 0), vehicle ? "Vehicle destroyed" : head ? "Headshot kill" : "Kill");
+        const cash = vehicle ? BOUNTY.vehicle : (dead.typeId === "minecraft:player" ? BOUNTY.player : BOUNTY.soldier) + (head ? BOUNTY.headshot : 0);
+        award(p, vehicle ? 300 : 100 + (head ? 25 : 0), vehicle ? "Vehicle destroyed" : head ? "Headshot kill" : "Kill", cash);
         cue(p, `${NS}.kill`);
       } else {
         award(p, -50, "Team kill");
@@ -139,7 +146,7 @@ export function init() {
         if (near) tell(p, msg);
       }
     }
-    for (const fn of onKill) safe(() => fn(dead, killer));
+    for (const fn of onKill) safe(() => fn(dead, killer, Boolean(head)));
   });
 }
 

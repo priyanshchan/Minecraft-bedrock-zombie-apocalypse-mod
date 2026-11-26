@@ -10,6 +10,8 @@ import * as battle from "./battle.js";
 import * as patrols from "./patrols.js";
 import * as ui from "./ui.js";
 import * as gunsmith from "./gunsmith.js";
+import * as economy from "./economy.js";
+import * as soldiers from "./soldiers.js";
 
 let started = false;
 const PLACEABLE = new Set(["sandbags", "barbed_wire", "ammo_crate", "spawn_beacon", "jeep_kit", "tank_kit"].map(id));
@@ -21,6 +23,8 @@ function start() {
   vehicles.init(); // before weapons: in a tank's commander seat every item fires the cannon
   weapons.init();
   gunsmith.init();
+  economy.init();
+  soldiers.init();
   explosives.init();
   gear.init();
   battle.init();
@@ -71,7 +75,8 @@ function start() {
       }
       const v = vehicles.vehicleText(p);
       if (v) lines.push(v);
-      else if (held && weapons.GUNS[held]) lines.push(weapons.ammoText(p, held));
+      else if (held && weapons.GUNS[held]) lines.push(`${weapons.ammoText(p, held)} §8| §a${economy.fmt(economy.money(p))}`);
+      else if (held === id("field_radio")) lines.push(`§7Balance §a${economy.fmt(economy.money(p))}`);
       if (lines.length) safe(() => p.onScreenDisplay.setActionBar(lines.join("\n")));
     }
   }, 5);

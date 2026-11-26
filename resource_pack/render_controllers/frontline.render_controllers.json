@@ -1292,6 +1292,55 @@
         "Array.skins[query.variant]"
       ]
     },
+    "controller.render.frontline.corpse": {
+      "arrays": {
+        "textures": {
+          "Array.skins": [
+            "Texture.skin_0",
+            "Texture.skin_1",
+            "Texture.skin_2",
+            "Texture.skin_3",
+            "Texture.skin_4",
+            "Texture.skin_5",
+            "Texture.skin_6",
+            "Texture.skin_7",
+            "Texture.skin_8",
+            "Texture.skin_9"
+          ]
+        },
+        "geometries": {
+          "Array.geos": [
+            "Geometry.skin_0",
+            "Geometry.skin_1",
+            "Geometry.skin_2",
+            "Geometry.skin_3",
+            "Geometry.skin_4",
+            "Geometry.skin_5",
+            "Geometry.skin_6",
+            "Geometry.skin_7",
+            "Geometry.skin_8",
+            "Geometry.skin_9"
+          ]
+        }
+      },
+      "geometry": "Array.geos[q.property('frontline:skin')]",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.skins[q.property('frontline:skin')]"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "gun": false
+        }
+      ]
+    },
     "controller.render.frontline.single": {
       "geometry": "Geometry.default",
       "materials": [

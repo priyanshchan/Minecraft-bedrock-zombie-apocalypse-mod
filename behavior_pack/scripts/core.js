@@ -58,6 +58,8 @@ export const DEFAULT_SETTINGS = {
   cameraRecoil: true,
   bulletDrop: 1,
   tracers: true,
+  salaryMinutes: 2,
+  vanillaMobs: false,
 };
 
 /** @type {typeof DEFAULT_SETTINGS | undefined} */

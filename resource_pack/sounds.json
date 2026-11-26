@@ -97,6 +97,10 @@
           }
         }
       },
+      "frontline:corpse": {
+        "volume": 0.0,
+        "events": {}
+      },
       "frontline:jeep": {
         "volume": 1.0,
         "pitch": [

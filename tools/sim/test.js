@@ -367,6 +367,35 @@ await advance(220);
 check(dim.getEntities({ tags: ["fl_battle"] }).length === 0, "the battle's soldiers, vehicles and flags are cleared away");
 check(mc.commands.some((c) => c.startsWith("tickingarea remove fl_battle")), "the ticking area is removed");
 
+// ---- money: funding on a timer, bounties for kills, the Armory
+const econ = await load("economy.js");
+const shop = await load("shop.js");
+check(econ.money(alice) >= 1000, "players start with money");
+const cash0 = econ.money(alice);
+const victim = dim.spawnEntity("frontline:redfang_fighter", { x: 5.5, y: 64, z: 5.5 });
+await advance(2);
+kill(victim, alice);
+check(econ.money(alice) === cash0 + 150, "killing a Red Fang soldier pays a $150 bounty");
+await advance(3);
+check(entities.some((e) => e.typeId === "frontline:corpse"), "the fallen soldier's body falls in its place (a corpse with a death animation)");
+const corpse = entities.find((e) => e.typeId === "frontline:corpse");
+check(corpse.props.has("frontline:skin") && corpse.props.has("frontline:fall"), "the body wears the soldier's uniform and falls forward or backward");
+const drops = entities.filter((e) => e.typeId === "minecraft:item" && e.stack).map((e) => e.stack);
+check(drops.some((st) => st.typeId === "frontline:ak47"), "a soldier killed by a player drops the gun it carried");
+check(drops.some((st) => st.typeId === "frontline:ammo_762x39" && st.amount > 0), "and ammunition for it");
+await advance(1200 * 2 + 40);
+check(econ.money(alice) === cash0 + 150 + econ.SALARY, "funding arrives every two minutes");
+const before = econ.money(alice);
+const m4count = core.countItem(alice, "frontline:m4a1");
+check(shop.buy(alice, { item: "frontline:m4a1", name: "Colt M4A1", count: 1, price: 1600 }) === (before >= 1600), "the Armory sells guns when you can afford them");
+if (before >= 1600) check(core.countItem(alice, "frontline:m4a1") === m4count + 1 && econ.money(alice) === before - 1600, "buying takes the money and gives the gun");
+econ.addMoney(alice, -econ.money(alice));
+check(!shop.buy(alice, { item: "frontline:tank_kit", name: "Tank", count: 1, price: 5000 }), "you cannot buy what you cannot afford");
+// vanilla mobs are cleared away
+const zombie = dim.spawnEntity("minecraft:zombie", { x: 3, y: 64, z: 3 });
+await advance(2);
+check(!zombie.isValid, "vanilla mobs are removed");
+
 // ---- patrols
 const n = patrols.sendPatrol(alice);
 check(n >= 2, "a patrol of two or more soldiers is sent");

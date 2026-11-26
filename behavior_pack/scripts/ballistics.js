@@ -17,7 +17,7 @@ const SPENT = 1.5;
 /** The speed of sound in blocks a tick: faster bullets crack as they pass. */
 const SOUND_SPEED = 343 / 20;
 
-const SKIP_TYPES = [`${NS}:capture_flag`, `${NS}:bullet`, `${NS}:sniper_bullet`, `${NS}:rocket`, `${NS}:tank_shell`,
+const SKIP_TYPES = [`${NS}:capture_flag`, `${NS}:corpse`, `${NS}:bullet`, `${NS}:sniper_bullet`, `${NS}:rocket`, `${NS}:tank_shell`,
   `${NS}:frag_grenade`, `${NS}:smoke_grenade`, "minecraft:item", "minecraft:xp_orb", "minecraft:arrow"];
 
 /**

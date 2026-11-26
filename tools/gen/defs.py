@@ -14,7 +14,7 @@ RP = ROOT / "resource_pack"
 
 NS = "frontline"
 TITLE = "Frontline: NATO vs Red Fang"
-VERSION = [1, 2, 0]
+VERSION = [1, 3, 0]
 MIN_ENGINE = [1, 21, 90]
 DESCRIPTION = (
     "Large-scale battles between NATO and the Red Fang terror cell: capture flags, drain tickets, "
@@ -224,4 +224,4 @@ def block_ids():
 
 
 def entity_ids():
-    return list(SOLDIERS) + list(PROJECTILES) + list(VEHICLES)
+    return list(SOLDIERS) + list(PROJECTILES) + list(VEHICLES) + ["corpse"]
