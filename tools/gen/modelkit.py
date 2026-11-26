@@ -364,7 +364,7 @@ def _enhance(region, low, k, rng, side):
 
 
 class Model:
-    SIZES = [(32, 32), (64, 32), (64, 64), (128, 64), (128, 128), (256, 128), (256, 256), (512, 256), (512, 512)]
+    SIZES = [(32, 32), (64, 32), (64, 64), (128, 64), (128, 128), (256, 128), (256, 256), (512, 256), (512, 512), (1024, 512)]
     HD = 2  # texels per painted pixel in the texture that is shipped
 
     def __init__(self, name, bounds=(3.0, 3.5, 1.25), res=1):

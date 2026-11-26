@@ -798,7 +798,7 @@ BLOCK_MODELS = {"sandbags": sandbags, "barbed_wire": barbed_wire, "ammo_crate": 
 
 def prop(key, build):
     # ammunition is drawn side-on and tilted like the guns; other props from above
-    g = H.Held(key, "pistol" if key.startswith("ammo_") and key not in ("ammo_9mm", "ammo_45acp") else "gear")
+    g = H.Held(key, "pistol" if key.startswith("ammo_") and key not in ("ammo_9mm", "ammo_45acp", "ammo_50ae") else "gear")
     build(g)
     return g
 
@@ -837,6 +837,22 @@ def _ammo_45acp(g):
 def _ammo_556(g):  # a 10-round stripper clip of 5.56
     g.box(-1, 1, -4, 4, -8, 8, STEEL_C)
     _rounds(g, 5, 18, 1.1, 6, 3)
+
+
+def _ammo_50ae(g):
+    _ammo_box(g, "#2a2a2c", "#c9a43a", (4, 1.8))
+
+
+def _ammo_57(g):
+    _rounds(g, 5, 16, 0.9, 6, 2.6)
+
+
+def _ammo_762x51(g):
+    _rounds(g, 4, 22, 1.4, 7, 3.4)
+
+
+def _ammo_50bmg(g):
+    _rounds(g, 3, 36, 2.4, 12, 5.6)
 
 
 def _ammo_762x39(g):
@@ -883,7 +899,8 @@ def _field_ration(g):
 
 PROPS = {"ammo_9mm": _ammo_9mm, "ammo_45acp": _ammo_45acp, "ammo_556": _ammo_556, "ammo_762x39": _ammo_762x39,
          "ammo_762x54r": _ammo_762x54r, "ammo_338": _ammo_338, "ammo_12g": _ammo_12g, "ammo_84mm": _ammo_84mm,
-         "ammo_pg7v": _ammo_pg7v, "field_ration": _field_ration}
+         "ammo_pg7v": _ammo_pg7v, "ammo_50ae": _ammo_50ae, "ammo_57": _ammo_57, "ammo_762x51": _ammo_762x51,
+         "ammo_50bmg": _ammo_50bmg, "field_ration": _field_ration}
 
 
 def props():

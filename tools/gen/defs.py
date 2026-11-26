@@ -49,6 +49,11 @@ GUNS = [
     ("svd", "SVD Dragunov", "rare"),
     ("carl_gustaf", "Carl Gustaf M4", "rare"),
     ("rpg7", "RPG-7", "rare"),
+    ("deagle", "IWI Desert Eagle", "uncommon"),
+    ("p90", "FN P90", "uncommon"),
+    ("scar_h", "FN SCAR-H", "rare"),
+    ("barrett", "Barrett M82A1", "epic"),
+    ("pkm", "PKM", "rare"),
 ]
 
 # Cartridges: id, name, stack, muzzle velocity m/s (in the guns that fire them), drag per block, bullet mass g.
@@ -63,6 +68,10 @@ AMMO = [
     ("ammo_12g", "12 Gauge 00 Buckshot", 32),
     ("ammo_84mm", "84mm HEAT Round", 4),
     ("ammo_pg7v", "PG-7V Rocket", 4),
+    ("ammo_50ae", ".50 Action Express", 32),
+    ("ammo_57", "5.7x28mm", 64),
+    ("ammo_762x51", "7.62x51mm NATO", 64),
+    ("ammo_50bmg", ".50 BMG", 16),
 ]
 CALIBER = {a[0]: a[1] for a in AMMO}
 
@@ -99,6 +108,16 @@ GUN_STATS = {
     "rpg7": dict(ammo="ammo_pg7v", mag=1, mode="launcher", rpm=20, damage=0, velocity=115, drag=0.0, headshot=1.0,
                  hip=1.6, ads=0.6, vrec=5.0, hrec=1.2, bloom=0.0, sound="rocket_launch", jam=0.01, pose="launcher",
                  projectile="rocket", power=3.4),
+    "deagle": dict(ammo="ammo_50ae", mag=7, mode="semi", rpm=300, damage=11.0, velocity=470, drag=0.0020, headshot=1.9,
+                   hip=2.6, ads=1.1, vrec=5.0, hrec=1.4, bloom=1.2, sound="heavy_pistol", jam=0.004, pose="pistol"),
+    "p90": dict(ammo="ammo_57", mag=50, mode="auto", rpm=900, damage=4.6, velocity=715, drag=0.0019, headshot=1.7,
+                hip=2.2, ads=0.8, vrec=0.5, hrec=0.4, bloom=0.18, sound="smg", jam=0.002, pose="rifle"),
+    "scar_h": dict(ammo="ammo_762x51", mag=20, mode="auto", rpm=600, damage=9.0, velocity=790, drag=0.0009, headshot=2.0,
+                   hip=2.8, ads=0.4, vrec=1.6, hrec=0.75, bloom=0.35, sound="dmr", jam=0.002, pose="rifle"),
+    "barrett": dict(ammo="ammo_50bmg", mag=10, mode="semi", rpm=120, damage=40.0, velocity=853, drag=0.0004, headshot=2.0,
+                    hip=6.0, ads=0.06, vrec=7.5, hrec=1.5, bloom=1.0, sound="sniper", jam=0.002, pose="rifle"),
+    "pkm": dict(ammo="ammo_762x54r", mag=100, mode="auto", rpm=650, damage=7.5, velocity=825, drag=0.0008, headshot=1.8,
+                hip=3.8, ads=1.1, vrec=1.1, hrec=0.8, bloom=0.25, sound="lmg", jam=0.003, pose="rifle"),
 }
 
 # Thrown items: id, name, projectile entity

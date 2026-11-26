@@ -2,6 +2,11 @@
 
 ## 1.2.0: real guns, real ballistics, attachments
 
+- **Five more guns** (seventeen in all): IWI Desert Eagle (.50 AE), FN P90 (5.7x28mm, its magazine on top), FN SCAR-H
+  (7.62x51mm NATO), Barrett M82A1 (.50 BMG) and the PKM (7.62x54mmR), with four new cartridge items. Red Fang support
+  soldiers now carry the PKM.
+- **Detail pass on every gun**, now including the MP5A3, UMP45, SVD, Carl Gustaf and RPG-7.
+
 - **Twelve real-world guns** replace the old seven, each firing its real cartridge:
   - pistols: Glock 17 (9x19mm), Colt M1911A1 (.45 ACP)
   - SMGs: H&K MP5A3 (9x19mm), H&K UMP45 (.45 ACP)

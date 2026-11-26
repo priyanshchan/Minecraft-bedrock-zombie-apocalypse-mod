@@ -45,7 +45,7 @@ export const CLASSES = {
     name: "Support", desc: "Light machine gun, ammo boxes and smoke: suppress the enemy and keep everyone firing.",
     kit: {
       nato: [["m249", 1, ["holo_sight"]], ["glock17", 1], ["ammo_556", 400], ["ammo_9mm", 34], ["ammo_box", 3], ["smoke_grenade", 2], ["combat_knife", 1]],
-      redfang: [["m249", 1], ["m1911", 1], ["ammo_556", 400], ["ammo_45acp", 28], ["ammo_box", 3], ["smoke_grenade", 2], ["combat_knife", 1]],
+      redfang: [["pkm", 1], ["m1911", 1], ["ammo_762x54r", 300], ["ammo_45acp", 28], ["ammo_box", 3], ["smoke_grenade", 2], ["combat_knife", 1]],
     },
   },
   recon: {

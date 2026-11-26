@@ -1,7 +1,7 @@
 # Frontline: NATO vs Red Fang
 
 A large-scale military battle add-on for **Minecraft Bedrock Edition**. Pick a side, **NATO** or the **Red Fang** terror cell, and fight
-conquest battles over a line of capture flags with AI soldiers, four classes, jeeps and tanks. There are twelve real-world guns, each a
+conquest battles over a line of capture flags with AI soldiers, four classes, jeeps and tanks. There are seventeen real-world guns, each a
 detailed 3D model firing its real cartridge, with real bullet flight and drop, recoil and spread, and 33 attachments.
 
 ![Pack icon](resource_pack/pack_icon.png)
@@ -43,10 +43,11 @@ Each side carries its own guns. Kit guns come with a few attachments already fit
 | --- | --- | --- | --- |
 | **Assault** | Colt M4A1 (red dot, vertical grip), Glock 17 | AKM (compensator), M1911A1 | Frag grenades, Medkits |
 | **Engineer** | H&K MP5A3 (reflex sight), Carl Gustaf M4, Glock 17 | H&K UMP45, RPG-7, M1911A1 | Repair Tool |
-| **Support** | FN M249 SAW (holographic sight), Glock 17 | FN M249 SAW, M1911A1 | Ammo Boxes, Smoke grenades |
+| **Support** | FN M249 SAW (holographic sight), Glock 17 | PKM, M1911A1 | Ammo Boxes, Smoke grenades |
 | **Recon** | AI AWM, Glock 17 (suppressed) | SVD Dragunov, M1911A1 | Binoculars, Spawn Beacon, Smoke grenade |
 
 Everyone also gets a combat knife, an iron helmet and chestplate if they have none, and field rations. Kits only **top up** your inventory and never take anything away.
+The Desert Eagle, P90, SCAR-H and Barrett M82A1 are crafted or taken from fallen soldiers.
 
 ## Weapons
 
@@ -88,8 +89,14 @@ Their moving parts are animated:
 | SVD Dragunov | 7.62x54mmR | 10 | semi | 830 m/s |
 | Carl Gustaf M4 | 84mm HEAT Round | 1 | recoilless rifle | rocket |
 | RPG-7 | PG-7V Rocket | 1 | rocket launcher | rocket |
+| IWI Desert Eagle | .50 Action Express | 7 | semi | 470 m/s |
+| FN P90 | 5.7x28mm | 50 | auto, 900 rpm | 715 m/s |
+| FN SCAR-H | 7.62x51mm NATO | 20 | auto, 600 rpm | 790 m/s |
+| Barrett M82A1 | .50 BMG | 10 | semi | 853 m/s |
+| PKM | 7.62x54mmR | 100 | auto, 650 rpm | 825 m/s |
 
-Each cartridge is its own ammunition item: 9x19mm, .45 ACP, 5.56x45mm, 7.62x39mm, 7.62x54mmR, .338 Lapua Magnum, 12 gauge, 84mm and PG-7V.
+Each cartridge is its own ammunition item: 9x19mm, .45 ACP, .50 AE, 5.7x28mm, 5.56x45mm, 7.62x39mm, 7.62x51mm, 7.62x54mmR,
+.338 Lapua Magnum, .50 BMG, 12 gauge, 84mm and PG-7V.
 
 ### Shooting
 

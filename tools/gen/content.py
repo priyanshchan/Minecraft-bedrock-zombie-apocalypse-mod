@@ -713,16 +713,16 @@ def loot_tables():
     common = {"rolls": 1, "entries": [entry("field_ration", 2), entry("medkit", 1), {"type": "empty", "weight": 3}]}
     special = {
         "nato_rifleman": [entry("ammo_556", 4, 6, 20), entry("ammo_9mm", 2, 6, 17), entry("frag_grenade", 1),
-                          entry("m4a1", 1), entry("red_dot", 1), entry("vertical_grip", 1), entry("flash_hider", 1)],
-        "nato_marksman": [entry("ammo_338", 4, 2, 6), entry("ammo_9mm", 2, 6, 17), entry("variable_6x", 1),
+                          entry("m4a1", 1), entry("scar_h", 1), entry("ammo_762x51", 2, 5, 20), entry("red_dot", 1), entry("vertical_grip", 1), entry("flash_hider", 1)],
+        "nato_marksman": [entry("ammo_338", 4, 2, 6), entry("ammo_50bmg", 1, 2, 5), entry("p90", 1), entry("ammo_57", 1, 10, 50), entry("ammo_9mm", 2, 6, 17), entry("variable_6x", 1),
                           entry("bipod", 1), entry("rifle_suppressor", 1)],
         "nato_heavy": [entry("ammo_84mm", 3, 1, 2), entry("ammo_9mm", 2, 6, 17), entry("flashlight", 1),
                        entry("laser_sight", 1)],
         "redfang_fighter": [entry("ammo_762x39", 4, 6, 20), entry("ammo_45acp", 2, 4, 10), entry("frag_grenade", 1),
-                            entry("ak47", 1), entry("holo_sight", 1), entry("compensator", 1), entry("drum_mag", 1)],
+                            entry("ak47", 1), entry("deagle", 1), entry("ammo_50ae", 1, 3, 7), entry("holo_sight", 1), entry("compensator", 1), entry("drum_mag", 1)],
         "redfang_sniper": [entry("ammo_762x54r", 4, 3, 10), entry("combat_4x", 1), entry("muzzle_brake", 1),
                            entry("night_vision_4x", 1)],
-        "redfang_rpg": [entry("ammo_pg7v", 3, 1, 2), entry("ammo_45acp", 2, 4, 10), entry("angled_grip", 1)],
+        "redfang_rpg": [entry("ammo_pg7v", 3, 1, 2), entry("pkm", 1), entry("ammo_762x54r", 2, 10, 40), entry("ammo_45acp", 2, 4, 10), entry("angled_grip", 1)],
     }
     for name in SOLDIERS:
         pools = [common, {"conditions": [{"condition": "killed_by_player"},
@@ -808,6 +808,15 @@ def recipes():
     shaped("svd", ["GIII", " PI ", " W  "], {"I": I, "P": P, "G": "minecraft:spyglass", "W": W}, "svd")
     shaped("carl_gustaf", ["III", "TPT", "CCC"], {"I": I, "P": P, "T": "minecraft:tnt", "C": C}, "carl_gustaf")
     shaped("rpg7", ["III", "TPT", "WWW"], {"I": I, "P": P, "T": "minecraft:tnt", "W": W}, "rpg7")
+    shaped("deagle", ["IIC", " P"], {"I": I, "P": P, "C": C}, "deagle")
+    shaped("p90", ["PPP", "IPI"], {"I": I, "P": P}, "p90")
+    shaped("scar_h", ["IIII", "CPI ", "  C "], {"I": I, "P": P, "C": C}, "scar_h")
+    shaped("barrett", ["GIII", "BPI ", " P  "], {"I": I, "P": P, "B": B, "G": "minecraft:spyglass"}, "barrett")
+    shaped("pkm", ["IIII", "BPI ", "W C "], {"I": I, "P": P, "C": C, "B": B, "W": W}, "pkm")
+    shapeless("ammo_50ae", [G, G, C, N, N], "ammo_50ae", 7)
+    shapeless("ammo_57", [G, C, C, N], "ammo_57", 50)
+    shapeless("ammo_762x51", [G, G, C, C, I], "ammo_762x51", 20)
+    shapeless("ammo_50bmg", [G, G, G, C, C, I], "ammo_50bmg", 5)
     shapeless("ammo_9mm", [G, C, N], "ammo_9mm", 17)
     shapeless("ammo_45acp", [G, C, N, N], "ammo_45acp", 14)
     shapeless("ammo_556", [G, G, C, N], "ammo_556", 30)

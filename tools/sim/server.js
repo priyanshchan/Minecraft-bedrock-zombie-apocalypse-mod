@@ -42,7 +42,7 @@ export class ItemStack {
     this.typeId = typeId;
     this.amount = amount;
     const single = ["glock17", "m1911", "mp5", "ump45", "m4a1", "ak47", "m249", "rem870", "awm", "svd", "carl_gustaf", "rpg7",
-      "combat_knife", "field_radio", "binoculars", "repair_tool", "jeep_kit", "tank_kit"].map((n) => `frontline:${n}`);
+      "deagle", "p90", "scar_h", "barrett", "pkm", "combat_knife", "field_radio", "binoculars", "repair_tool", "jeep_kit", "tank_kit"].map((n) => `frontline:${n}`);
     this.maxAmount = single.includes(typeId) || /helmet|chestplate/.test(typeId) ? 1 : typeId.endsWith("grenade") ? 4 : 64;
     this.props = new Map();
   }

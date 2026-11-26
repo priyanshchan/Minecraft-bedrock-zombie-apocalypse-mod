@@ -18,12 +18,12 @@ import math
 from kit import BLACK, BRASS, CHROME, DARK, GLASS, Held, OD, OD_D, POLY, RED, RUBBER, SILVER, STEEL, TAN, WHITE, mark, ribs, shade
 
 GROUPS = {
-    "pistol": ["glock17", "m1911"],
-    "smg": ["mp5", "ump45"],
-    "rifle": ["m4a1", "ak47"],
-    "lmg": ["m249"],
+    "pistol": ["glock17", "m1911", "deagle"],
+    "smg": ["mp5", "ump45", "p90"],
+    "rifle": ["m4a1", "ak47", "scar_h"],
+    "lmg": ["m249", "pkm"],
     "shotgun": ["rem870"],
-    "sniper": ["awm"],
+    "sniper": ["awm", "barrett"],
     "dmr": ["svd"],
 }
 

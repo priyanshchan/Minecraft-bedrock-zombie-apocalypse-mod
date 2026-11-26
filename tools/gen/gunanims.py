@@ -27,6 +27,11 @@ TIMING = {
     "svd": {"fire": 5, "reload": 54, "jam": 31, "malfunction": 68},
     "carl_gustaf": {"fire": 8, "reload": 80, "jam": 36, "malfunction": 84},
     "rpg7": {"fire": 8, "reload": 70, "jam": 37, "malfunction": 81},
+    "deagle": {"fire": 4, "reload": 36, "jam": 25, "malfunction": 54},
+    "p90": {"fire": 2, "reload": 52, "jam": 26, "malfunction": 62},
+    "scar_h": {"fire": 4, "reload": 48, "jam": 29, "malfunction": 65},
+    "barrett": {"fire": 8, "reload": 64, "jam": 35, "malfunction": 78},
+    "pkm": {"fire": 2, "reload": 110, "jam": 31, "malfunction": 74},
 }
 
 SLOT = "'slot.weapon.mainhand', 0"
@@ -155,6 +160,7 @@ def build(gun, family=None, bones=None):
         return Anim(length, bones)
 
     lmg = family == "lmg"
+    depth = -24 if gun == "p90" else 32  # the P90's magazine lies on top: it lifts off instead of dropping
     if family in ("ar", "lmg"):
         handle = "charging_handle"
         fire = mk(t["fire"])
@@ -176,7 +182,7 @@ def build(gun, family=None, bones=None):
             rack(r, handle, 3.7, 12, 0.15, 0.1, 0.12)
         else:
             tilt(r, 0.25, t["reload"] - 0.45, cant, lift)
-            mag_swap(r, 0.3, min(1.35, t["reload"] - 1.0), 32, (8, 0, 0))
+            mag_swap(r, 0.3, min(1.35, t["reload"] - 1.0), depth, (8, 0, 0))
             rack(r, handle, t["reload"] - 0.75, 10)
             rack(r, "bolt", t["reload"] - 0.75, 8)
         out["reload"] = r
@@ -205,7 +211,7 @@ def build(gun, family=None, bones=None):
             mag_swap(m, 1.0, 2.3, 30, (12, 0, 0))
             rack(m, handle, 2.95, 12)
         else:
-            mag_swap(m, 0.75, 2.15, 32, (8, 0, 0))
+            mag_swap(m, 0.75, 2.15, depth, (8, 0, 0))
             for i in range(3):
                 rack(m, handle, 1.15 + i * 0.28, 10, 0.08, 0.03, 0.07)
                 rack(m, "bolt", 1.15 + i * 0.28, 8, 0.08, 0.03, 0.07)
