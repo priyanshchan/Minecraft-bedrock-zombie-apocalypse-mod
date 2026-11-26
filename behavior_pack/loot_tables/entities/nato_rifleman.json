@@ -72,6 +72,25 @@
         },
         {
           "type": "item",
+          "name": "frontline:scar_h",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "frontline:ammo_762x51",
+          "weight": 2,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 5,
+                "max": 20
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
           "name": "frontline:red_dot",
           "weight": 1
         },

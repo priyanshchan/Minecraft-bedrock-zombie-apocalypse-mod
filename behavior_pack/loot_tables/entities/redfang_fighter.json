@@ -72,6 +72,25 @@
         },
         {
           "type": "item",
+          "name": "frontline:deagle",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "frontline:ammo_50ae",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 3,
+                "max": 7
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
           "name": "frontline:holo_sight",
           "weight": 1
         },

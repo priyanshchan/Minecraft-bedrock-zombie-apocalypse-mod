@@ -790,6 +790,362 @@
         }
       ]
     },
+    "controller.render.frontline.gun_deagle": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "a_reflex_sight": "q.cooldown_time_remaining('frontline_att_reflex_sight') > 0"
+        },
+        {
+          "a_pistol_suppressor": "q.cooldown_time_remaining('frontline_att_pistol_suppressor') > 0"
+        },
+        {
+          "a_compensator": "q.cooldown_time_remaining('frontline_att_compensator') > 0"
+        },
+        {
+          "a_laser_sight": "q.cooldown_time_remaining('frontline_att_laser_sight') > 0"
+        },
+        {
+          "a_flashlight": "q.cooldown_time_remaining('frontline_att_flashlight') > 0"
+        },
+        {
+          "a_laser_light": "q.cooldown_time_remaining('frontline_att_laser_light') > 0"
+        },
+        {
+          "a_extended_mag": "q.cooldown_time_remaining('frontline_att_extended_mag') > 0"
+        },
+        {
+          "a_quick_mag": "q.cooldown_time_remaining('frontline_att_quick_mag') > 0"
+        },
+        {
+          "def_mag": "!(q.cooldown_time_remaining('frontline_att_extended_mag') > 0 || q.cooldown_time_remaining('frontline_att_quick_mag') > 0)"
+        }
+      ]
+    },
+    "controller.render.frontline.gun_p90": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "a_reflex_sight": "q.cooldown_time_remaining('frontline_att_reflex_sight') > 0"
+        },
+        {
+          "a_red_dot": "q.cooldown_time_remaining('frontline_att_red_dot') > 0"
+        },
+        {
+          "a_holo_sight": "q.cooldown_time_remaining('frontline_att_holo_sight') > 0"
+        },
+        {
+          "a_prism_2x": "q.cooldown_time_remaining('frontline_att_prism_2x') > 0"
+        },
+        {
+          "a_pistol_suppressor": "q.cooldown_time_remaining('frontline_att_pistol_suppressor') > 0"
+        },
+        {
+          "a_compensator": "q.cooldown_time_remaining('frontline_att_compensator') > 0"
+        },
+        {
+          "a_flash_hider": "q.cooldown_time_remaining('frontline_att_flash_hider') > 0"
+        },
+        {
+          "a_laser_sight": "q.cooldown_time_remaining('frontline_att_laser_sight') > 0"
+        },
+        {
+          "a_flashlight": "q.cooldown_time_remaining('frontline_att_flashlight') > 0"
+        },
+        {
+          "a_laser_light": "q.cooldown_time_remaining('frontline_att_laser_light') > 0"
+        },
+        {
+          "def_muzzle": "!(q.cooldown_time_remaining('frontline_att_pistol_suppressor') > 0 || q.cooldown_time_remaining('frontline_att_compensator') > 0 || q.cooldown_time_remaining('frontline_att_flash_hider') > 0)"
+        }
+      ]
+    },
+    "controller.render.frontline.gun_scar_h": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "a_reflex_sight": "q.cooldown_time_remaining('frontline_att_reflex_sight') > 0"
+        },
+        {
+          "a_red_dot": "q.cooldown_time_remaining('frontline_att_red_dot') > 0"
+        },
+        {
+          "a_holo_sight": "q.cooldown_time_remaining('frontline_att_holo_sight') > 0"
+        },
+        {
+          "a_holo_magnifier": "q.cooldown_time_remaining('frontline_att_holo_magnifier') > 0"
+        },
+        {
+          "a_prism_2x": "q.cooldown_time_remaining('frontline_att_prism_2x') > 0"
+        },
+        {
+          "a_combat_4x": "q.cooldown_time_remaining('frontline_att_combat_4x') > 0"
+        },
+        {
+          "a_variable_6x": "q.cooldown_time_remaining('frontline_att_variable_6x') > 0"
+        },
+        {
+          "a_marksman_8x": "q.cooldown_time_remaining('frontline_att_marksman_8x') > 0"
+        },
+        {
+          "a_night_vision_4x": "q.cooldown_time_remaining('frontline_att_night_vision_4x') > 0"
+        },
+        {
+          "a_rifle_suppressor": "q.cooldown_time_remaining('frontline_att_rifle_suppressor') > 0"
+        },
+        {
+          "a_compensator": "q.cooldown_time_remaining('frontline_att_compensator') > 0"
+        },
+        {
+          "a_muzzle_brake": "q.cooldown_time_remaining('frontline_att_muzzle_brake') > 0"
+        },
+        {
+          "a_flash_hider": "q.cooldown_time_remaining('frontline_att_flash_hider') > 0"
+        },
+        {
+          "a_vertical_grip": "q.cooldown_time_remaining('frontline_att_vertical_grip') > 0"
+        },
+        {
+          "a_angled_grip": "q.cooldown_time_remaining('frontline_att_angled_grip') > 0"
+        },
+        {
+          "a_stubby_grip": "q.cooldown_time_remaining('frontline_att_stubby_grip') > 0"
+        },
+        {
+          "a_handstop": "q.cooldown_time_remaining('frontline_att_handstop') > 0"
+        },
+        {
+          "a_bipod": "q.cooldown_time_remaining('frontline_att_bipod') > 0"
+        },
+        {
+          "a_laser_sight": "q.cooldown_time_remaining('frontline_att_laser_sight') > 0"
+        },
+        {
+          "a_flashlight": "q.cooldown_time_remaining('frontline_att_flashlight') > 0"
+        },
+        {
+          "a_laser_light": "q.cooldown_time_remaining('frontline_att_laser_light') > 0"
+        },
+        {
+          "a_heavy_stock": "q.cooldown_time_remaining('frontline_att_heavy_stock') > 0"
+        },
+        {
+          "a_light_stock": "q.cooldown_time_remaining('frontline_att_light_stock') > 0"
+        },
+        {
+          "a_precision_stock": "q.cooldown_time_remaining('frontline_att_precision_stock') > 0"
+        },
+        {
+          "a_extended_mag": "q.cooldown_time_remaining('frontline_att_extended_mag') > 0"
+        },
+        {
+          "a_drum_mag": "q.cooldown_time_remaining('frontline_att_drum_mag') > 0"
+        },
+        {
+          "a_quick_mag": "q.cooldown_time_remaining('frontline_att_quick_mag') > 0"
+        },
+        {
+          "def_optic": "!(q.cooldown_time_remaining('frontline_att_reflex_sight') > 0 || q.cooldown_time_remaining('frontline_att_red_dot') > 0 || q.cooldown_time_remaining('frontline_att_holo_sight') > 0 || q.cooldown_time_remaining('frontline_att_holo_magnifier') > 0 || q.cooldown_time_remaining('frontline_att_prism_2x') > 0 || q.cooldown_time_remaining('frontline_att_combat_4x') > 0 || q.cooldown_time_remaining('frontline_att_variable_6x') > 0 || q.cooldown_time_remaining('frontline_att_marksman_8x') > 0 || q.cooldown_time_remaining('frontline_att_night_vision_4x') > 0)"
+        },
+        {
+          "def_muzzle": "!(q.cooldown_time_remaining('frontline_att_rifle_suppressor') > 0 || q.cooldown_time_remaining('frontline_att_compensator') > 0 || q.cooldown_time_remaining('frontline_att_muzzle_brake') > 0 || q.cooldown_time_remaining('frontline_att_flash_hider') > 0)"
+        },
+        {
+          "def_stock": "!(q.cooldown_time_remaining('frontline_att_heavy_stock') > 0 || q.cooldown_time_remaining('frontline_att_light_stock') > 0 || q.cooldown_time_remaining('frontline_att_precision_stock') > 0)"
+        },
+        {
+          "def_mag": "!(q.cooldown_time_remaining('frontline_att_extended_mag') > 0 || q.cooldown_time_remaining('frontline_att_drum_mag') > 0 || q.cooldown_time_remaining('frontline_att_quick_mag') > 0)"
+        }
+      ]
+    },
+    "controller.render.frontline.gun_barrett": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "a_combat_4x": "q.cooldown_time_remaining('frontline_att_combat_4x') > 0"
+        },
+        {
+          "a_variable_6x": "q.cooldown_time_remaining('frontline_att_variable_6x') > 0"
+        },
+        {
+          "a_marksman_8x": "q.cooldown_time_remaining('frontline_att_marksman_8x') > 0"
+        },
+        {
+          "a_sniper_12x": "q.cooldown_time_remaining('frontline_att_sniper_12x') > 0"
+        },
+        {
+          "a_night_vision_4x": "q.cooldown_time_remaining('frontline_att_night_vision_4x') > 0"
+        },
+        {
+          "a_rifle_suppressor": "q.cooldown_time_remaining('frontline_att_rifle_suppressor') > 0"
+        },
+        {
+          "a_muzzle_brake": "q.cooldown_time_remaining('frontline_att_muzzle_brake') > 0"
+        },
+        {
+          "a_bipod": "q.cooldown_time_remaining('frontline_att_bipod') > 0"
+        },
+        {
+          "a_precision_stock": "q.cooldown_time_remaining('frontline_att_precision_stock') > 0"
+        },
+        {
+          "a_extended_mag": "q.cooldown_time_remaining('frontline_att_extended_mag') > 0"
+        },
+        {
+          "a_quick_mag": "q.cooldown_time_remaining('frontline_att_quick_mag') > 0"
+        },
+        {
+          "def_optic": "!(q.cooldown_time_remaining('frontline_att_combat_4x') > 0 || q.cooldown_time_remaining('frontline_att_variable_6x') > 0 || q.cooldown_time_remaining('frontline_att_marksman_8x') > 0 || q.cooldown_time_remaining('frontline_att_sniper_12x') > 0 || q.cooldown_time_remaining('frontline_att_night_vision_4x') > 0)"
+        },
+        {
+          "def_muzzle": "!(q.cooldown_time_remaining('frontline_att_rifle_suppressor') > 0 || q.cooldown_time_remaining('frontline_att_muzzle_brake') > 0)"
+        },
+        {
+          "def_underbarrel": "!(q.cooldown_time_remaining('frontline_att_bipod') > 0)"
+        },
+        {
+          "def_stock": "!(q.cooldown_time_remaining('frontline_att_precision_stock') > 0)"
+        },
+        {
+          "def_mag": "!(q.cooldown_time_remaining('frontline_att_extended_mag') > 0 || q.cooldown_time_remaining('frontline_att_quick_mag') > 0)"
+        }
+      ]
+    },
+    "controller.render.frontline.gun_pkm": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "a_red_dot": "q.cooldown_time_remaining('frontline_att_red_dot') > 0"
+        },
+        {
+          "a_holo_sight": "q.cooldown_time_remaining('frontline_att_holo_sight') > 0"
+        },
+        {
+          "a_holo_magnifier": "q.cooldown_time_remaining('frontline_att_holo_magnifier') > 0"
+        },
+        {
+          "a_prism_2x": "q.cooldown_time_remaining('frontline_att_prism_2x') > 0"
+        },
+        {
+          "a_combat_4x": "q.cooldown_time_remaining('frontline_att_combat_4x') > 0"
+        },
+        {
+          "a_variable_6x": "q.cooldown_time_remaining('frontline_att_variable_6x') > 0"
+        },
+        {
+          "a_night_vision_4x": "q.cooldown_time_remaining('frontline_att_night_vision_4x') > 0"
+        },
+        {
+          "a_rifle_suppressor": "q.cooldown_time_remaining('frontline_att_rifle_suppressor') > 0"
+        },
+        {
+          "a_compensator": "q.cooldown_time_remaining('frontline_att_compensator') > 0"
+        },
+        {
+          "a_muzzle_brake": "q.cooldown_time_remaining('frontline_att_muzzle_brake') > 0"
+        },
+        {
+          "a_flash_hider": "q.cooldown_time_remaining('frontline_att_flash_hider') > 0"
+        },
+        {
+          "a_vertical_grip": "q.cooldown_time_remaining('frontline_att_vertical_grip') > 0"
+        },
+        {
+          "a_angled_grip": "q.cooldown_time_remaining('frontline_att_angled_grip') > 0"
+        },
+        {
+          "a_stubby_grip": "q.cooldown_time_remaining('frontline_att_stubby_grip') > 0"
+        },
+        {
+          "a_handstop": "q.cooldown_time_remaining('frontline_att_handstop') > 0"
+        },
+        {
+          "a_bipod": "q.cooldown_time_remaining('frontline_att_bipod') > 0"
+        },
+        {
+          "a_laser_sight": "q.cooldown_time_remaining('frontline_att_laser_sight') > 0"
+        },
+        {
+          "a_flashlight": "q.cooldown_time_remaining('frontline_att_flashlight') > 0"
+        },
+        {
+          "a_laser_light": "q.cooldown_time_remaining('frontline_att_laser_light') > 0"
+        },
+        {
+          "a_heavy_stock": "q.cooldown_time_remaining('frontline_att_heavy_stock') > 0"
+        },
+        {
+          "a_big_box": "q.cooldown_time_remaining('frontline_att_big_box') > 0"
+        },
+        {
+          "def_muzzle": "!(q.cooldown_time_remaining('frontline_att_rifle_suppressor') > 0 || q.cooldown_time_remaining('frontline_att_compensator') > 0 || q.cooldown_time_remaining('frontline_att_muzzle_brake') > 0 || q.cooldown_time_remaining('frontline_att_flash_hider') > 0)"
+        },
+        {
+          "def_underbarrel": "!(q.cooldown_time_remaining('frontline_att_vertical_grip') > 0 || q.cooldown_time_remaining('frontline_att_angled_grip') > 0 || q.cooldown_time_remaining('frontline_att_stubby_grip') > 0 || q.cooldown_time_remaining('frontline_att_handstop') > 0 || q.cooldown_time_remaining('frontline_att_bipod') > 0)"
+        },
+        {
+          "def_stock": "!(q.cooldown_time_remaining('frontline_att_heavy_stock') > 0)"
+        },
+        {
+          "def_mag": "!(q.cooldown_time_remaining('frontline_att_big_box') > 0)"
+        }
+      ]
+    },
     "controller.render.frontline.nato_rifleman": {
       "arrays": {
         "textures": {

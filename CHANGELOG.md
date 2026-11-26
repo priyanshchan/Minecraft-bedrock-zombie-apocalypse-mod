@@ -15,7 +15,7 @@
   - launchers: Carl Gustaf M4 (84mm), RPG-7 (PG-7V)
 - **Nine cartridge items** replace the old ammo: 9x19mm, .45 ACP, 5.56x45mm, 7.62x39mm, 7.62x54mmR, .338 Lapua Magnum, 12 gauge,
   84mm and PG-7V.
-- **Far more detailed models:** the Glock, M1911, M4A1, AKM, M249, 870 and AWM rebuilt from 110 to 370 parts each, and every gun has round bars drawn as 12- and 16-sided sections. The
+- **Far more detailed models:** every gun rebuilt from 110 to 370 parts, with round bars drawn as 12- and 16-sided sections. The
   details are real: rails with teeth, real slots, pins, screws, roll marks, feed lips with the top round, sights and scopes with glass.
   Soldiers carry lighter versions of the same guns.
 - **33 attachments** with their own 3D models, fitted at the new **Gunsmith** (Field Radio) or by using the item:

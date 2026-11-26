@@ -14,11 +14,23 @@
     "frontline_ammo_45acp": {
       "textures": "textures/items/frontline/ammo_45acp"
     },
+    "frontline_ammo_50ae": {
+      "textures": "textures/items/frontline/ammo_50ae"
+    },
+    "frontline_ammo_50bmg": {
+      "textures": "textures/items/frontline/ammo_50bmg"
+    },
     "frontline_ammo_556": {
       "textures": "textures/items/frontline/ammo_556"
     },
+    "frontline_ammo_57": {
+      "textures": "textures/items/frontline/ammo_57"
+    },
     "frontline_ammo_762x39": {
       "textures": "textures/items/frontline/ammo_762x39"
+    },
+    "frontline_ammo_762x51": {
+      "textures": "textures/items/frontline/ammo_762x51"
     },
     "frontline_ammo_762x54r": {
       "textures": "textures/items/frontline/ammo_762x54r"
@@ -40,6 +52,9 @@
     },
     "frontline_awm": {
       "textures": "textures/items/frontline/awm"
+    },
+    "frontline_barrett": {
+      "textures": "textures/items/frontline/barrett"
     },
     "frontline_big_box": {
       "textures": "textures/items/frontline/big_box"
@@ -64,6 +79,9 @@
     },
     "frontline_cylinder_choke": {
       "textures": "textures/items/frontline/cylinder_choke"
+    },
+    "frontline_deagle": {
+      "textures": "textures/items/frontline/deagle"
     },
     "frontline_drum_mag": {
       "textures": "textures/items/frontline/drum_mag"
@@ -143,8 +161,14 @@
     "frontline_night_vision_4x": {
       "textures": "textures/items/frontline/night_vision_4x"
     },
+    "frontline_p90": {
+      "textures": "textures/items/frontline/p90"
+    },
     "frontline_pistol_suppressor": {
       "textures": "textures/items/frontline/pistol_suppressor"
+    },
+    "frontline_pkm": {
+      "textures": "textures/items/frontline/pkm"
     },
     "frontline_precision_stock": {
       "textures": "textures/items/frontline/precision_stock"
@@ -172,6 +196,9 @@
     },
     "frontline_rpg7": {
       "textures": "textures/items/frontline/rpg7"
+    },
+    "frontline_scar_h": {
+      "textures": "textures/items/frontline/scar_h"
     },
     "frontline_smoke_grenade": {
       "textures": "textures/items/frontline/smoke_grenade"

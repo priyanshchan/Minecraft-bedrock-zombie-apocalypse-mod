@@ -8,39 +8,39 @@ Numbers multiply the gun's own value (0.7 = 30% less). `spread`: hip-fire spread
 
 | Attachment | Slot | Effects | Fits |
 | --- | --- | --- | --- |
-| Mini Reflex Sight | optic | zoom 1, ads ×0.85 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), Remington 870 |
-| Red Dot Sight | optic | zoom 1, ads ×0.8 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW, Remington 870, SVD Dragunov |
-| Holographic Sight | optic | zoom 1, ads ×0.78, spread ×0.97 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW, Remington 870 |
-| Holographic Sight + 3x Magnifier | optic | zoom 3, ads ×0.68 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov |
-| 2x Prism Sight | optic | zoom 2, ads ×0.72 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW, Remington 870, SVD Dragunov |
-| 4x Combat Scope | optic | zoom 4, ads ×0.6 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| 1-6x Variable Scope | optic | zoom 6, ads ×0.55 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| 8x Marksman Scope | optic | zoom 8, ads ×0.45 | Colt M4A1, AKM (AK-47), SVD Dragunov, Accuracy International AWM |
-| 12x Sniper Scope | optic | zoom 12, ads ×0.35 | SVD Dragunov, Accuracy International AWM |
-| 4x Night Vision Scope | optic | zoom 4, ads ×0.62, nv 1 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Pistol Suppressor | muzzle | noise ×0.25, flash 1, velocity ×0.95, vrec ×0.92 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45 |
-| Rifle Suppressor | muzzle | noise ×0.3, flash 1, velocity ×1.03, vrec ×0.9, hrec ×0.9 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Compensator | muzzle | hrec ×0.7, vrec ×0.9, noise ×1.1 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW |
-| Muzzle Brake | muzzle | vrec ×0.7, noise ×1.2 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Flash Hider | muzzle | flash 1, vrec ×0.95 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov |
+| Mini Reflex Sight | optic | zoom 1, ads ×0.85 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, Remington 870 |
+| Red Dot Sight | optic | zoom 1, ads ×0.8 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, Remington 870, SVD Dragunov |
+| Holographic Sight | optic | zoom 1, ads ×0.78, spread ×0.97 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, Remington 870 |
+| Holographic Sight + 3x Magnifier | optic | zoom 3, ads ×0.68 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov |
+| 2x Prism Sight | optic | zoom 2, ads ×0.72 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, Remington 870, SVD Dragunov |
+| 4x Combat Scope | optic | zoom 4, ads ×0.6 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| 1-6x Variable Scope | optic | zoom 6, ads ×0.55 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| 8x Marksman Scope | optic | zoom 8, ads ×0.45 | Colt M4A1, AKM (AK-47), FN SCAR-H, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| 12x Sniper Scope | optic | zoom 12, ads ×0.35 | SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| 4x Night Vision Scope | optic | zoom 4, ads ×0.62, nv 1 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Pistol Suppressor | muzzle | noise ×0.25, flash 1, velocity ×0.95, vrec ×0.92 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90 |
+| Rifle Suppressor | muzzle | noise ×0.3, flash 1, velocity ×1.03, vrec ×0.9, hrec ×0.9 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Compensator | muzzle | hrec ×0.7, vrec ×0.9, noise ×1.1 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM |
+| Muzzle Brake | muzzle | vrec ×0.7, noise ×1.2 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Flash Hider | muzzle | flash 1, vrec ×0.95 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov |
 | Full Choke | muzzle | spread ×0.6, ads ×0.6 | Remington 870 |
 | Cylinder Choke | muzzle | spread ×0.82, velocity ×1.05 | Remington 870 |
-| Vertical Grip | underbarrel | vrec ×0.7 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW |
-| Angled Grip | underbarrel | hrec ×0.65, ads ×0.95 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW |
-| Stubby Grip | underbarrel | vrec ×0.85, hrec ×0.85, spread ×0.9 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW |
-| Handstop | underbarrel | vrec ×0.9, hrec ×0.9 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov |
-| Bipod | underbarrel | bipod 1 | Colt M4A1, AKM (AK-47), FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Laser Sight | side | spread ×0.65, laser 1 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), Remington 870, FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Tactical Flashlight | side | light 1 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), Remington 870, FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Laser-Light Module | side | spread ×0.8, laser 1, light 1 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), Remington 870, FN M249 SAW, SVD Dragunov, Accuracy International AWM |
-| Heavy Stock | stock | vrec ×0.8, ads ×0.9, spread ×1.1 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), FN M249 SAW, Remington 870 |
-| Lightweight Stock | stock | spread ×0.85, vrec ×1.1 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47) |
-| Precision Stock | stock | ads ×0.8, hrec ×0.8 | Colt M4A1, AKM (AK-47), SVD Dragunov, Accuracy International AWM |
-| Extended Magazine | magazine | mag ×1.5, reload ×1.1 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), SVD Dragunov, Accuracy International AWM |
-| Drum Magazine | magazine | mag ×2.0, reload ×1.4, ads ×1.1 | H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47) |
-| Quick-Pull Magazine | magazine | reload ×0.7 | Glock 17, Colt M1911A1, H&K MP5A3, H&K UMP45, Colt M4A1, AKM (AK-47), SVD Dragunov, Accuracy International AWM |
+| Vertical Grip | underbarrel | vrec ×0.7 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM |
+| Angled Grip | underbarrel | hrec ×0.65, ads ×0.95 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM |
+| Stubby Grip | underbarrel | vrec ×0.85, hrec ×0.85, spread ×0.9 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM |
+| Handstop | underbarrel | vrec ×0.9, hrec ×0.9 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov |
+| Bipod | underbarrel | bipod 1 | Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Laser Sight | side | spread ×0.65, laser 1 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, Remington 870, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Tactical Flashlight | side | light 1 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, Remington 870, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Laser-Light Module | side | spread ×0.8, laser 1, light 1 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, Remington 870, FN M249 SAW, PKM, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Heavy Stock | stock | vrec ×0.8, ads ×0.9, spread ×1.1 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, FN M249 SAW, PKM, Remington 870 |
+| Lightweight Stock | stock | spread ×0.85, vrec ×1.1 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H |
+| Precision Stock | stock | ads ×0.8, hrec ×0.8 | Colt M4A1, AKM (AK-47), FN SCAR-H, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Extended Magazine | magazine | mag ×1.5, reload ×1.1 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
+| Drum Magazine | magazine | mag ×2.0, reload ×1.4, ads ×1.1 | H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H |
+| Quick-Pull Magazine | magazine | reload ×0.7 | Glock 17, Colt M1911A1, IWI Desert Eagle, H&K MP5A3, H&K UMP45, FN P90, Colt M4A1, AKM (AK-47), FN SCAR-H, SVD Dragunov, Accuracy International AWM, Barrett M82A1 |
 | Extended Tube | magazine | mag_add 3, reload ×1.1 | Remington 870 |
-| 300-Round Box | magazine | mag ×1.5, reload ×1.25 | FN M249 SAW |
+| 300-Round Box | magazine | mag ×1.5, reload ×1.25 | FN M249 SAW, PKM |
 
 ## How a fitted attachment shows on the gun
 
@@ -159,7 +159,7 @@ Takes: 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 12x Sniper Scope
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
 | optic | 8 | 22 | 4 | 12 |
-| muzzle | 112 | 12 | 0.0 | - |
+| muzzle | 112 | 12.0 | 0.0 | - |
 | underbarrel | 48 | 6 | 0.0 | 10 |
 | stock | -10 | 10 | 0.0 | - |
 
@@ -180,3 +180,58 @@ Takes: none.
 | optic | 2 | 28 | 8 | 8 |
 
 Takes: none.
+
+### IWI Desert Eagle (.50 Action Express)
+
+| Slot | f | u | s | rail length |
+| --- | --- | --- | --- | --- |
+| optic | 6 | 17.5 | 0.0 | 10 |
+| muzzle | 37 | 12.5 | 0.0 | - |
+| side | 24 | 2 | 0.0 | 10 |
+
+Takes: Mini Reflex Sight, Pistol Suppressor, Compensator, Laser Sight, Tactical Flashlight, Laser-Light Module, Extended Magazine, Quick-Pull Magazine.
+
+### FN P90 (5.7x28mm)
+
+| Slot | f | u | s | rail length |
+| --- | --- | --- | --- | --- |
+| optic | -4 | 26 | 0.0 | 18 |
+| muzzle | 40 | 12 | 0.0 | - |
+| side | 22 | 12 | 5 | 10 |
+
+Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Pistol Suppressor, Compensator, Flash Hider, Laser Sight, Tactical Flashlight, Laser-Light Module.
+
+### FN SCAR-H (7.62x51mm NATO)
+
+| Slot | f | u | s | rail length |
+| --- | --- | --- | --- | --- |
+| muzzle | 80 | 13.5 | 0.0 | - |
+| optic | 8 | 22 | 0.0 | 36 |
+| underbarrel | 38 | 8 | 0.0 | 14 |
+| side | 40 | 13.5 | 4.5 | 10 |
+| stock | -8 | 13 | 0.0 | - |
+
+Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, Holographic Sight + 3x Magnifier, 2x Prism Sight, 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 4x Night Vision Scope, Rifle Suppressor, Compensator, Muzzle Brake, Flash Hider, Vertical Grip, Angled Grip, Stubby Grip, Handstop, Bipod, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, Lightweight Stock, Precision Stock, Extended Magazine, Drum Magazine, Quick-Pull Magazine.
+
+### Barrett M82A1 (.50 BMG)
+
+| Slot | f | u | s | rail length |
+| --- | --- | --- | --- | --- |
+| optic | 4 | 24 | 0.0 | 30 |
+| muzzle | 120 | 15 | 0.0 | - |
+| underbarrel | 88 | 9 | 0.0 | - |
+| stock | -30 | 12 | 0.0 | - |
+
+Takes: 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 12x Sniper Scope, 4x Night Vision Scope, Rifle Suppressor, Muzzle Brake, Bipod, Precision Stock, Extended Magazine, Quick-Pull Magazine.
+
+### PKM (7.62x54mmR)
+
+| Slot | f | u | s | rail length |
+| --- | --- | --- | --- | --- |
+| muzzle | 104 | 14.0 | 0.0 | - |
+| underbarrel | 80 | 8 | 0.0 | - |
+| optic | 6 | 25 | -5 | 20 |
+| side | 44 | 14 | 5 | 10 |
+| stock | -12 | 13 | 0.0 | - |
+
+Takes: Red Dot Sight, Holographic Sight, Holographic Sight + 3x Magnifier, 2x Prism Sight, 4x Combat Scope, 1-6x Variable Scope, 4x Night Vision Scope, Rifle Suppressor, Compensator, Muzzle Brake, Flash Hider, Vertical Grip, Angled Grip, Stubby Grip, Handstop, Bipod, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, 300-Round Box.

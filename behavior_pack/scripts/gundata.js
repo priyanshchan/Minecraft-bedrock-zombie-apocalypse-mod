@@ -678,7 +678,7 @@ export const GUN_DATA = {
         },
         "muzzle": {
           "f": 112,
-          "u": 12,
+          "u": 12.0,
           "s": 0.0,
           "length": 0,
           "bore": 2,
@@ -785,6 +785,345 @@ export const GUN_DATA = {
           "parent": "gun"
         }
       }
+    },
+    "frontline:deagle": {
+      "key": "deagle",
+      "name": "IWI Desert Eagle",
+      "caliber": ".50 Action Express",
+      "ammo": "frontline:ammo_50ae",
+      "mag": 7,
+      "mode": "semi",
+      "rpm": 300,
+      "damage": 11.0,
+      "velocity": 470,
+      "drag": 0.002,
+      "headshot": 1.9,
+      "hip": 2.6,
+      "ads": 1.1,
+      "vrec": 5.0,
+      "hrec": 1.4,
+      "bloom": 1.2,
+      "sound": "frontline.heavy_pistol",
+      "jam": 0.004,
+      "pose": "pistol",
+      "timing": {
+        "fire": 4,
+        "reload": 36,
+        "jam": 25,
+        "malfunction": 54
+      },
+      "slots": [
+        "optic",
+        "muzzle",
+        "side",
+        "magazine"
+      ],
+      "mounts": {
+        "optic": {
+          "f": 6,
+          "u": 17.5,
+          "s": 0.0,
+          "length": 10,
+          "bore": 2.0,
+          "parent": "slide"
+        },
+        "muzzle": {
+          "f": 37,
+          "u": 12.5,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.2,
+          "parent": "slide"
+        },
+        "side": {
+          "f": 24,
+          "u": 2,
+          "s": 0.0,
+          "length": 10,
+          "bore": 2.0,
+          "parent": "gun"
+        }
+      }
+    },
+    "frontline:p90": {
+      "key": "p90",
+      "name": "FN P90",
+      "caliber": "5.7x28mm",
+      "ammo": "frontline:ammo_57",
+      "mag": 50,
+      "mode": "auto",
+      "rpm": 900,
+      "damage": 4.6,
+      "velocity": 715,
+      "drag": 0.0019,
+      "headshot": 1.7,
+      "hip": 2.2,
+      "ads": 0.8,
+      "vrec": 0.5,
+      "hrec": 0.4,
+      "bloom": 0.18,
+      "sound": "frontline.smg",
+      "jam": 0.002,
+      "pose": "rifle",
+      "timing": {
+        "fire": 2,
+        "reload": 52,
+        "jam": 26,
+        "malfunction": 62
+      },
+      "slots": [
+        "optic",
+        "muzzle",
+        "side"
+      ],
+      "mounts": {
+        "optic": {
+          "f": -4,
+          "u": 26,
+          "s": 0.0,
+          "length": 18,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "muzzle": {
+          "f": 40,
+          "u": 12,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2,
+          "parent": "gun"
+        },
+        "side": {
+          "f": 22,
+          "u": 12,
+          "s": 5,
+          "length": 10,
+          "bore": 2.0,
+          "parent": "gun"
+        }
+      }
+    },
+    "frontline:scar_h": {
+      "key": "scar_h",
+      "name": "FN SCAR-H",
+      "caliber": "7.62x51mm NATO",
+      "ammo": "frontline:ammo_762x51",
+      "mag": 20,
+      "mode": "auto",
+      "rpm": 600,
+      "damage": 9.0,
+      "velocity": 790,
+      "drag": 0.0009,
+      "headshot": 2.0,
+      "hip": 2.8,
+      "ads": 0.4,
+      "vrec": 1.6,
+      "hrec": 0.75,
+      "bloom": 0.35,
+      "sound": "frontline.dmr",
+      "jam": 0.002,
+      "pose": "rifle",
+      "timing": {
+        "fire": 4,
+        "reload": 48,
+        "jam": 29,
+        "malfunction": 65
+      },
+      "slots": [
+        "optic",
+        "muzzle",
+        "underbarrel",
+        "side",
+        "stock",
+        "magazine"
+      ],
+      "mounts": {
+        "muzzle": {
+          "f": 80,
+          "u": 13.5,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.2,
+          "parent": "gun"
+        },
+        "optic": {
+          "f": 8,
+          "u": 22,
+          "s": 0.0,
+          "length": 36,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "underbarrel": {
+          "f": 38,
+          "u": 8,
+          "s": 0.0,
+          "length": 14,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "side": {
+          "f": 40,
+          "u": 13.5,
+          "s": 4.5,
+          "length": 10,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "stock": {
+          "f": -8,
+          "u": 13,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.0,
+          "parent": "gun"
+        }
+      }
+    },
+    "frontline:barrett": {
+      "key": "barrett",
+      "name": "Barrett M82A1",
+      "caliber": ".50 BMG",
+      "ammo": "frontline:ammo_50bmg",
+      "mag": 10,
+      "mode": "semi",
+      "rpm": 120,
+      "damage": 40.0,
+      "velocity": 853,
+      "drag": 0.0004,
+      "headshot": 2.0,
+      "hip": 6.0,
+      "ads": 0.06,
+      "vrec": 7.5,
+      "hrec": 1.5,
+      "bloom": 1.0,
+      "sound": "frontline.sniper",
+      "jam": 0.002,
+      "pose": "rifle",
+      "timing": {
+        "fire": 8,
+        "reload": 64,
+        "jam": 35,
+        "malfunction": 78
+      },
+      "slots": [
+        "optic",
+        "muzzle",
+        "underbarrel",
+        "stock",
+        "magazine"
+      ],
+      "mounts": {
+        "optic": {
+          "f": 4,
+          "u": 24,
+          "s": 0.0,
+          "length": 30,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "muzzle": {
+          "f": 120,
+          "u": 15,
+          "s": 0.0,
+          "length": 0,
+          "bore": 3,
+          "parent": "gun"
+        },
+        "underbarrel": {
+          "f": 88,
+          "u": 9,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "stock": {
+          "f": -30,
+          "u": 12,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.0,
+          "parent": "gun"
+        }
+      }
+    },
+    "frontline:pkm": {
+      "key": "pkm",
+      "name": "PKM",
+      "caliber": "7.62x54mmR",
+      "ammo": "frontline:ammo_762x54r",
+      "mag": 100,
+      "mode": "auto",
+      "rpm": 650,
+      "damage": 7.5,
+      "velocity": 825,
+      "drag": 0.0008,
+      "headshot": 1.8,
+      "hip": 3.8,
+      "ads": 1.1,
+      "vrec": 1.1,
+      "hrec": 0.8,
+      "bloom": 0.25,
+      "sound": "frontline.lmg",
+      "jam": 0.003,
+      "pose": "rifle",
+      "timing": {
+        "fire": 2,
+        "reload": 110,
+        "jam": 31,
+        "malfunction": 74
+      },
+      "slots": [
+        "optic",
+        "muzzle",
+        "underbarrel",
+        "side",
+        "stock",
+        "magazine"
+      ],
+      "mounts": {
+        "muzzle": {
+          "f": 104,
+          "u": 14.0,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.4,
+          "parent": "gun"
+        },
+        "underbarrel": {
+          "f": 80,
+          "u": 8,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "optic": {
+          "f": 6,
+          "u": 25,
+          "s": -5,
+          "length": 20,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "side": {
+          "f": 44,
+          "u": 14,
+          "s": 5,
+          "length": 10,
+          "bore": 2.0,
+          "parent": "gun"
+        },
+        "stock": {
+          "f": -12,
+          "u": 13,
+          "s": 0.0,
+          "length": 0,
+          "bore": 2.0,
+          "parent": "gun"
+        }
+      }
     }
   },
   "attachments": {
@@ -795,10 +1134,13 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:rem870"
       ],
       "mods": {
@@ -814,9 +1156,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:rem870",
         "frontline:svd"
       ],
@@ -833,9 +1178,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:rem870"
       ],
       "mods": {
@@ -852,7 +1200,9 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd"
       ],
       "mods": {
@@ -868,9 +1218,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:rem870",
         "frontline:svd"
       ],
@@ -887,9 +1240,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "zoom": 4,
@@ -904,9 +1260,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "zoom": 6,
@@ -921,8 +1280,10 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "zoom": 8,
@@ -936,7 +1297,8 @@ export const GUN_DATA = {
       "slot": "optic",
       "guns": [
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "zoom": 12,
@@ -951,9 +1313,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "zoom": 4,
@@ -969,8 +1334,10 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
-        "frontline:ump45"
+        "frontline:ump45",
+        "frontline:p90"
       ],
       "mods": {
         "noise": 0.25,
@@ -987,9 +1354,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "noise": 0.3,
@@ -1007,11 +1377,15 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
-        "frontline:m249"
+        "frontline:scar_h",
+        "frontline:m249",
+        "frontline:pkm"
       ],
       "mods": {
         "hrec": 0.7,
@@ -1027,9 +1401,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "vrec": 0.7,
@@ -1044,9 +1421,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd"
       ],
       "mods": {
@@ -1088,9 +1468,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
-        "frontline:m249"
+        "frontline:scar_h",
+        "frontline:m249",
+        "frontline:pkm"
       ],
       "mods": {
         "vrec": 0.7
@@ -1104,9 +1487,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
-        "frontline:m249"
+        "frontline:scar_h",
+        "frontline:m249",
+        "frontline:pkm"
       ],
       "mods": {
         "hrec": 0.65,
@@ -1121,9 +1507,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
-        "frontline:m249"
+        "frontline:scar_h",
+        "frontline:m249",
+        "frontline:pkm"
       ],
       "mods": {
         "vrec": 0.85,
@@ -1139,9 +1528,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd"
       ],
       "mods": {
@@ -1157,9 +1549,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "bipod": 1
@@ -1173,14 +1568,19 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:rem870",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "spread": 0.65,
@@ -1195,14 +1595,19 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:rem870",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "light": 1
@@ -1216,14 +1621,19 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:rem870",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "spread": 0.8,
@@ -1239,9 +1649,12 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:m249",
+        "frontline:pkm",
         "frontline:rem870"
       ],
       "mods": {
@@ -1258,8 +1671,10 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
-        "frontline:ak47"
+        "frontline:ak47",
+        "frontline:scar_h"
       ],
       "mods": {
         "spread": 0.85,
@@ -1274,8 +1689,10 @@ export const GUN_DATA = {
       "guns": [
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "ads": 0.8,
@@ -1290,12 +1707,16 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "mag": 1.5,
@@ -1310,8 +1731,10 @@ export const GUN_DATA = {
       "guns": [
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
-        "frontline:ak47"
+        "frontline:ak47",
+        "frontline:scar_h"
       ],
       "mods": {
         "mag": 2.0,
@@ -1327,12 +1750,16 @@ export const GUN_DATA = {
       "guns": [
         "frontline:glock17",
         "frontline:m1911",
+        "frontline:deagle",
         "frontline:mp5",
         "frontline:ump45",
+        "frontline:p90",
         "frontline:m4a1",
         "frontline:ak47",
+        "frontline:scar_h",
         "frontline:svd",
-        "frontline:awm"
+        "frontline:awm",
+        "frontline:barrett"
       ],
       "mods": {
         "reload": 0.7
@@ -1357,7 +1784,8 @@ export const GUN_DATA = {
       "name": "300-Round Box",
       "slot": "magazine",
       "guns": [
-        "frontline:m249"
+        "frontline:m249",
+        "frontline:pkm"
       ],
       "mods": {
         "mag": 1.5,

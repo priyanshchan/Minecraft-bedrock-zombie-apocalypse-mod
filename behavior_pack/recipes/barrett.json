@@ -1,0 +1,37 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "frontline:barrett"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "GIII",
+      "BPI ",
+      " P  "
+    ],
+    "key": {
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "P": {
+        "item": "minecraft:blackstone"
+      },
+      "B": {
+        "item": "minecraft:iron_block"
+      },
+      "G": {
+        "item": "minecraft:spyglass"
+      }
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    },
+    "result": {
+      "item": "frontline:barrett",
+      "count": 1
+    }
+  }
+}
