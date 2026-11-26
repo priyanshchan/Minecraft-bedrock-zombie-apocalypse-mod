@@ -2,6 +2,10 @@
 
 ## 1.3.0: money, the Armory, fallen soldiers
 
+- **Ten guns rebuilt in higher detail** (240 to 380 parts, the Desert Eagle 163 and the P90 209): MP5A3, UMP45, Desert Eagle, P90,
+  SVD, SCAR-H, PKM, Barrett M82A1, Carl Gustaf and RPG-7. Clearer materials on the MP5 and UMP45, a real perforated sleeve, arrowhead
+  brake and bipod on the Barrett, a slimmer RPG-7 with a true PG-7V, and attachment mounts moved to sit on the new rails.
+
 - **Money:**
   - start with $1,000
   - funding every 2 minutes: $300 from the government (NATO) or the cell's backers (Red Fang); the interval is a setting
@@ -33,7 +37,7 @@
   - launchers: Carl Gustaf M4 (84mm), RPG-7 (PG-7V)
 - **Nine cartridge items** replace the old ammo: 9x19mm, .45 ACP, 5.56x45mm, 7.62x39mm, 7.62x54mmR, .338 Lapua Magnum, 12 gauge,
   84mm and PG-7V.
-- **Far more detailed models:** every gun rebuilt from 110 to 370 parts, with round bars drawn as 12- and 16-sided sections. The
+- **Far more detailed models:** every gun rebuilt from 110 to 380 parts, with round bars drawn as 12- and 16-sided sections. The
   details are real: rails with teeth, real slots, pins, screws, roll marks, feed lips with the top round, sights and scopes with glass.
   Soldiers carry lighter versions of the same guns.
 - **33 attachments** with their own 3D models, fitted at the new **Gunsmith** (Field Radio) or by using the item:

@@ -257,6 +257,34 @@ def studs(g, f, u, half, color=None, size=1.0, bone=None):
     return [stud(g, f, u, half, "left", color, size, bone=bone), stud(g, f, u, -half, "right", color, size, bone=bone)]
 
 
+def boss(g, f, u, s0, s1, d, color, noise=2, bone=None):
+    """A small round head across the gun (axis along s), d units across: a plus for d <= 2, a cross over a
+    square for d = 3, an octagon (two crossed boxes and four 45-degree corners) from d = 4. Reads round from
+    the side without the star points of turned squares."""
+    d = max(1, int(round(d)))
+    h = d / 2
+    out = []
+    if d <= 2:
+        out.append(g.box(f - h, f + h, u - 0.5, u + 0.5, s0, s1, color, noise, bone=bone))
+        if d == 2:
+            out.append(g.box(f - 0.5, f + 0.5, u - h, u + h, s0, s1, color, noise, bone=bone))
+        return out
+    if d == 3:
+        out.append(g.box(f - 1.5, f + 1.5, u - 0.5, u + 0.5, s0, s1, color, noise, bone=bone))
+        out.append(g.box(f - 0.5, f + 0.5, u - 1.5, u + 1.5, s0, s1, color, noise, bone=bone))
+        out.append(g.box(f - 1, f + 1, u - 1, u + 1, s0, s1, color, noise, bone=bone))
+        return out
+    r2 = (math.sqrt(2) - 1) / 2
+    out.append(g.box(f - h, f + h, u - h + 1, u + h - 1, s0, s1, color, noise, bone=bone))
+    out.append(g.box(f - h + 1, f + h - 1, u - h, u + h, s0, s1, color, noise, bone=bone))
+    for df in (-1, 1):
+        for du in (-1, 1):
+            cf, cu = f + df * (h - 1), u + du * (h - 1)
+            out.append(g.box(cf - 0.5, cf + 0.5, cu - 0.5, cu + 0.5, s0, s1, shade(color, 1.12 if du > 0 else 0.88),
+                             noise, inflate=r2, tilt=45, pivot=(cf, cu), bone=bone))
+    return out
+
+
 def lines(c, side, f0, f1, u0, u1, every, color, vertical=False):
     """Parallel engraved lines over an area of a side: along f, or (vertical) across it."""
     if vertical:
@@ -758,12 +786,12 @@ def mp5():
     for f in (-2.5, -1.5, -0.5):
         mark(hs, "left", f, f + 0.8, 7.5, 8.5, RED)
     SEL = shade(ST, 1.05)  # selector: a steel pivot boss and the long thumb lever (at safe)
-    spin(g, -4, 6, 3.5, 4.5, 1.4, SEL)
+    boss(g, -4, 6, 3.5, 4.5, 3, SEL)
     endmark(g.box(-4.5, -3.5, 5.5, 6.5, 4, 5, WHITE, 0, inflate=-0.2), "front", 4, 5, 5.5, 6.5, WHITE)
     g.box(-9, -4, 5.5, 6.5, 4.3, 5.3, SEL, 1, tilt=-12, pivot=(-4, 6))
     lv = g.box(-10.5, -8.5, 4.8, 7.2, 4.5, 5.5, shade(SEL, 1.15), 1, tilt=-12, pivot=(-4, 6))
     lines(lv, "left", -10.5, -8.5, 4.8, 7.2, 2, shade(SEL, 0.7), vertical=True)
-    spin(g, -4, 6, -4.5, -3.5, 1.4, SEL)
+    boss(g, -4, 6, -4.5, -3.5, 3, SEL)
     g.box(-7.5, -4, 5.5, 6.5, -5.3, -4.3, SEL, 1, tilt=-12, pivot=(-4, 6))
     for f, u in ((2.5, 6), (6, 6.5), (-7.5, 5)):  # trigger, hammer and catch pins
         studs(g, f, u, 3.5, PIN, 0.8)
@@ -782,8 +810,6 @@ def mp5():
     for side, (s0, s1) in (("left", (2.5, 3.5)), ("right", (-3.5, -2.5))):
         p = gr.box(-7.5, -1.5, -11, 2, s0, s1, PL, 1)
         stipple(p, (side,), PL, 1.3)
-        for u in (-11.5, 2.5):
-            gr.box(-7.5, -1.5, u - 0.5, u + 0.5, s0, s1, PL, 1, extra=45, inflate=-0.15)
     rim = gr.box(-9.5, 0.5, -13, -12, -3.5, 3.5, PD, 2)
     mark(rim, "down", -8.5, -0.5, 0, 0, shade(PD, 0.7), -2.5, 2.5)
     # the big rounded guard
@@ -883,7 +909,7 @@ def mp5():
             g.box(f, f + 3, U1 - 2, U1 + 1, s0, s0 + 1, BKD, 2)
             g.box(f, f + 3, U1 - 2.5, U1 - 1.5, s0 - 0.5 if s0 > 0 else s0 + 0.5, (s0 - 0.5 if s0 > 0 else s0 + 0.5) + 1,
                   BKD, 1)
-    spin(g, 9.5, U1 - 0.5, 3, 4.5, 1.3, shade(ST, 0.9))  # the clamping nut and lever on the left
+    boss(g, 9.5, U1 - 0.5, 3, 4.5, 3, shade(ST, 0.9))  # the clamping nut and lever on the left
     endmark(g.box(9, 10, U1 - 1, U1, 4, 4.7, DARK, 0), "front", 4, 4.7, U1 - 1, U1, DARK)
     g.box(9.5, 14, U1 - 0.5, U1 + 0.5, 4, 5, shade(BLACK, 0.95), 1, tilt=-8, pivot=(9.5, U1))
     rl = g.teeth_rail(CM0, CM1, U1 + 1, -2.5, 2.5, shade(BLACK, 0.95))
@@ -1039,7 +1065,7 @@ def ump45():
         for f in (-3, -2, -1):
             mark(lo, side, f, f + 0.8, 8, 9, RED)
     for s0, d in ((3.5, 1), (-4.5, -1)):  # ambidextrous selector, at safe
-        spin(g, -4.5, 6.5, s0, s0 + 1, 1.5, shade(LO, 1.3))
+        boss(g, -4.5, 6.5, s0, s0 + 1, 3, shade(LO, 1.3))
         g.box(-9.5 if d > 0 else -7.5, -4.5, 6, 7, s0 + 0.5 * d, s0 + 1 + 0.5 * d, shade(LO, 1.5), 1,
               tilt=-12, pivot=(-4.5, 6.5))
     for f, u in ((-7.5, 5.5), (2, 6.5), (6, 6.5), (10.5, 8.5), (-9, 8.5)):
@@ -1065,8 +1091,6 @@ def ump45():
     for side, (s0, s1) in (("left", (2.5, 3.5)), ("right", (-3.5, -2.5))):
         p = gr.box(-7.5, -1.5, -10.5, 2.5, s0, s1, LO, 1)
         stipple(p, (side,), LO, 1.3)
-        for u in (-11, 3):
-            gr.box(-7.5, -1.5, u - 0.5, u + 0.5, s0, s1, LO, 1, extra=45, inflate=-0.15)
     for h in (-0.5, -4.5):  # the finger ridges on the front strap
         gr.box(-0.5, 0.5, h - 0.5, h + 0.5, -1.5, 1.5, shade(LO, 0.85), 2, extra=45, inflate=0.207)
     gr.box(-10, -9, -9, 1, -1.5, 1.5, LO, 2)  # palm swell
@@ -1097,7 +1121,7 @@ def ump45():
     g.box(30, 35, U1 + 1, U1 + 3, 2.5, 3.5, RL, 2)
     hoop(g, 30.5, 34.5, U1 + 6.5, 0, 2.6, RL, 1, (-135, 135))
     g.box(32, 33, U1 + 4, U1 + 6.5, -0.5, 0.5, DARK, 1)
-    spin(g, 32.5, U1 + 2, 3.5, 4.5, 1, PIN)
+    boss(g, 32.5, U1 + 2, 3.5, 4.5, 2, PIN)
     for s0 in (2, -3):  # the hood's protective wings
         g.box(30.5, 34.5, U1 + 4, U1 + 6, s0, s0 + 1, RL, 2)
 
@@ -1145,7 +1169,7 @@ def ump45():
     g.box(-7, -6, U1 + 4.5, U1 + 5.5, 2.5, 3.5, WHITE, 0, inflate=-0.2)
     g.box(-8.5, -5.5, U1 + 3, U1 + 4.5, -4, -2.5, shade(SILVER, 0.7), 1, inflate=-0.1)  # windage knob
     endmark(g.box(-7.5, -6.5, U1 + 3.2, U1 + 4.2, -4.3, -3.8, DARK, 0), "rear", -4.3, -3.8, U1 + 3, U1 + 4, DARK)
-    spin(g, -6.5, U1 + 2, -4.5, -3.5, 1, PIN)
+    boss(g, -6.5, U1 + 2, -4.5, -3.5, 2, PIN)
     g.mount("muzzle", 43, B, bore=1.6)
     g.use("def_muzzle")
     g.rod(43, 44, B, 0, 2.2, shade(RL, 1.1))  # collar
@@ -1161,7 +1185,7 @@ def ump45():
     hb = g.box(-14.5, -12, 8, U1, -3.5, 3.5, LO)  # hinge block
     for u0, u1 in ((9, 12), (16, 19)):
         vrod(g, u0, u1, -12, -4, 1.2, ST)  # hinge knuckles on the right
-    spin(g, -13, 14, 3.5, 4.5, 1.3, shade(SILVER, 0.75))  # release button on the left
+    boss(g, -13, 14, 3.5, 4.5, 3, shade(SILVER, 0.75))  # release button on the left
     g.box(-14.5, -12, 7, 8, -3, 3, LO, 2)  # the hinge's lower lug
     endmark(g.box(-15, -14.5, 10, 18, -3, 3, PD, 1), "rear", -2, 2, 13, 15, shade(PD, 0.7))
     top = g.box(-40, -14, 16, 19.5, -2.5, 2.5, LO)  # the comb

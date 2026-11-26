@@ -75,11 +75,11 @@ Takes: Pistol Suppressor, Compensator, Extended Magazine, Quick-Pull Magazine.
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 8 | 23 | 0.0 | 20 |
-| muzzle | 54 | 12 | 0.0 | - |
+| optic | 10 | 22.5 | 0.0 | 20 |
+| muzzle | 52.5 | 12.0 | 0.0 | - |
 | underbarrel | 34 | 7 | 0.0 | 12 |
-| side | 34 | 11 | 5 | 10 |
-| stock | -10 | 13 | 0.0 | - |
+| side | 34 | 10 | 4.5 | 10 |
+| stock | -11 | 15 | 0.0 | - |
 
 Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Pistol Suppressor, Compensator, Flash Hider, Vertical Grip, Angled Grip, Stubby Grip, Handstop, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, Lightweight Stock, Extended Magazine, Drum Magazine, Quick-Pull Magazine.
 
@@ -88,10 +88,10 @@ Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Pist
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
 | optic | 12 | 23 | 0.0 | 36 |
-| muzzle | 44 | 13 | 0.0 | - |
-| underbarrel | 30 | 3 | 0.0 | 10 |
-| side | 30 | 15 | 6 | 10 |
-| stock | -10 | 13 | 0.0 | - |
+| muzzle | 43 | 13.0 | 0.0 | - |
+| underbarrel | 30 | 4 | 0.0 | 10 |
+| side | 30 | 13.5 | 7 | 10 |
+| stock | -12 | 14 | 0.0 | - |
 
 Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Pistol Suppressor, Compensator, Flash Hider, Vertical Grip, Angled Grip, Stubby Grip, Handstop, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, Lightweight Stock, Extended Magazine, Drum Magazine, Quick-Pull Magazine.
 
@@ -158,8 +158,8 @@ Takes: 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 12x Sniper Scope
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 8 | 22 | 4 | 12 |
-| muzzle | 112 | 12.0 | 0.0 | - |
+| optic | 8 | 20 | 3 | 12 |
+| muzzle | 110 | 12.0 | 0.0 | - |
 | underbarrel | 48 | 6 | 0.0 | 10 |
 | stock | -10 | 10 | 0.0 | - |
 
@@ -169,7 +169,7 @@ Takes: Red Dot Sight, Holographic Sight + 3x Magnifier, 2x Prism Sight, 4x Comba
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 4 | 30 | 12 | 8 |
+| optic | 4 | 31 | 11.5 | 8 |
 
 Takes: none.
 
@@ -177,7 +177,7 @@ Takes: none.
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 2 | 28 | 8 | 8 |
+| optic | 2 | 27 | 8 | 8 |
 
 Takes: none.
 
@@ -185,9 +185,9 @@ Takes: none.
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 6 | 17.5 | 0.0 | 10 |
-| muzzle | 37 | 12.5 | 0.0 | - |
-| side | 24 | 2 | 0.0 | 10 |
+| optic | 22 | 18 | 0.0 | 18 |
+| muzzle | 38 | 13.0 | 0.0 | - |
+| side | 19 | 2 | 0.0 | 8 |
 
 Takes: Mini Reflex Sight, Pistol Suppressor, Compensator, Laser Sight, Tactical Flashlight, Laser-Light Module, Extended Magazine, Quick-Pull Magazine.
 
@@ -195,9 +195,9 @@ Takes: Mini Reflex Sight, Pistol Suppressor, Compensator, Laser Sight, Tactical 
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | -4 | 26 | 0.0 | 18 |
-| muzzle | 40 | 12 | 0.0 | - |
-| side | 22 | 12 | 5 | 10 |
+| optic | 8 | 28 | 0.0 | 30 |
+| muzzle | 40 | 12.0 | 0.0 | - |
+| side | 25 | 20.5 | 8 | 8 |
 
 Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Pistol Suppressor, Compensator, Flash Hider, Laser Sight, Tactical Flashlight, Laser-Light Module.
 
@@ -205,11 +205,11 @@ Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Pist
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| muzzle | 80 | 13.5 | 0.0 | - |
+| muzzle | 82 | 13.5 | 0.0 | - |
 | optic | 8 | 22 | 0.0 | 36 |
-| underbarrel | 38 | 8 | 0.0 | 14 |
-| side | 40 | 13.5 | 4.5 | 10 |
-| stock | -8 | 13 | 0.0 | - |
+| underbarrel | 44 | 6 | 0.0 | 20 |
+| side | 48 | 13.5 | 6 | 16 |
+| stock | -10 | 13.5 | 0.0 | - |
 
 Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, Holographic Sight + 3x Magnifier, 2x Prism Sight, 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 4x Night Vision Scope, Rifle Suppressor, Compensator, Muzzle Brake, Flash Hider, Vertical Grip, Angled Grip, Stubby Grip, Handstop, Bipod, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, Lightweight Stock, Precision Stock, Extended Magazine, Drum Magazine, Quick-Pull Magazine.
 
@@ -217,10 +217,10 @@ Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, Holographic Sight + 
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 4 | 24 | 0.0 | 30 |
-| muzzle | 120 | 15 | 0.0 | - |
-| underbarrel | 88 | 9 | 0.0 | - |
-| stock | -30 | 12 | 0.0 | - |
+| optic | 4 | 26.5 | 0.0 | 36 |
+| muzzle | 119 | 15 | 0.0 | - |
+| underbarrel | 69 | 9.5 | 0.0 | - |
+| stock | -28 | 13 | 0.0 | - |
 
 Takes: 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 12x Sniper Scope, 4x Night Vision Scope, Rifle Suppressor, Muzzle Brake, Bipod, Precision Stock, Extended Magazine, Quick-Pull Magazine.
 
@@ -229,9 +229,9 @@ Takes: 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 12x Sniper Scope
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
 | muzzle | 104 | 14.0 | 0.0 | - |
-| underbarrel | 80 | 8 | 0.0 | - |
-| optic | 6 | 25 | -5 | 20 |
-| side | 44 | 14 | 5 | 10 |
-| stock | -12 | 13 | 0.0 | - |
+| underbarrel | 80 | 6 | 0.0 | - |
+| optic | 2 | 24.5 | 2 | 16 |
+| side | 52 | 14.0 | 3.2 | 10 |
+| stock | -13.5 | 13 | 0.0 | - |
 
 Takes: Red Dot Sight, Holographic Sight, Holographic Sight + 3x Magnifier, 2x Prism Sight, 4x Combat Scope, 1-6x Variable Scope, 4x Night Vision Scope, Rifle Suppressor, Compensator, Muzzle Brake, Flash Hider, Vertical Grip, Angled Grip, Stubby Grip, Handstop, Bipod, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, 300-Round Box.
