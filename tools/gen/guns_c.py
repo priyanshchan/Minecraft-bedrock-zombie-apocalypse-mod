@@ -121,11 +121,15 @@ def stud(g, f, u, s, side, color=None, d=1.0, proud=0.5, bone=None):
     return c
 
 
-def grain(c, color, seed=0, sides=("right", "left", "up", "down"), every=(2, 4)):
-    """Wood: wavy darker and lighter streaks running along the length."""
+def grain(c, color, seed=0, sides=("right", "left", "up", "down"), every=(2, 4), flat=True):
+    """Wood: wavy darker and lighter streaks running along the length. With `flat`, the sides are first
+    repainted without the box's own top-to-bottom light, so pieces of one stock blend into each other."""
     rnd = random.Random(seed)
     for side in sides:
         face = getattr(c, FACES[side])
+        if flat and side in ("right", "left"):
+            face.fill(shade(color, 0.95))
+            face.noise(3, seed + len(side))
         x0 = rnd.randint(0, 1)
         while x0 < face.w:
             ph, amp, per = rnd.random() * 6.3, rnd.choice((0.0, 0.6, 1.0, 1.4)), rnd.uniform(4, 9)
@@ -193,19 +197,16 @@ def rem870():
     mark(bolt, "right", 11, 13, 12, 16, shade("#7d838b", 1.25))  # bolt face and extractor
     mark(bolt, "right", 12, 13, 14, 15, DARK)
     g.box(13, 14, 12, 16, -3.2, -2.2, DARK, 1)  # gap to the barrel extension
-    # receiver rear: the tang slopes down into the stock
-    g.box(-9, -6, 9, 17, -3.5, 3.5, R, tilt=-12, pivot=(-6, 17))
     # a low scope rail on the receiver (the optic mount sits on it)
     base = g.box(1, 15, 18, 19, -2, 2, ANOD, 2)
     for f in range(2, 15, 2):
         mark(base, "up", f, f + 1, 0, 0, DARK, -2, 2)
         mark(base, "right", f, f + 1, 18, 19, DARK)
         mark(base, "left", f, f + 1, 18, 19, DARK)
-    for f in (3, 13):
-        stud(g, f, 18.5, 2, "left", DARK) if False else None
-    # trigger plate pins (the side saddle hangs on the left ends)
-    for f in (-3, 13):
-        stud(g, f, 8.5, -4, "right")
+    # trigger plate pins (the side saddle hangs on their left ends) and the cartridge stop rivets
+    for f, u in ((-3, 8.5), (13, 8.5), (18.5, 9.5), (20.5, 8)):
+        stud(g, f, u, -4, "right")
+    g.rod(22, 23.5, 15, 0, 3.3, R)  # breech end of the barrel
     # ---- trigger group
     g.box(-6, 10, 5, 6, -2.5, 2.5, ANOD, 2)  # trigger plate
     g.box(-4, -2, 1.5, 5, -1, 1, ANOD, 2, tilt=12, pivot=(-3, 5))  # guard: rear
@@ -248,9 +249,13 @@ def rem870():
         grain(c, W, 11 + i)
     for i, c in enumerate(g.bevel(31, 33, 3.5, 14, -5.5, 5.5, W, 2.5)):  # rear flare
         grain(c, W, 21 + i) if i < 2 else None
-    for f in range(34, 50, 2):  # the rings of the ribbed grip
-        for c in (g.box(f, f + 1, 4, 14, -4, 4, W, 2), g.box(f, f + 1, 5.5, 12.5, -5, 5, W, 2)):
+    for f in range(34, 50, 2):  # the rings of the ribbed grip, their edges rounded
+        for c in (g.box(f, f + 1, 4, 14, -3.5, 3.5, W, 2), g.box(f, f + 1, 5.5, 12.5, -5, 5, W, 2)):
             grain(c, W, f)
+        if hi():
+            for cu, cs in ((12.5, 3.5), (12.5, -3.5), (5.5, 3.5), (5.5, -3.5)):
+                c = g.box(f, f + 1, cu - 0.5, cu + 0.5, cs - 0.5, cs + 0.5, shade(W, 0.95), 2, inflate=0.55, roll=45,
+                          pivot=(f, cu, cs))
     for s0 in (-5, 3.5):  # the fore-end's ears up the sides of the barrel
         c = g.box(33, 51, 13, 15, s0, s0 + 1.5, W, 2)
         grain(c, W, 40 + s0)
@@ -315,23 +320,24 @@ def rem870():
     g.mount("muzzle", 92, 15, bore=2.6)
     g.mount("side", 42, 9, 5, length=10, default=False, parent="pump")
     g.mount("stock", -6, 12)
-    # ---- walnut stock (def_stock): semi-pistol grip, comb, white-line spacer and recoil pad, sling stud
+    # ---- walnut stock (def_stock): semi-pistol grip with a cap, comb, white-line spacer, recoil pad, sling stud
     g.use("def_stock")
     W = WALNUT
     parts = []
-    parts += g.bevel(-17, -8, 6, 16, -3.5, 3.5, W, 1.5)[:2]  # wrist
-    parts += g.bevel(-52, -22, 9, 17, -4.5, 4.5, W, 2)[:2]  # comb and heel
-    parts.append(g.box(-25, -12, 11, 16, -3.5, 3.5, W, tilt=-11, pivot=(-25, 16)))  # comb nose into the wrist
-    parts.append(g.box(-52, -16, -0.5, 10, -4.5, 4.5, W, tilt=6, pivot=(-52, -0.5)))  # butt, toe line rising
-    parts.append(g.box(-52, -17, -1, 4, -3.5, 3.5, W, tilt=6, pivot=(-52, -1)))  # rounded underside
-    grip = g.box(-21, -11, 1.5, 9, -3.5, 3.5, W, tilt=-22, pivot=(-11, 9))  # the pistol grip
-    parts.append(grip)
-    parts.append(g.box(-12, -6, 5.5, 10, -3.5, 3.5, W, tilt=-30, pivot=(-6, 10)))  # grip front up to the guard
+    parts += g.bevel(-10, -6, 6, 18, -4, 4, W, 2)[:2]  # the head, matching the receiver
+    parts += g.bevel(-24, -9, 6.5, 15.5, -3.5, 3.5, W, 1.5)[:2]  # wrist
+    parts += g.bevel(-52, -25, 8, 17, -4.5, 4.5, W, 2)[:2]  # comb and heel
+    parts.append(g.box(-31, -19, 11, 16, -3.5, 3.5, W, tilt=-9, pivot=(-31, 16)))  # comb nose down into the wrist
+    toe = math.degrees(math.atan2(2.5, 37))  # the line from the toe up to the grip cap
+    parts.append(g.box(-52, -26, -0.5, 9, -4.5, 4.5, W, tilt=toe, pivot=(-52, -1)))  # butt
+    parts.append(g.box(-52, -15, -1, 9, -3.5, 3.5, W, tilt=toe, pivot=(-52, -1)))  # its rounded underside
+    parts.append(g.box(-34, -15, -0.5, 9, -3.75, 3.75, W, tilt=toe, pivot=(-52, -1)))  # into the grip
+    parts.append(g.box(-17, -5, 1, 8, -3.5, 3.5, W, tilt=26, pivot=(-17, 1)))  # the grip's front, up to the guard
     for i, c in enumerate(parts):
         grain(c, W, 70 + i)
-    knurl(parts[0], "right", -16, -9, 8, 14, shade(W, 0.7))  # checkering
-    knurl(parts[0], "left", -16, -9, 8, 14, shade(W, 0.7))
-    g.box(-22, -15, 0.5, 1.5, -3, 3, "#1e1e20", 1, tilt=-22, pivot=(-11, 9))  # grip cap
+    for side in ("right", "left"):
+        knurl(parts[2], side, -20, -11, 8, 14, shade(W, 0.72))  # checkering on the wrist
+    g.box(-19, -15, 0.6, 1.6, -3, 3, "#1e1e20", 1, tilt=toe, pivot=(-52, -1))  # grip cap
     g.box(-53, -52, -1, 17, -4.5, 4.5, IVORY, 1)  # white-line spacer
     pad = g.bevel(-56, -53, -1.5, 17.5, -4.75, 4.75, PAD, 1, noise=2)
     for c in pad[:2]:
@@ -339,10 +345,10 @@ def rem870():
         for x in range(1, face.w, 2):
             face.vline(x, shade(PAD, 0.7))
     if hi():
-        g.box(-45.5, -44.5, -1.2, 0.5, -0.5, 0.5, STEEL, 1)  # sling stud
-        g.box(-47, -43, -3, -2, -0.5, 0.5, STEEL, 1)
-        g.box(-47, -46, -3, -1, -0.5, 0.5, STEEL, 1)
-        g.box(-44, -43, -3, -1, -0.5, 0.5, STEEL, 1)
+        g.box(-45.5, -44.5, -0.5, 1, -0.5, 0.5, STEEL, 1)  # sling stud and swivel
+        g.box(-47, -43, -2.5, -1.5, -0.5, 0.5, STEEL, 1)
+        g.box(-47, -46, -2.5, -0.5, -0.5, 0.5, STEEL, 1)
+        g.box(-44, -43, -2.5, -0.5, -0.5, 0.5, STEEL, 1)
     g.use("frame")
     return g
 
