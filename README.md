@@ -55,7 +55,7 @@ Everyone also gets a combat knife, an iron helmet and chestplate if they have no
 Every gun, launcher, knife, grenade and piece of gear is a **3D model in your hand**, in both first and third person. Players holding a
 gun are shown **aiming it with both hands** to everyone else.
 
-The guns are modelled after the real ones, at quarter-pixel detail, from hundreds of parts each:
+The guns are modelled after the real ones at quarter-pixel detail. The Glock, M1911, M4A1, AKM, M249, 870 and AWM are built from 110 to 370 parts each; the MP5, UMP45, SVD, Carl Gustaf and RPG-7 are next in line for the same treatment:
 - machined and stamped receivers with pins, screws, rivets and roll marks
 - ejection ports, bolt carriers, charging handles, safeties and magazine releases
 - round, fluted barrels; birdcages, slant brakes and muzzle brakes

@@ -247,6 +247,9 @@ def rem870():
     core = g.bevel(33, 51, 4.5, 13.5, -4.5, 4.5, W, 2)
     for i, c in enumerate(core[:2]):
         grain(c, W, 11 + i)
+        for side in ("right", "left", "down"):
+            for f in range(35, 50, 2):
+                mark(c, side, f, f + 1, 4.5, 13.5, shade(W, 0.62))  # the grooves between the ribs
     for i, c in enumerate(g.bevel(31, 33, 3.5, 14, -5.5, 5.5, W, 2.5)):  # rear flare
         grain(c, W, 21 + i) if i < 2 else None
     for f in range(34, 50, 2):  # the rings of the ribbed grip, their edges rounded
@@ -356,70 +359,205 @@ def rem870():
 # =========================================================================== AWM
 
 def awm():
+    """Accuracy International AWM (.338 Lapua Magnum): round action with an ejection port showing the bolt,
+    recoil lug and long top rail, the green AI stock on its aluminium chassis with hex screws and a side rail,
+    fluted barrel, two-port muzzle brake, a 5-25x56 scope on rings, folding bipod, and the folding thumbhole
+    stock with an adjustable cheek piece, spacers, butt pad and monopod."""
     g = gun("awm", "rifle", "bolt")
-    g.rod(-16, 12, 15, 0, 4.5, STEEL)  # round action
-    g.teeth_rail(-14, 22, 19.5, -3, 3)
-    g.box(-16, 12, 6, 12, -4.5, 4.5, AWM_GREEN)  # chassis under the action
-    fore = g.bevel(12, 54, 4, 14, -5, 5, AWM_GREEN, 1.5)
-    for c in fore[:2]:
-        slots(c, ("right", "left"), 16, 52, 7, 10, 6, 4, shade(AWM_GREEN, 0.6))
-    g.trigger(-12, 6)
-    g.pistol_grip(-18, -10, 8, 17, 6, AWM_GREEN, angle=8)
-    g.rod(54, 96, 15, 0, 2.8, DARK)
-    for c in g.rod(54, 86, 15, 0, 2.9, DARK):  # fluting
-        for side in ("right", "left"):
-            face = getattr(c, side)
-            for x in range(0, face.w, 2):
-                face.vline(x, GUNMETAL)
+    G = AWM_GREEN
+    ACT = "#3c3f44"
+    BBL = "#2b2d31"
+    # ---- action: a round receiver with the port on its upper right, bridge and front ring, recoil lug
+    pipe(g, -16, -6, 15, 0, 3.5, 1, ACT, n=12)
+    pipe(g, -6, 8, 15, 0, 3.5, 1, ACT, n=12, keep=lambda a: not 15 < a < 105)
+    pipe(g, 8, 13, 15, 0, 3.5, 1, ACT, n=12)
+    if hi():
+        for f0, f1 in ((-16, -13), (9, 13)):
+            pipe(g, f0, f1, 15, 0, 3.9, 1, ACT, n=12)  # rear bridge and front ring
+        g.box(-15, -11, 15, 16.5, 3.5, 4.5, ANOD, 1)  # bolt release
+        g.box(-15, -12, 15.5, 17, -4.5, -3.5, ANOD, 1)  # three-position safety
+        g.box(-13, -11, 16.5, 18, -4.8, -3.8, ANOD, 1, tilt=30, pivot=(-12, 16.5))
+    g.box(13, 15, 9.5, 19, -3.5, 3.5, "#26282c", 2)  # recoil lug
+    g.rod(15, 22, 15, 0, 3.2, BBL)  # barrel shank
+    # rail: a base on the action and a long picatinny rail
+    g.box(-15, 21, 18, 20, -2, 2, ANOD, 2)
+    g.teeth_rail(-14, 22, 19.5, -3, 3, ANOD)
+    # ---- chassis: the green stock round the action, the black aluminium bedding, screws, magazine well
+    body = g.box(-18, 13, 5, 13, -4.5, 4.5, G)
+    g.box(-18, 13, 12, 13.5, -5, 5, ANOD, 2)  # chassis rails along the action
+    for side, s0 in (("right", -4.5), ("left", 4.5)):
+        for f in (-14, 9):
+            stud(g, f, 10, s0, side, shade(SILVER, 0.6))
+    roll_mark(body, "left", -10, 6, 8, shade(G, 1.35))
+    for f0, f1, s0, s1 in ((-3.5, -2, -4.5, 4.5), (8, 9.5, -4.5, 4.5), (-3.5, 9.5, -4.5, -3.5), (-3.5, 9.5, 3.5, 4.5)):
+        g.box(f0, f1, 3, 5, s0, s1, G, 2)  # magazine well
+    # ---- fore-end: a channel for the floated barrel, end cap, flush cups, screws and a short side rail
+    g.bevel(13, 56, 4, 10, -5, 5, G, 1.5, edges=("bl", "br"))
+    for s0 in (-5, 3):
+        wall = g.box(13, 56, 9, 15, s0, s0 + 2, G)
+        mark(wall, "up", 13, 56, 0, 0, shade(G, 1.2), s0, s0 + 2)
+    g.box(13, 56, 9, 10, -3, 3, shade(G, 0.55), 1)  # the channel floor
+    g.box(56, 57, 4.5, 14.5, -4.5, 4.5, ANOD, 2)  # end cap
+    for side, s0 in (("right", -5), ("left", 5)):
+        for f in (20, 32, 46):
+            stud(g, f, 7, s0, side, shade(SILVER, 0.6))
+    if hi():
+        qd_cup(g, 51, 7, -5, "right", ANOD)
+        qd_cup(g, 51, 7, 5, "left", ANOD)
+        side_rail = g.box(29, 43, 8, 12, 5, 5.5, ANOD, 2)
+        for f in range(29, 42, 3):
+            g.box(f, f + 2, 8, 12, 5.5, 6.5, shade(ANOD, 1.1), 1)
+    # ---- trigger, guard and grip
+    g.box(-12, -10, 0, 5, -1, 1, G, 2)  # guard rear
+    g.box(-12, -2, -0.5, 1, -1, 1, G, 2)  # bottom
+    g.box(-3.5, -2, -0.5, 5, -1, 1, G, 2)  # front
+    g.box(-7.5, -6, 3, 5, -0.5, 0.5, SILVER, 1)  # trigger blade
+    g.box(-7, -5.5, 1.5, 3.2, -0.5, 0.5, SILVER, 1, tilt=-25, pivot=(-6.25, 3))
+    if hi():
+        g.box(-5, -4, 1.5, 4, -1.5, 1.5, ANOD, 1, tilt=15, pivot=(-4.5, 4))  # magazine release paddle
+    g.pistol_grip(-18, -10, 8, 17, 6, G, angle=8)
+    # ---- barrel: shank, fluted middle (lands standing between the flutes), plain muzzle end
+    g.rod(22, 28, 15, 0, 2.8, BBL)
+    g.rod(28, 84, 15, 0, 2.2, shade(BBL, 0.8))
+    if hi():
+        for ang in (0, 45, 90, 135):
+            c = g.box(28, 84, 12, 18, -0.5, 0.5, BBL, 2, inflate=-0.15, roll=ang if ang else 0.0, pivot=(56, 15, 0))
+            for face in (c.front, c.back):
+                face.vline(face.w // 2, shade(BBL, 1.5))  # the lands catch the light
+    g.rod(84, 94, 15, 0, 2.8, BBL)
+    g.rod(94, 96, 15, 0, 2.4, shade(BBL, 1.2))  # thread
     g.muzzle = (104.0, 15.0)
-    g.part("bolt", -8, 15, -4)
+    # ---- bolt: body seen through the port, lugs, shroud with the cocking indicator, handle with a big knob
+    g.part("bolt", -8, 15, 0)
     g.use("bolt")
-    g.rod(-22, -16, 15, 0, 2.5, STEEL)
-    g.box(-8, -5, 14, 16, -10, -4, SILVER, 1)
-    g.rod(-11, -3, 15, -12, 3, POLY)  # big bolt knob
+    BOLT = "#8f959c"
+    g.rod(-16, 8, 15, 0, 2.4, BOLT)
+    for c in g.rod(5, 8, 15, 0, 2.5, shade(BOLT, 1.1)):  # locking lugs
+        ribs(c, ("right", "left", "up", "down"), 2, shade(BOLT, 0.6))
+    g.rod(-22, -16, 15, 0, 2.8, ANOD)  # shroud
+    g.rod(-24, -22, 15, 0, 1.4, ANOD)
+    if hi():
+        g.box(-24.4, -23.4, 14.5, 15.5, -0.5, 0.5, RED, 0)  # cocked indicator
+    KNOB = "#44474d"
+    g.box(-11, -8, 14, 16, -10, -2, GUNMETAL, 2)  # handle
+    g.rod(-12, -7, 15, -12, 2.6, KNOB)  # knob: three crossed rounds make a ball
+    if hi():
+        scyl(g, -9.5, 15, -14.5, -9.5, 2.4, KNOB)
+        vcyl(g, -9.5, -12, 12.6, 17.4, 2.4, KNOB)
     g.use("frame")
+    # ---- magazine (def_mag): .338 five-round box, exactly as mag_profile describes it
     mag_bones(g, 4, 6)
-    mg = g.box(-2, 10, 0, 8, -3.5, 3.5, DARK)
-    ribs(mg, ("right", "left"), 2, shade(DARK, 1.6))
-    g.box(-3, 11, -2, 0, -4, 4, POLY)
-    g.mag_profile = dict(f0=-2, top=8, width=7, segs=[(0, 10)], color=DARK, kind="sniper")
+    MG = "#222428"
+    mg = g.box(-2, 8, -2, 8, -3.5, 3.5, MG)
+    for side in ("right", "left"):
+        for u in (0, 3, 6):
+            mark(mg, side, -1, 7, u, u + 1, shade(MG, 1.5))  # pressed ribs
+    g.box(-3, 9, -4, -2, -4.5, 4.5, shade(MG, 0.85))  # floor plate
+    if hi():
+        g.box(7, 9, -3.5, -2, -4, 4, shade(MG, 1.1), 1)  # its lip
+        mag_lips(g, -2, 8, 8, 7, MG, round_len=9, r=1.4)
+    g.mag_profile = dict(f0=-2, top=8, width=7, segs=[(0, 10)], color=MG, kind="sniper")
+    # ---- factory scope (def_optic): 5-25x56 on two rings
     g.mount("optic", 4, 22.5, length=36)
     g.use("def_optic")
-    g.box(-2, 2, 22.5, 28, -3, 3, BLACK)  # rings
-    g.box(18, 22, 22.5, 28, -3, 3, BLACK)
-    g.rod(-12, 26, 29, 0, 3.5, POLY)  # factory 3-12x scope
-    g.rod(26, 30, 29, 0, 4.5, POLY)
-    g.rod(30, 42, 29, 0, 5.5, POLY)
-    g.rod(-22, -12, 29, 0, 4.5, POLY)
-    g.rod(-24, -22, 29, 0, 3.5, RUBBER)
-    g.lens(42, 25, 33, -3, 3)
-    g.lens(-25, 26, 32, -2, 2, "#7fd0f5")
-    g.box(6, 10, 32, 36, -2, 2, BLACK)
-    g.box(6, 10, 27, 31, -8, -3, BLACK)
-    g.box(7, 9, 36, 37, -1, 1, SILVER, 1)
+    SC = "#26282c"
+    for f0 in (-6, 14):
+        g.box(f0, f0 + 4, 22.5, 26.5, -3, 3, ANOD, 2)  # ring base and clamp
+        stud(g, f0 + 2, 23.8, 3, "left", shade(SILVER, 0.7), d=1.6)
+        g.rod(f0 + 0.5, f0 + 3.5, 29, 0, 3.7, ANOD)  # ring
+        if hi():
+            g.box(f0 + 0.5, f0 + 3.5, 28.5, 29.5, -4, 4, shade(ANOD, 1.2), 1, inflate=-0.1)  # cap split and screws
+    tube = g.rod(-11, 24, 29, 0, 3, SC)
+    for c in tube:
+        for side in ("left",):
+            roll_mark(c, side, -9, 0, 28, shade(SILVER, 0.6))
+    for c in g.bevel(1, 9, 25.5, 32.5, -3.5, 3.5, SC, 1.5):  # turret saddle
+        pass
+    el = vcyl(g, 5, 0, 32, 35, 2.4, SC)  # elevation turret, zero ring, cap
+    vcyl(g, 5, 0, 32.5, 33.5, 2.7, shade(SC, 1.3))
+    vcyl(g, 5, 0, 35, 36, 2.0, shade(SC, 0.8))
+    for c in el:
+        for face in (c.right, c.left):
+            for y in range(0, face.h, 2):
+                face.px(face.w - 1, y, WHITE)  # the click scale
+    scyl(g, 5, 29, -7, -3.5, 2.2, SC)  # windage
+    scyl(g, 5, 29, -8, -7, 1.8, shade(SC, 0.8))
+    scyl(g, 5, 29, 3.5, 7, 2.2, SC)  # parallax
+    illum = scyl(g, 5, 29, 7, 9, 1.6, shade(SC, 1.1))  # illumination
+    for c in illum:
+        c.left.px(0, 0, RED)
+    cone(g, -14, -11, 29, 0, 3.7, 3.0, 1, SC, n=12)
+    for c in g.rod(-17, -14, 29, 0, 3.7, SC):  # magnification ring
+        ribs(c, ("right", "left", "up", "down"), 2, shade(SC, 1.4))
+    g.box(-16, -15, 32, 34, -0.5, 0.5, SC, 1)  # its throw lever
+    g.rod(-24, -17, 29, 0, 4, SC)  # ocular
+    for c in g.rod(-24, -22, 29, 0, 4.1, SC):  # dioptre ring
+        ribs(c, ("right", "left", "up", "down"), 2, shade(SC, 1.4))
+    pipe(g, -27, -24, 29, 0, 3.8, 1, RUBBER, n=12)  # eyecup
+    g.lens(-26, 26.5, 31.5, -2.5, 2.5, "#7fd0f5")
+    cone(g, 24, 28, 29, 0, 3.0, 5.0, 1, SC)  # objective bell
+    bell = pipe(g, 28, 42, 29, 0, 5, 1, SC)
+    g.lens(38, 26, 32, -3, 3)
+    # ---- muzzle brake (def_muzzle): two chambers with big side ports
     g.mount("muzzle", 96, 15, bore=2.8)
     g.use("def_muzzle")
-    brake = g.bevel(96, 104, 11, 19, -4, 4, DARK, 1)
-    for c in brake[:2]:
-        for side in ("right", "left"):
-            mark(c, side, 98, 100, 13, 17, "#060607")
-            mark(c, side, 101, 103, 13, 17, "#060607")
+    BR = "#2b2d31"
+    g.rod(96, 98, 15, 0, 3.4, BR)
+    for f0 in (98, 101):
+        pipe(g, f0, f0 + 2, 15, 0, 3.4, 1, BR, n=12, keep=lambda a: not (50 < a < 130 or 230 < a < 310))
+        g.rod(f0, f0 + 2, 15, 0, 1.4, DARK)  # the blast seen through the port
+    g.rod(100, 101, 15, 0, 3.4, BR)
+    g.rod(103, 104, 15, 0, 3.4, BR)
+    g.box(103.4, 104.4, 13.5, 16.5, -1.5, 1.5, DARK, 0, inflate=-0.1)  # bore
+    # ---- bipod (def_underbarrel): yoke on the fore-end, legs folded forward under the barrel
     g.mount("underbarrel", 42, 4)
     g.use("def_underbarrel")
-    g.box(44, 48, 1, 4, -3, 3, BLACK)
-    g.rod(22, 46, 2, -3, 1, SILVER)
-    g.rod(22, 46, 2, 3, 1, SILVER)
-    g.mount("side", 36, 10, 5, length=10, default=False)
+    g.box(42, 48, 1.5, 4, -3.5, 3.5, ANOD, 2)
+    g.box(43, 47, 0.5, 1.5, -2, 2, ANOD, 1)
+    for s in (-2.5, 2.5):
+        scyl(g, 46, 2.5, s - 1, s + 1, 1.3, ANOD)  # leg hinge
+        g.rod(46, 64, 2.5, s, 1.0, ANOD)  # upper leg
+        g.rod(64, 72, 2.5, s, 0.7, shade(SILVER, 0.85))  # extension
+        g.box(63.5, 65, 1.5, 3.5, s - 1, s + 1, ANOD, 1)  # leg lock
+        g.box(72, 74, 1.2, 3.8, s - 1.3, s + 1.3, RUBBER, 1)  # foot
+    g.mount("side", 36, 10, 6.5, length=10, default=False)
+    # ---- folding thumbhole stock (def_stock)
     g.mount("stock", -18, 12)
     g.use("def_stock")
-    g.box(-50, -18, 14, 18, -4, 4, AWM_GREEN)  # thumbhole stock: top bar
-    g.box(-50, -24, 2, 6, -4, 4, AWM_GREEN)  # bottom bar
-    g.box(-26, -18, 2, 14, -4, 4, AWM_GREEN)  # front post (behind the grip)
-    g.bevel(-58, -46, 2, 18, -4.5, 4.5, AWM_GREEN, 1.5)  # butt
-    g.box(-46, -28, 18, 21, -3, 3, AWM_GREEN)  # cheek piece
-    g.box(-44, -42, 21, 22, -1, 1, SILVER, 1)
-    g.bevel(-60, -58, 2, 18, -4.5, 4.5, RUBBER, 1)
-    g.box(-52, -48, -4, 2, -1.5, 1.5, DARK)  # monopod
+    g.box(-37, -18, 8, 12, -4, 4, G)  # top bar under the bolt's travel
+    g.box(-22, -18, 2, 9, -4, 4, G)  # hinge block behind the grip
+    if hi():
+        for u0 in (3, 6.5, 10):
+            vcyl(g, -20, 4.7, u0, u0 + 2, 0.8, ANOD)  # hinge knuckles
+        g.box(-21, -19, 2, 12.5, 4, 4.5, ANOD, 1)
+    lean = -math.degrees(math.atan2(4.5, 17.5))
+    g.box(-38, -18.5, -5, -1, -3.5, 3.5, G, tilt=lean, pivot=(-38, -5))  # bottom bar up to the grip's foot
+    g.box(-41, -35, 0, 8, -4, 4, G, tilt=-35, pivot=(-37, 0))  # the thumbhole's rounded back
+    butt = g.bevel(-58, -37, -5, 14, -4.5, 4.5, G, 1.5)
+    for c in butt[:2]:
+        for side in ("right", "left"):
+            mark(c, side, -54, -40, 4, 5, shade(G, 0.75))  # moulded line
+    if hi():
+        for f in (-54, -41):
+            vcyl(g, f, 0, 14, 15, 0.6, SILVER)  # cheek piece posts
+        g.box(-51, -45, 14.5, 15.5, -1, 1, ANOD, 1)  # its clamp knob
+        qd_cup(g, -52, 0, -4.5, "right", ANOD)
+        qd_cup(g, -52, 0, 4.5, "left", ANOD)
+    g.bevel(-56, -38, 15, 19, -3.5, 3.5, G, 1)  # adjustable cheek piece
+    for i, f0 in enumerate((-59, -60)):  # spacers
+        g.box(f0, f0 + 1, -5, 14, -4.25, 4.25, ANOD if i == 0 else shade(G, 0.8), 1)
+    pad = g.bevel(-62, -60, -6, 15, -4.5, 4.5, RUBBER, 1)
+    for c in pad[:2]:
+        for x in range(1, c.bottom.w, 2):
+            c.bottom.vline(x, shade(RUBBER, 0.6))
+    # monopod: a knurled wheel and a retracted spike in the butt's foot
+    vcyl(g, -52, 0, -9, -5, 0.8, SILVER)
+    wheel = vcyl(g, -52, 0, -7.5, -6, 2.2, ANOD)
+    for c in wheel:
+        for face in (c.right, c.left):
+            for y in range(0, face.h, 2):
+                face.hline(y, shade(ANOD, 1.5))
+    g.box(-54, -50, -10, -9, -1.5, 1.5, RUBBER, 1)
     g.use("frame")
     return g
 

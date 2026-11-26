@@ -112,7 +112,7 @@ Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, Holographic Sight + 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
 | optic | 10 | 20 | 0.0 | 16 |
-| muzzle | 82 | 12 | 0.0 | - |
+| muzzle | 82 | 12.0 | 0.0 | - |
 | underbarrel | 48 | 6 | 0.0 | 12 |
 | side | 48 | 10 | 5 | 10 |
 | stock | -10 | 10 | 0.0 | - |
@@ -123,7 +123,7 @@ Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, Holographic Sight + 
 
 | Slot | f | u | s | rail length |
 | --- | --- | --- | --- | --- |
-| optic | 9 | 29 | 0.0 | 26 |
+| optic | 9 | 29.5 | 0.0 | 26 |
 | muzzle | 102 | 14.5 | 0.0 | - |
 | underbarrel | 80 | 6 | 0.0 | - |
 | side | 44 | 14.5 | 6 | 10 |
@@ -137,7 +137,7 @@ Takes: Red Dot Sight, Holographic Sight, Holographic Sight + 3x Magnifier, 2x Pr
 | --- | --- | --- | --- | --- |
 | optic | 8 | 19 | 0.0 | 12 |
 | muzzle | 92 | 15 | 0.0 | - |
-| side | 40 | 9 | 5 | 10 |
+| side | 42 | 9 | 5 | 10 |
 | stock | -6 | 12 | 0.0 | - |
 
 Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Full Choke, Cylinder Choke, Laser Sight, Tactical Flashlight, Laser-Light Module, Heavy Stock, Extended Tube.
@@ -149,7 +149,7 @@ Takes: Mini Reflex Sight, Red Dot Sight, Holographic Sight, 2x Prism Sight, Full
 | optic | 4 | 22.5 | 0.0 | 36 |
 | muzzle | 96 | 15 | 0.0 | - |
 | underbarrel | 42 | 4 | 0.0 | - |
-| side | 36 | 10 | 5 | 10 |
+| side | 36 | 10 | 6.5 | 10 |
 | stock | -18 | 12 | 0.0 | - |
 
 Takes: 4x Combat Scope, 1-6x Variable Scope, 8x Marksman Scope, 12x Sniper Scope, 4x Night Vision Scope, Rifle Suppressor, Muzzle Brake, Bipod, Laser Sight, Tactical Flashlight, Laser-Light Module, Precision Stock, Extended Magazine, Quick-Pull Magazine.

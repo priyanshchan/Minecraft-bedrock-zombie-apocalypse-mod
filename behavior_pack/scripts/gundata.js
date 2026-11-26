@@ -379,7 +379,7 @@ export const GUN_DATA = {
         },
         "muzzle": {
           "f": 82,
-          "u": 12,
+          "u": 12.0,
           "s": 0.0,
           "length": 0,
           "bore": 2,
@@ -448,7 +448,7 @@ export const GUN_DATA = {
       "mounts": {
         "optic": {
           "f": 9,
-          "u": 29,
+          "u": 29.5,
           "s": 0.0,
           "length": 26,
           "bore": 2.0,
@@ -540,7 +540,7 @@ export const GUN_DATA = {
           "parent": "gun"
         },
         "side": {
-          "f": 40,
+          "f": 42,
           "u": 9,
           "s": 5,
           "length": 10,
@@ -619,7 +619,7 @@ export const GUN_DATA = {
         "side": {
           "f": 36,
           "u": 10,
-          "s": 5,
+          "s": 6.5,
           "length": 10,
           "bore": 2.0,
           "parent": "gun"

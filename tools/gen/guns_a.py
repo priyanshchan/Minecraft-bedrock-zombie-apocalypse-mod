@@ -218,6 +218,20 @@ def text(n, seed=0, tall=()):
     return ["".join(top)[:n], "".join(low)[:n]]
 
 
+def repaint(c, side, fn):
+    """Repaint a side texel by texel: fn(f, u, old) gives the new colour (or None to keep it), (f, u) being the
+    texel's centre in the box's own (unturned) coordinates."""
+    bf0, bf1, bu0, bu1, bs0, bs1 = c.ext
+    face = getattr(c, FACES[side])
+    for y in range(face.h):
+        for x in range(face.w):
+            f = bf1 - y - 0.5
+            u = bu0 + x + 0.5 if side == "right" else bu1 - x - 0.5
+            col = fn(f, u, face.get(x, y))
+            if col is not None:
+                face.px(x, y, col)
+
+
 def coil(g, f0, f1, cu, cs, r, color, pitch=2, bone=None):
     """A coil spring along f: turns every `pitch` units round a thin core."""
     g.rod(f0, f1, cu, cs, r * 0.55, shade(color, 0.6), 1, bone=bone)
@@ -286,7 +300,7 @@ def glock17():
         for side in ("right", "left"):
             mark(c, side, 10, 13, 7, 9, DARK)
     for f, u in ((-3.5, 6.5), (4, 6), (9, 5)):  # trigger housing, trigger and locking block pins
-        spin(g, f + 0.5, u + 0.5, -2.8, 2.8, 0.55, PIN, facets=2)
+        g.box(f, f + 1, u, u + 1, -3, 3, PIN, 1, inflate=-0.12)
     g.box(-0.5, 1.5, 1.5, 3.5, 3, 4, PD, 1)  # magazine catch
     g.box(-0.5, 1.5, 1.5, 3.5, -4, -3, PD, 1)
 
@@ -396,48 +410,169 @@ def glock17():
 
 
 def m1911():
+    """Colt M1911A1, .45 ACP: a blued slide with a rounded top, fine rear serrations, a low ejection port and a
+    nose that wraps the barrel bushing and the recoil spring plug; a spur hammer (cocked), the grip safety's
+    short tang, the thumb safety, plunger tube and slide stop on the left, checkered walnut grips with their
+    screws, an arched mainspring housing with the lanyard loop."""
     g = gun("m1911", "pistol", "pistol")
-    frame = g.box(-6, 25, 3, 9, -2.5, 2.5, BLUED)
-    g.box(14, 25, 2, 3, -2, 2, BLUED)  # dust cover
-    g.box(0, 12, 0, 1, -1, 1, BLUED)  # trigger guard
-    g.box(11, 12, 0, 4, -1, 1, BLUED)
-    g.box(3, 5, 1, 5, -0.5, 0.5, SILVER, 1)  # long trigger
-    grip = g.pistol_grip(-8, 2, 4, 17, 5, BLUED, angle=16, stipple=False)
-    for sx, side in ((2.5, "left"), (-3.5, "right")):  # walnut grip panels with checkering and screws
-        p = g.box(-7, 1, -10, 2, sx, sx + 1, WALNUT, 3, tilt=-16, pivot=(-3, 4))
-        face = getattr(p, "left" if side == "left" else "right")
-        for y in range(1, face.h - 1):
-            for x in range(1 + (y % 2), face.w - 1, 2):
-                face.px(x, y, shade(WALNUT, 0.7))
-        face.px(face.w // 2, 2, SILVER)
-        face.px(face.w // 2, face.h - 3, SILVER)
-    g.box(-11, -6, 7, 10, -2, 2, BLUED)  # grip safety beavertail
-    g.box(-12, -10, 6, 9, -1.5, 1.5, BLUED)
-    g.box(-8, -3, -12, -10, -2, 2, BLUED, tilt=-16, pivot=(-3, 4))  # arched mainspring housing
-    g.box(-6, -2, 9, 11, 2.5, 3.5, BLUED)  # thumb safety
-    g.box(2, 10, 8, 9, 2.5, 3.5, BLUED)  # slide stop
-    g.pin(10, 6, 2.5, "left")
-    g.pin(-4, 6, 2.5, "left")
-    mark(frame, "left", 6, 14, 4, 6, shade(BLUED, 1.4))
-    g.part("hammer", -6, 12)
-    g.box(-9, -6, 11, 16, -1, 1, BLUED, tilt=15, pivot=(-6, 12), bone="hammer")
+    BL, BD, BLL = BLUED, shade(BLUED, 0.8), shade(BLUED, 1.25)
+    PIN = shade(SILVER, 0.6)
+    gr = Raked(g, -16, (-3, 4))  # the grip, raked 16 degrees
+
+    # ------------------------------------------------------------ frame
+    fr = g.box(-6, 14, 4, 9, -2.5, 2.5, BL)  # receiver over the trigger
+    dc = cham(g, 14, 25, 6, 9, -2.5, 2.5, BL, t=0, b=1)  # dust cover round the recoil spring
+    g.box(11, 14, 4, 6, -2.5, 2.5, BL)
+    g.box(13, 15, 4.5, 6.5, -2.5, 2.5, BL, inflate=-0.3, tilt=45, pivot=(14, 5.5))
+    for side in ("right", "left"):
+        mark(fr, side, -6, 14, 8, 9, BD)  # frame rails under the slide
+        mark(dc, side, 14, 25, 8, 9, BD)
+        mark(fr, side, 0, 3, 4, 7, shade(BL, 0.85))  # A1 finger relief cuts behind the trigger
+    engrave(fr, "left", 2, 6, text(7, 11), shade(BL, 1.6))  # UNITED STATES PROPERTY / M1911A1 U.S. ARMY
+    engrave(dc, "right", 15, 7, text(7, 12)[1:], shade(BL, 1.6))  # serial
+    mark(fr, "down", 2.5, 5, 0, 0, DARK, -1, 1)  # trigger slot
+    # grip safety tang over the web of the hand
+    g.box(-11, -6, 6.5, 9, -2, 2, BL)
+    g.box(-11.5, -10.5, 6.75, 8.75, -1.5, 1.5, BL, inflate=0.1, tilt=45, pivot=(-11, 7.75))
+    edge(g, -11, -6, 6.5, 1.5, BD, 0.5)
+    edge(g, -11, -6, 6.5, -1.5, BD, 0.5)
+    # trigger guard: round-fronted
+    g.box(1, 10, 0, 1, -1, 1, BL)
+    g.box(9.5, 11, 0.2, 1.2, -1, 1, BL, tilt=30, pivot=(10.3, 0.7))
+    g.box(10.8, 11.8, 1, 3, -1, 1, BL)
+    g.box(10.3, 11.3, 2.8, 4.6, -1, 1, BL, tilt=-30, pivot=(10.8, 3.7))
+    edge(g, 1, 10, 0.5, 0.5, BD, 0.5)
+    g.box(0.5, 1.5, 0.5, 1.5, -1, 1, BL, inflate=-0.15, tilt=45)
+    # short A1 trigger with a serrated face
+    tr = g.box(3, 4, 1.5, 5, -1, 1, shade(STEEL, 1.1), 2)
+    g.box(3.2, 4.2, 0.7, 1.7, -1, 1, shade(STEEL, 1.1), 2, tilt=25, pivot=(3.7, 1.7))
+    for u in (2, 4):
+        endmark(tr, "front", -1, 1, u, u + 1, shade(STEEL, 0.7))
+    # slide stop: checkered thumb pad, lever arm forward to its pin (whose end shows on the right)
+    pad = g.box(1, 4, 8, 10, 2.5, 3.5, BL, 1)
+    knurl(pad, "left", 1, 4, 8, 10, BD)
+    g.box(3, 9.5, 7.5, 8.5, 2.5, 3.2, BL, 1, tilt=-12, pivot=(3, 8))
+    spin(g, 9.5, 7, 2.5, 3.5, 0.9, BL, facets=2)
+    g.box(9, 10, 6.5, 7.5, -3, -2, PIN, 1)
+    # plunger tube (staked to the frame) between slide stop and thumb safety
+    g.rod(-3, 1, 8.5, 3, 0.6, BL, facets=1)
+    g.box(-2.5, 0.5, 7.5, 8.5, 2.5, 3.2, BD, 1)
+    g.box(0.5, 1, 8.2, 8.8, 3.2, 3.8, BL, 1, inflate=-0.1)
+    # thumb safety
+    g.box(-8, -5, 8, 10, 2.5, 3.5, BL, 1)
+    g.box(-8.5, -7.5, 8.5, 9.5, 2.5, 3.5, BL, 1, inflate=0.2, tilt=45, pivot=(-8, 9))
+    g.box(-5, -2, 9, 10, 2.5, 3.5, BL, 1)
+    ts = g.box(-3, -1.5, 9, 10, 3, 4, BLL, 1)
+    knurl(ts, "left", -3, -1, 9, 10, BD)
+    # pins on the right side: hammer, sear, thumb safety shaft
+    for f, u in ((-8.5, 8), (-5, 7), (-8.5, 9.5)):
+        g.box(f, f + 1, u, u + 1, -3, -2, PIN, 1, inflate=-0.1)
+    g.box(-0.5, 1.5, 2.5, 4.5, 2.6, 3.6, shade(BL, 1.15), 1)  # magazine catch, checkered
+    g.box(0, 1, 3, 4, 3.4, 3.9, BD, 1, inflate=-0.1)
+
+    # ------------------------------------------------------------ grip: walnut double-diamond panels
+    gr.box(-7, 1, -13, 4, -2.5, 2.5, BL)
+    gr.box(-8, 2, -13, 4, -1.5, 1.5, BL)
+    for f in (-7, 1):
+        for s in (-1.5, 1.5):
+            gr.vedge(f, s, -13, 3.5, BL)
+    gr.box(-8.5, -7.5, -4, 3, -1.5, 1.5, BL, 2)  # grip safety lever
+    msh = gr.box(-9, -8, -11, -5, -1.5, 1.5, BL)  # arched mainspring housing
+    gr.box(-9, -8, -12, -11, -1.5, 1.5, BL, extra=45, inflate=-0.15)
+    gr.box(-9, -8, -5, -4, -1.5, 1.5, BL, extra=45, inflate=-0.15)
+    for u in range(-11, -5, 2):
+        endmark(msh, "rear", -1.5, 1.5, u, u + 1, BD)  # its serrations
+    for side, (s0, s1), d in (("left", (2.5, 3.5), 1), ("right", (-3.5, -2.5), -1)):
+        p = gr.box(-6.5, 0.5, -11, 2, s0, s1, WALNUT, 2)
+
+        def checker(f, u, old, side=side):
+            di = min(abs(f + 3) / 2.6 + abs(u - h) / 3.2 for h in (-8.5, -0.5))
+            if di <= 1:
+                return shade(WALNUT_L, 1.0 + 0.1 * (1 - di))  # the smooth diamonds round the screws
+            return shade(WALNUT, 0.72) if (int(f + 20) + int(u + 20)) % 2 else shade(WALNUT_L, 0.95)
+        repaint(p, side, checker)
+        for u in (-11.5, 2.5):
+            gr.box(-6.5, 0.5, u - 0.5, u + 0.5, s0, s1, WALNUT, 1, extra=45, inflate=-0.15)
+        for u in (-8.5, -0.5):  # grip screws
+            sc = gr.box(-3.5, -2.5, u - 0.5, u + 0.5, s0 + 0.5 * d + 0.5, s1 + 0.5 * d - 0.5, PIN, 1, inflate=0.1)
+            mark(sc, side, -3.5, -2.5, u - 0.5, u + 0.5, shade(SILVER, 0.75))
+    gr.pin(-8.5, -12, -2, 2, 0.5, PIN)  # mainspring housing pin
+    # lanyard loop
+    for f0 in (-9.5, -7.5):
+        gr.box(f0, f0 + 1, -15, -13, -0.5, 0.5, STEEL, 1)
+    gr.box(-9.5, -6.5, -15.5, -14.5, -0.5, 0.5, STEEL, 1)
+
+    # ------------------------------------------------------------ barrel (stays put while the slide runs back)
+    for c in g.rod(6, 30, 12, 0, 1.4, GUNMETAL, facets=3):
+        endmark(c, "front", -0.5, 0.5, 11.5, 12.5, DARK)
+    g.box(7, 11, 10.5, 14.5, -2, 1, GUNMETAL, 2)  # chamber hood in the ejection port
+    g.box(7, 8, 11, 13, -2.2, -1.2, shade(GUNMETAL, 0.7), 1)
+    g.muzzle = (30.0, 12.0)
+
+    # ------------------------------------------------------------ hammer: the A1 spur hammer, cocked
+    g.part("hammer", -8, 8.5)
+    hr = Raked(g, 40, (-8, 8.5))
+    hr.box(-1, 1, -1, 1, -1, 1, BL, 2, bone="hammer")
+    hr.box(-1, 1, -1, 1, -1, 1, BL, 2, extra=45, inflate=0.15, bone="hammer")
+    hr.box(-0.8, 1, 1, 3.5, -1, 1, BL, 2, bone="hammer")
+    spur = hr.box(-2, 0.5, 3.5, 5, -1, 1, BL, 2, bone="hammer")
+    for f in (-1.5, -0.5):
+        mark(spur, "up", f, f + 0.5, 0, 0, BD)
+    hr.box(-2.5, -1.5, 3.7, 4.7, -1, 1, BL, 2, extra=45, inflate=-0.1, bone="hammer")
+
+    # ------------------------------------------------------------ slide
     g.part("slide", 10, 12)
     g.use("slide")
-    g.bevel(-7, 28, 9, 15, -2.5, 2.5, BLUED, 1)
-    sl = g.box(-7, 28, 10, 14, -2.7, 2.7, BLUED)
-    for side in ("right", "left"):
-        for f in range(-6, 1, 2):
-            mark(sl, side, f, f + 1, 10, 14, DARK)
-    mark(sl, "left", 8, 20, 11, 12, shade(BLUED, 1.5))
-    g.box(4, 12, 12, 15, -3, -1, DARK)  # ejection port
-    g.box(-6, -3, 15, 17, -1.5, 1.5, DARK)
-    g.box(24, 26, 15, 16.5, -0.4, 0.4, DARK)
-    g.rod(27, 30, 12, 0, 2.6, BLUED)  # barrel bushing
-    g.box(29.5, 30, 11, 13, -1, 1, "#050505", 0)
-    g.muzzle = (30.0, 12.0)
+    rear = g.box(-7, -6, 9, 14, -2.5, 2.5, BL)
+    endmark(rear, "rear", -1, 1, 10, 13, BD)  # firing pin stop
+    endmark(rear, "rear", -0.5, 0.5, 11.5, 12.5, DARK)
+    ridges(g, -6, 0, 9, 14, -2.5, 2.5, BL)  # rear serrations
+    m1 = g.box(0, 6, 9, 14, -2.5, 2.5, BL)
+    g.box(6, 11, 9, 11, -2.5, 2.5, BL)  # under the ejection port
+    g.box(6, 11, 11, 14, 0, 2.5, BL)
+    g.box(6, 7, 11, 14, -2, 0, DARK, 0)
+    m2 = g.box(11, 29, 9, 14, -2.5, 2.5, BL)
+    g.box(-7, 6, 14, 15, -1.5, 1.5, BL)  # the top, rounded over
+    g.box(6, 11, 14, 15, 0, 1.5, BL)
+    g.box(11, 29, 14, 15, -1.5, 1.5, BL)
+    edge(g, -7, 29, 14, 1.5, BLL)
+    edge(g, -7, 6, 14, -1.5, BLL)
+    edge(g, 11, 29, 14, -1.5, BLL)
+    g.box(-7, 29, 14.6, 15.2, -1, 1, shade(BL, 1.1), 1)  # matted sight plane
+    nose = g.box(25, 29, 6, 9, -2.5, 2.5, BL)  # the nose wraps the recoil spring plug
+    edge(g, 25, 29, 6.5, 2, BD, 0.5)
+    edge(g, 25, 29, 6.5, -2, BD, 0.5)
+    g.box(28.5, 29.5, 5.5, 6.5, -2.5, 2.5, BL, inflate=-0.3, tilt=45, pivot=(29, 6))
+    for c in g.rod(28.5, 29.5, 12, 0, 2, shade(BL, 1.1), facets=3):  # barrel bushing
+        pass
+    for c in g.rod(28.5, 29.5, 8, 0, 1.1, shade(BL, 1.15), facets=2):  # recoil spring plug
+        endmark(c, "front", -0.5, 0.5, 7.5, 8.5, BD)
+    mark(m1, "left", 1, 4, 9, 10, BD)  # slide stop notch
+    mark(m2, "left", 11, 13, 9, 10, BD)  # disassembly notch
+    engrave(m2, "left", 12, 12, text(13, 21, (0, 6)), shade(BL, 1.6))  # PATENTED ... / COLT'S PT. F.A. MFG. CO.
+    engrave(m2, "left", 12, 10, text(11, 22)[1:], shade(BL, 1.6))
+    engrave(m2, "right", 15, 12, text(10, 23, (0,)), shade(BL, 1.6))  # MODEL OF 1911. U.S. ARMY
+    # sights: a small notch rear sight and the staked half-moon front blade
+    g.box(-6, -3, 15, 16, -1.5, 1.5, BD, 1)
+    for s0 in (-1.5, 0.5):
+        g.box(-6, -3.5, 16, 17, s0, s0 + 1, BD, 1)
+    g.box(24, 26, 15, 17, -0.5, 0.5, BD, 1)
+    g.box(25.5, 26.5, 15, 16.5, -0.5, 0.5, BD, 1, tilt=40, pivot=(26, 15))
+
+    # ------------------------------------------------------------ magazine: seven rounds of .45, flat base
     mag_bones(g, -3, -10)
-    g.box(-8, 1, -13, -11, -2.5, 2.5, STEEL, tilt=-16, pivot=(-3, 4))
-    g.mag_profile = dict(f0=-8, f1=1, top=-11, length=3, width=5, tilt=-16, pivot=(-3, 4), color=STEEL, kind="pistol")
+    mg = Raked(g, -16, (-3, 4))
+    body = mg.box(-6.5, 0, -13, 3, -2, 2, STEEL, 2)
+    for side in ("right", "left"):
+        for u in (-10, -7, -4):  # witness holes
+            mark(body, side, -4, -3, u, u + 1, DARK)
+    base = mg.box(-7, 0.5, -14, -13, -2, 2, shade(STEEL, 0.85), 2)
+    mark(base, "down", -6, 0, 0, 0, shade(STEEL, 0.6), -0.5, 0.5)
+    g.box(-6, 0, 4, 5, -2, -1, STEEL, 1)  # feed lips
+    g.box(-6, 0, 4, 5, 1, 2, STEEL, 1)
+    cartridge(g, -6, 5.4, 0, 6.2, 1.15)
+    g.mag_profile = dict(f0=-6.5, f1=0, top=-13, length=1, width=4, tilt=-16, pivot=(-3, 4), color=STEEL,
+                         kind="pistol")
     g.mount("muzzle", 30, 12, default=False, parent="slide", bore=2.3)
     g.use("frame")
     return g
